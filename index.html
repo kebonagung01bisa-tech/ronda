@@ -11,7 +11,10 @@
     <style>
         .page-content { display: none; }
         .page-content.active { display: block; }
-        .tab-btn.active { border-bottom: 2px solid #3b82f6; color: #3b82f6; font-weight: 600; }
+        /* Style baru untuk Bottom Navbar */
+        .tab-btn { color: #94a3b8; transition: all 0.2s ease-in-out; }
+        .tab-btn.active { color: #2563eb; }
+        .tab-btn.active i { transform: scale(1.25); }
         .rotate-180 { transform: rotate(180deg); }
         /* Kustom Scrollbar untuk Thumbnail Foto */
         .hide-scroll::-webkit-scrollbar { height: 6px; }
@@ -20,7 +23,7 @@
         .hide-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-10">
+<body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-24">
 
     <!-- LOGIN SCREEN (LOCK) -->
     <div id="login-screen" class="fixed inset-0 bg-blue-700 z-[300] flex flex-col items-center justify-center text-white transition-opacity duration-500 p-4">
@@ -69,7 +72,7 @@
             </div>
         </div>
 
-        <!-- Navbar -->
+        <!-- Navbar Header -->
         <nav class="bg-blue-600 text-white shadow-md relative z-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
@@ -105,31 +108,8 @@
             </div>
         </nav>
 
-        <!-- Menu Tabs -->
-        <div class="bg-white shadow mb-6 relative z-0">
-            <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-                <div class="flex space-x-4 sm:space-x-8 overflow-x-auto hide-scroll px-2 sm:px-0" id="nav-tabs">
-                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
-                        <i class="fa-solid fa-chart-line mr-1"></i> Dashboard
-                    </button>
-                    <button onclick="switchTab('presensi')" id="tab-presensi" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
-                        <i class="fa-solid fa-clipboard-user mr-1"></i> Presensi Ronda
-                    </button>
-                    <button onclick="switchTab('kas-lainnya')" id="tab-kas-lainnya" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
-                        <i class="fa-solid fa-money-bill-transfer mr-1"></i> Kas Lainnya
-                    </button>
-                    <button onclick="switchTab('realisasi')" id="tab-realisasi" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
-                        <i class="fa-solid fa-camera-retro mr-1"></i> Realisasi
-                    </button>
-                    <button onclick="switchTab('aspirasi')" id="tab-aspirasi" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
-                        <i class="fa-solid fa-bullhorn mr-1"></i> Aspirasi
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Content (Milik App Container) -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative pt-6">
 
             <!-- DASHBOARD -->
             <div id="page-dashboard" class="page-content active">
@@ -139,7 +119,7 @@
                 </div>
                 
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                    <!-- Card Saldo Kas (Diubah ke switchTab) -->
+                    <!-- Card Saldo Kas -->
                     <div class="bg-white rounded-lg shadow-sm sm:shadow p-4 sm:p-6 border-l-4 border-green-500 cursor-pointer hover:shadow-lg hover:border-green-600 transition relative overflow-hidden group" onclick="switchTab('riwayat-kas')">
                         <div class="absolute inset-0 bg-green-50 opacity-0 group-hover:opacity-100 transition"></div>
                         <div class="relative flex items-center justify-between">
@@ -210,7 +190,6 @@
                         <h3 class="text-base sm:text-lg font-semibold text-gray-800 flex items-center"><i class="fa-solid fa-clipboard-check text-indigo-500 mr-2"></i>Riwayat Kehadiran</h3>
                         <button id="btn-catat-presensi" onclick="switchTab('presensi')" class="text-[10px] sm:text-xs text-blue-600 font-bold hover:underline transition">Catat Baru</button>
                     </div>
-                    <!-- Diubah menjadi flex-wrap agar tombol tanggal menyamping secara ringkas -->
                     <div id="dashboard-riwayat-presensi" class="flex flex-wrap gap-2 sm:gap-3">
                         <!-- Konten digenerate via Javascript -->
                     </div>
@@ -312,7 +291,7 @@
                 </div>
             </div>
 
-            <!-- HALAMAN RIWAYAT KAS (Dulu Pop-up, sekarang Halaman Mandiri) -->
+            <!-- HALAMAN RIWAYAT KAS -->
             <div id="page-riwayat-kas" class="page-content">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                     <h2 class="text-xl sm:text-2xl font-bold">Riwayat Kas Keseluruhan</h2>
@@ -329,7 +308,7 @@
                 </div>
             </div>
 
-            <!-- REALISASI ANGGARAN (PENGELUARAN & BUKTI) -->
+            <!-- REALISASI ANGGARAN -->
             <div id="page-realisasi" class="page-content">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-3">
                     <div>
@@ -341,7 +320,6 @@
                     </button>
                 </div>
 
-                <!-- Grid Kontainer untuk Card Pengeluaran -->
                 <div id="container-realisasi" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     <!-- Konten digenerate via Javascript -->
                 </div>
@@ -368,7 +346,6 @@
                     <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-1 sm:mb-2">Suara & Aspirasi Warga</h2>
                     <p class="text-xs sm:text-sm text-gray-600 mb-4">Sampaikan kritik, saran, atau ide Anda untuk lingkungan kita di sini.</p>
                     
-                    <!-- Form Tambah Aspirasi -->
                     <div class="bg-white p-4 sm:p-5 rounded-lg shadow-sm border border-gray-200 mb-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-3">
                             <div>
@@ -383,12 +360,11 @@
                         </div>
                     </div>
 
-                    <!-- List Aspirasi -->
                     <div id="container-aspirasi" class="space-y-4"></div>
                 </div>
             </div>
 
-            <!-- DATA WARGA (Admin + Warga) -->
+            <!-- DATA WARGA -->
             <div id="page-warga" class="page-content">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                     <h2 class="text-xl sm:text-2xl font-bold">Jadwal Regu & Warga</h2>
@@ -406,7 +382,76 @@
             </div>
 
         </main>
+
+        <!-- BOTTOM NAVIGATION BAR -->
+        <nav id="bottom-navbar" class="fixed bottom-0 w-full bg-white border-t border-gray-200 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-50">
+            <div class="flex justify-between items-end h-16 max-w-7xl mx-auto px-1 pb-1">
+                
+                <!-- Beranda -->
+                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active flex-1 flex flex-col items-center justify-end h-full pb-1">
+                    <i class="fa-solid fa-chart-line text-lg sm:text-xl mb-1"></i>
+                    <span class="text-[8px] sm:text-[10px] font-bold leading-none">Beranda</span>
+                </button>
+                
+                <!-- Presensi -->
+                <button onclick="switchTab('presensi')" id="tab-presensi" class="tab-btn flex-1 flex flex-col items-center justify-end h-full pb-1">
+                    <i class="fa-solid fa-clipboard-user text-lg sm:text-xl mb-1"></i>
+                    <span class="text-[8px] sm:text-[10px] font-bold leading-none">Presensi</span>
+                </button>
+                
+                <!-- Kas -->
+                <button onclick="switchTab('kas-lainnya')" id="tab-kas-lainnya" class="tab-btn flex-1 flex flex-col items-center justify-end h-full pb-1">
+                    <i class="fa-solid fa-money-bill-transfer text-lg sm:text-xl mb-1"></i>
+                    <span class="text-[8px] sm:text-[10px] font-bold leading-none">Kas</span>
+                </button>
+                
+                <!-- WA Center Floating Action Button -->
+                <div id="btn-wa-container" class="relative flex-shrink-0 w-16 flex justify-center pb-1">
+                    <button onclick="bukaModalWA()" class="absolute bottom-2 bg-green-500 hover:bg-green-600 text-white w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shadow-[0_5px_15px_rgba(34,197,94,0.4)] border-4 border-white transition transform hover:scale-105 z-[60]">
+                        <i class="fa-brands fa-whatsapp text-2xl sm:text-3xl"></i>
+                    </button>
+                </div>
+
+                <!-- Realisasi -->
+                <button onclick="switchTab('realisasi')" id="tab-realisasi" class="tab-btn flex-1 flex flex-col items-center justify-end h-full pb-1">
+                    <i class="fa-solid fa-camera-retro text-lg sm:text-xl mb-1"></i>
+                    <span class="text-[8px] sm:text-[10px] font-bold leading-none">Realisasi</span>
+                </button>
+                
+                <!-- Aspirasi -->
+                <button onclick="switchTab('aspirasi')" id="tab-aspirasi" class="tab-btn flex-1 flex flex-col items-center justify-end h-full pb-1">
+                    <i class="fa-solid fa-bullhorn text-lg sm:text-xl mb-1"></i>
+                    <span class="text-[8px] sm:text-[10px] font-bold leading-none">Aspirasi</span>
+                </button>
+                
+            </div>
+        </nav>
+
     </div> <!-- END APP CONTAINER -->
+
+    <!-- Modal WhatsApp / Hubungi Pak RT -->
+    <div id="modal-wa" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[200] p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden text-center transform scale-100 transition-transform">
+            <div class="bg-gradient-to-br from-green-400 to-green-600 p-6 flex flex-col items-center relative">
+                <button onclick="tutupModalWA()" class="absolute top-3 right-3 text-green-100 hover:text-white transition"><i class="fa-solid fa-times text-xl"></i></button>
+                <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg mb-3 mt-2">
+                    <i class="fa-brands fa-whatsapp text-4xl text-green-500"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Hubungi Pak RT</h3>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-600 mb-6 font-medium leading-relaxed">Akses cepat hubungi Pak RT.01 /05 KebonAgung, Jatinegara, Sempor.</p>
+                <div class="flex flex-col gap-3">
+                    <button onclick="window.open('https://wa.me/6285157467216', '_blank')" class="w-full bg-green-500 text-white px-5 py-3 rounded-xl hover:bg-green-600 font-bold transition shadow-md flex items-center justify-center text-sm">
+                        <i class="fa-brands fa-whatsapp mr-2 text-lg"></i> Chat WhatsApp Sekarang
+                    </button>
+                    <button onclick="tutupModalWA()" class="w-full bg-gray-50 text-gray-600 px-5 py-3 rounded-xl hover:bg-gray-100 border border-gray-200 font-bold transition shadow-sm text-sm">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal Tambah/Edit Warga -->
     <div id="modal-warga" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[100] p-4 transition-opacity">
@@ -809,12 +854,19 @@
             setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-10'), 3000);
         }
 
-        // --- FUNGSI MODAL INFORMASI ---
+        // --- FUNGSI MODAL INFORMASI & WHATSAPP ---
         function bukaModalInfo() {
             document.getElementById('modal-informasi').classList.remove('hidden');
         }
         function tutupModalInfo() {
             document.getElementById('modal-informasi').classList.add('hidden');
+        }
+
+        function bukaModalWA() {
+            document.getElementById('modal-wa').classList.remove('hidden');
+        }
+        function tutupModalWA() {
+            document.getElementById('modal-wa').classList.add('hidden');
         }
 
         // --- GLOBAL STATE ---
@@ -983,6 +1035,7 @@
             const badge = document.getElementById('badge-role');
             const navBadge = document.getElementById('nav-role-badge');
             const formKas = document.getElementById('form-kas-lainnya');
+            const waContainer = document.getElementById('btn-wa-container');
             
             if(!badge || !navBadge) return; 
 
@@ -994,6 +1047,7 @@
                 if(document.getElementById('btn-tambah-rencana')) document.getElementById('btn-tambah-rencana').style.display = 'none';
                 if(document.getElementById('btn-catat-presensi')) document.getElementById('btn-catat-presensi').style.display = 'none';
                 if(formKas) formKas.classList.add('hidden');
+                if(waContainer) waContainer.style.display = 'flex'; // Tampilkan icon WA untuk Warga
                 
                 badge.innerText = "Mode Warga (Hanya Baca)";
                 badge.className = "bg-green-100 text-green-800 text-[10px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 rounded border border-green-400";
@@ -1002,13 +1056,14 @@
                 
                 if(document.getElementById('page-presensi') && document.getElementById('page-presensi').classList.contains('active')) switchTab('dashboard');
             } else {
-                if(document.getElementById('tab-presensi')) document.getElementById('tab-presensi').style.display = 'inline-block';
+                if(document.getElementById('tab-presensi')) document.getElementById('tab-presensi').style.display = 'flex';
                 if(document.getElementById('btn-tambah-warga')) document.getElementById('btn-tambah-warga').style.display = 'inline-flex';
                 if(document.getElementById('btn-kelola-tipe')) document.getElementById('btn-kelola-tipe').style.display = 'inline-flex';
                 if(document.getElementById('btn-tambah-realisasi')) document.getElementById('btn-tambah-realisasi').style.display = 'inline-flex';
                 if(document.getElementById('btn-tambah-rencana')) document.getElementById('btn-tambah-rencana').style.display = 'inline-flex';
                 if(document.getElementById('btn-catat-presensi')) document.getElementById('btn-catat-presensi').style.display = 'inline-block';
                 if(formKas) formKas.classList.remove('hidden');
+                if(waContainer) waContainer.style.display = 'none'; // Sembunyikan icon WA untuk Admin
                 
                 badge.innerText = "Mode Admin (Akses Penuh)";
                 badge.className = "bg-blue-100 text-blue-800 text-[10px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 rounded border border-blue-400";
@@ -1921,9 +1976,46 @@
             });
         }
 
+        // --- HANDLER TOMBOL KEMBALI (BACK BUTTON) ---
+        function setupBackButtonHandler() {
+            try {
+                // Memasukkan state awal agar tombol kembali bisa ditangkap
+                history.pushState(null, null, location.href);
+
+                window.addEventListener('popstate', function(event) {
+                    const appContainer = document.getElementById('app-container');
+                    
+                    // Cek apakah pengguna sedang login dan berada di dalam aplikasi
+                    if (appContainer && !appContainer.classList.contains('hidden')) {
+                        const pageDashboard = document.getElementById('page-dashboard');
+                        
+                        if (pageDashboard && !pageDashboard.classList.contains('active')) {
+                            // Jika berada di menu lain, arahkan ke Beranda
+                            switchTab('dashboard');
+                        } else {
+                            // Jika sudah di Beranda, munculkan peringatan
+                            showToast('Gunakan tombol Keluar (Power) di pojok atas untuk keluar aplikasi.');
+                        }
+                        
+                        try {
+                            // Dorong kembali state agar browser tetap tertahan di halaman ini
+                            history.pushState(null, null, location.href);
+                        } catch (e) {
+                            console.warn('History API terbatas di lingkungan ini.');
+                        }
+                    } else {
+                        // Jika berada di halaman login (Lock Screen), biarkan mereka keluar/menutup browser
+                    }
+                });
+            } catch (error) {
+                console.warn("Pencegahan tombol kembali dinonaktifkan secara otomatis (terkendala keamanan Sandbox).");
+            }
+        }
+
         // INIT LOAD
         window.onload = () => { 
             cekSesi(); 
+            setupBackButtonHandler();
         };
 
     </script>
