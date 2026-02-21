@@ -23,8 +23,8 @@
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-10">
 
     <!-- LOGIN SCREEN (LOCK) -->
-    <div id="login-screen" class="fixed inset-0 bg-blue-700 z-[300] flex flex-col items-center justify-center text-white transition-opacity duration-500">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm text-gray-800 transform transition-all scale-100" id="login-box">
+    <div id="login-screen" class="fixed inset-0 bg-blue-700 z-[300] flex flex-col items-center justify-center text-white transition-opacity duration-500 p-4">
+        <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-sm text-gray-800 transform transition-all scale-100" id="login-box">
             <div class="text-center mb-6">
                 <div class="bg-blue-50 p-3 rounded-full inline-block mb-3 shadow-inner">
                     <img src="https://i.ibb.co.com/rRk3kXpr/LOGO-KABUPATEN-KEBUMEN.png" alt="Logo Kabupaten Kebumen" class="h-14 mx-auto object-contain" style="mix-blend-mode: multiply;">
@@ -62,9 +62,9 @@
         
         <!-- LOADING INDICATOR -->
         <div id="loading-overlay" class="fixed inset-0 bg-gray-100/80 z-40 flex justify-center items-center rounded-lg backdrop-blur-sm transition-opacity duration-500 pointer-events-none opacity-0">
-            <div class="text-center">
+            <div class="text-center p-4">
                 <i class="fa-solid fa-circle-notch fa-spin text-blue-600 text-4xl mb-3"></i>
-                <p class="text-blue-800 font-bold animate-pulse">Menghubungkan ke Database Cloud...</p>
+                <p class="text-blue-800 font-bold animate-pulse text-sm sm:text-base">Menghubungkan ke Database Cloud...</p>
             </div>
         </div>
 
@@ -74,24 +74,24 @@
                 <div class="flex justify-between items-center h-16">
                     <!-- Header Title dengan Logo Baru -->
                     <div class="flex items-center">
-                        <div class="bg-white p-1 rounded-full mr-3 shadow-md h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center shrink-0">
+                        <div class="bg-white p-1 rounded-full mr-2 sm:mr-3 shadow-md h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center shrink-0">
                             <img src="https://i.ibb.co.com/rRk3kXpr/LOGO-KABUPATEN-KEBUMEN.png" alt="Logo Kabupaten Kebumen" class="max-h-full max-w-full object-contain" style="mix-blend-mode: multiply;">
                         </div>
-                        <div class="flex flex-col">
-                            <span class="font-bold text-lg md:text-xl tracking-tight leading-tight">E-Ronda RT001/RW005</span>
-                            <span class="text-xs font-normal leading-tight text-blue-100 hidden md:block mt-0.5">
-                                <i class="fa-solid fa-map-location-dot mr-1"></i> Dk.KebonAgung, Jatinegara, Sempor, Kebumen
+                        <div class="flex flex-col min-w-0">
+                            <span class="font-bold text-base sm:text-lg md:text-xl tracking-tight leading-tight truncate">E-Ronda RT001</span>
+                            <span class="text-[10px] sm:text-xs font-normal leading-tight text-blue-100 truncate mt-0.5">
+                                <i class="fa-solid fa-map-location-dot mr-1"></i> Dk.KebonAgung
                             </span>
                         </div>
                     </div>
                     
                     <!-- Role Indicator & Logout -->
-                    <div class="flex items-center space-x-3">
-                        <div class="hidden sm:flex flex-col items-end mr-2">
-                            <span class="text-[10px] text-blue-200 uppercase font-bold tracking-wider">Status Akses</span>
-                            <span id="nav-role-badge" class="bg-blue-800 text-white text-xs font-bold px-2 py-0.5 rounded shadow-inner">Admin</span>
+                    <div class="flex items-center space-x-2 sm:space-x-3 shrink-0 ml-2">
+                        <div class="flex flex-col items-end">
+                            <span class="text-[8px] sm:text-[10px] text-blue-200 uppercase font-bold tracking-wider">Akses</span>
+                            <span id="nav-role-badge" class="bg-blue-800 text-white text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded shadow-inner">Admin</span>
                         </div>
-                        <button onclick="logoutAplikasi()" class="bg-red-500 hover:bg-red-600 text-white p-2 sm:px-4 sm:py-2 rounded-lg text-sm font-bold shadow-md transition flex items-center">
+                        <button onclick="logoutAplikasi()" class="bg-red-500 hover:bg-red-600 text-white w-8 h-8 sm:w-auto sm:h-auto sm:px-4 sm:py-2 rounded-lg text-sm font-bold shadow-md transition flex items-center justify-center">
                             <i class="fa-solid fa-power-off sm:mr-2"></i> <span class="hidden sm:inline">Keluar</span>
                         </button>
                     </div>
@@ -101,28 +101,28 @@
 
         <!-- Menu Tabs -->
         <div class="bg-white shadow mb-6 relative z-0">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex space-x-8 overflow-x-auto hide-scroll" id="nav-tabs">
-                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700">
+            <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+                <div class="flex space-x-4 sm:space-x-8 overflow-x-auto hide-scroll px-2 sm:px-0" id="nav-tabs">
+                    <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
                         <i class="fa-solid fa-chart-line mr-1"></i> Dashboard
                     </button>
-                    <button onclick="switchTab('presensi')" id="tab-presensi" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700">
+                    <button onclick="switchTab('presensi')" id="tab-presensi" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
                         <i class="fa-solid fa-clipboard-user mr-1"></i> Presensi Ronda
                     </button>
-                    <button onclick="switchTab('keuangan')" id="tab-keuangan" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700">
+                    <button onclick="switchTab('keuangan')" id="tab-keuangan" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
                         <i class="fa-solid fa-wallet mr-1"></i> Tagihan & Denda
                     </button>
-                    <button onclick="switchTab('kas-lainnya')" id="tab-kas-lainnya" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700">
+                    <button onclick="switchTab('kas-lainnya')" id="tab-kas-lainnya" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
                         <i class="fa-solid fa-money-bill-transfer mr-1"></i> Kas Lainnya
                     </button>
-                    <button onclick="switchTab('realisasi')" id="tab-realisasi" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700">
-                        <i class="fa-solid fa-camera-retro mr-1"></i> Realisasi Anggaran
+                    <button onclick="switchTab('realisasi')" id="tab-realisasi" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
+                        <i class="fa-solid fa-camera-retro mr-1"></i> Realisasi
                     </button>
-                    <button onclick="switchTab('aspirasi')" id="tab-aspirasi" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700">
-                        <i class="fa-solid fa-bullhorn mr-1"></i> Aspirasi & Rencana
+                    <button onclick="switchTab('aspirasi')" id="tab-aspirasi" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
+                        <i class="fa-solid fa-bullhorn mr-1"></i> Aspirasi
                     </button>
-                    <button onclick="switchTab('warga')" id="tab-warga" class="tab-btn whitespace-nowrap py-4 px-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:text-gray-700">
-                        <i class="fa-solid fa-users mr-1"></i> Jadwal & Warga
+                    <button onclick="switchTab('warga')" id="tab-warga" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
+                        <i class="fa-solid fa-users mr-1"></i> Warga
                     </button>
                 </div>
             </div>
@@ -134,59 +134,59 @@
             <!-- DASHBOARD -->
             <div id="page-dashboard" class="page-content active">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold">Transparansi Dashboard</h2>
-                    <span id="badge-role" class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-blue-400">Mode Admin</span>
+                    <h2 class="text-xl sm:text-2xl font-bold">Transparansi Dashboard</h2>
+                    <span id="badge-role" class="bg-blue-100 text-blue-800 text-[10px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 rounded border border-blue-400">Mode Admin</span>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <!-- Card Saldo Kas -->
-                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-green-500 cursor-pointer hover:shadow-lg hover:border-green-600 transition relative overflow-hidden group" onclick="bukaModalMutasi()">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                    <!-- Card Saldo Kas (Diubah ke switchTab) -->
+                    <div class="bg-white rounded-lg shadow-sm sm:shadow p-4 sm:p-6 border-l-4 border-green-500 cursor-pointer hover:shadow-lg hover:border-green-600 transition relative overflow-hidden group" onclick="switchTab('riwayat-kas')">
                         <div class="absolute inset-0 bg-green-50 opacity-0 group-hover:opacity-100 transition"></div>
                         <div class="relative flex items-center justify-between">
                             <div class="flex items-center">
-                                <div class="p-3 rounded-full bg-green-100 text-green-500 mr-4 group-hover:scale-110 transition">
-                                    <i class="fa-solid fa-money-bill-wave text-2xl"></i>
+                                <div class="p-2 sm:p-3 rounded-full bg-green-100 text-green-500 mr-3 sm:mr-4 group-hover:scale-110 transition shrink-0">
+                                    <i class="fa-solid fa-money-bill-wave text-xl sm:text-2xl"></i>
                                 </div>
-                                <div>
-                                    <p class="text-sm text-gray-500 font-semibold uppercase">Total Kas Terkumpul</p>
-                                    <p class="text-2xl font-bold text-gray-800" id="dash-kas">Rp 0</p>
+                                <div class="min-w-0">
+                                    <p class="text-[10px] sm:text-sm text-gray-500 font-semibold uppercase truncate">Total Kas Terkumpul</p>
+                                    <p class="text-lg sm:text-2xl font-bold text-gray-800 truncate" id="dash-kas">Rp 0</p>
                                 </div>
                             </div>
-                            <div class="text-green-500 opacity-30 group-hover:opacity-100 transition">
-                                <i class="fa-solid fa-chevron-right text-xl"></i>
+                            <div class="text-green-500 opacity-30 group-hover:opacity-100 transition shrink-0 ml-2">
+                                <i class="fa-solid fa-chevron-right text-lg sm:text-xl"></i>
                             </div>
                         </div>
-                        <div class="relative mt-3 text-xs text-green-700 font-medium opacity-0 group-hover:opacity-100 transition">
+                        <div class="relative mt-2 sm:mt-3 text-[10px] sm:text-xs text-green-700 font-medium opacity-0 group-hover:opacity-100 transition">
                             <i class="fa-solid fa-hand-pointer mr-1"></i> Klik untuk riwayat mutasi
                         </div>
                     </div>
                     <!-- Card Piutang Denda -->
-                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-red-500">
+                    <div class="bg-white rounded-lg shadow-sm sm:shadow p-4 sm:p-6 border-l-4 border-red-500">
                         <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-red-100 text-red-500 mr-4">
-                                <i class="fa-solid fa-file-invoice-dollar text-2xl"></i>
+                            <div class="p-2 sm:p-3 rounded-full bg-red-100 text-red-500 mr-3 sm:mr-4 shrink-0">
+                                <i class="fa-solid fa-file-invoice-dollar text-xl sm:text-2xl"></i>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-500 font-semibold uppercase">Denda Belum Dibayar</p>
-                                <p class="text-2xl font-bold text-gray-800" id="dash-piutang">Rp 0</p>
+                            <div class="min-w-0">
+                                <p class="text-[10px] sm:text-sm text-gray-500 font-semibold uppercase truncate">Denda Belum Dibayar</p>
+                                <p class="text-lg sm:text-2xl font-bold text-gray-800 truncate" id="dash-piutang">Rp 0</p>
                             </div>
                         </div>
                     </div>
                     <!-- Card Total Warga -->
-                    <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+                    <div class="bg-white rounded-lg shadow-sm sm:shadow p-4 sm:p-6 border-l-4 border-blue-500">
                         <div class="flex items-center">
-                            <div class="p-3 rounded-full bg-blue-100 text-blue-500 mr-4">
-                                <i class="fa-solid fa-users-viewfinder text-2xl"></i>
+                            <div class="p-2 sm:p-3 rounded-full bg-blue-100 text-blue-500 mr-3 sm:mr-4 shrink-0">
+                                <i class="fa-solid fa-users-viewfinder text-xl sm:text-2xl"></i>
                             </div>
-                            <div>
-                                <p class="text-sm text-gray-500 font-semibold uppercase">Total Warga Aktif</p>
-                                <p class="text-2xl font-bold text-gray-800" id="dash-warga">0 Orang</p>
+                            <div class="min-w-0">
+                                <p class="text-[10px] sm:text-sm text-gray-500 font-semibold uppercase truncate">Total Warga Aktif</p>
+                                <p class="text-lg sm:text-2xl font-bold text-gray-800 truncate" id="dash-warga">0 Orang</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white shadow rounded-lg p-6 border-t-4 border-blue-600">
-                    <h3 class="text-lg font-semibold mb-3"><i class="fa-solid fa-circle-info text-blue-500 mr-2"></i>Informasi & Aturan</h3>
+                <div class="bg-white shadow-sm sm:shadow rounded-lg p-4 sm:p-6 border-t-4 border-blue-600 text-sm">
+                    <h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3"><i class="fa-solid fa-circle-info text-blue-500 mr-2"></i>Informasi & Aturan</h3>
                     <ul class="list-disc list-inside text-gray-600 space-y-1">
                         <li>Sistem ini terhubung ke <b>Database Cloud</b>. Perubahan tersimpan secara real-time.</li>
                         <li>Warga wajib mengikuti jadwal ronda. Jika berhalangan/absen akan dikenakan denda kedisiplinan.</li>
@@ -198,38 +198,35 @@
 
             <!-- PRESENSI RONDA (Hanya Admin) -->
             <div id="page-presensi" class="page-content">
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 sm:p-4 mb-4 rounded-r-lg">
                     <div class="flex">
-                        <div class="flex-shrink-0"><i class="fa-solid fa-triangle-exclamation text-yellow-400"></i></div>
-                        <div class="ml-3"><p class="text-sm text-yellow-700">Halaman ini hanya dapat diakses oleh Admin/Pengurus untuk mendata kehadiran.</p></div>
+                        <div class="flex-shrink-0"><i class="fa-solid fa-triangle-exclamation text-yellow-500 mt-0.5"></i></div>
+                        <div class="ml-3"><p class="text-xs sm:text-sm text-yellow-800 font-medium">Halaman ini hanya dapat diakses oleh Admin/Pengurus untuk mendata kehadiran.</p></div>
                     </div>
                 </div>
-                <h2 class="text-2xl font-bold mb-4">Catat Presensi Ronda</h2>
-                <div class="bg-white shadow rounded-lg p-6 mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <h2 class="text-xl sm:text-2xl font-bold mb-4">Catat Presensi Ronda</h2>
+                
+                <div class="bg-white shadow-sm sm:shadow rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Tanggal</label>
-                            <input type="date" id="input-tanggal-presensi" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-blue-500 focus:border-blue-500" onchange="loadPresensi()">
+                            <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Pilih Tanggal</label>
+                            <input type="date" id="input-tanggal-presensi" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-blue-500 focus:border-blue-500 text-sm" onchange="loadPresensi()">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Jadwal Regu Hari</label>
-                            <input type="text" id="input-hari-presensi" class="w-full border-gray-300 bg-gray-100 rounded-md shadow-sm border p-2 font-bold text-blue-800" readonly>
+                            <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Jadwal Regu Hari</label>
+                            <input type="text" id="input-hari-presensi" class="w-full border-gray-300 bg-gray-100 rounded-md shadow-sm border p-2 font-bold text-blue-800 text-sm" readonly>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Warga</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status/Tipe</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi Presensi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabel-presensi" class="bg-white divide-y divide-gray-200"></tbody>
-                    </table>
-                    <div id="pesan-kosong-presensi" class="p-6 text-center text-gray-500 hidden">
+                <div class="bg-white shadow-sm sm:shadow rounded-lg overflow-hidden mb-6">
+                    <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <h3 class="text-sm sm:text-base font-semibold text-gray-800">Daftar Warga Bertugas</h3>
+                    </div>
+                    <div class="p-3 bg-gray-50">
+                        <div id="container-presensi" class="flex flex-col gap-3"></div>
+                    </div>
+                    <div id="pesan-kosong-presensi" class="p-6 text-center text-gray-500 hidden bg-white text-sm">
                         Pilih tanggal untuk melihat jadwal warga. Jika tidak ada, berarti tidak ada jadwal ronda di hari tersebut.
                     </div>
                 </div>
@@ -237,13 +234,13 @@
 
             <!-- KAS & DENDA (Tagihan & Denda) -->
             <div id="page-keuangan" class="page-content">
-                <h2 class="text-2xl font-bold mb-4">Tagihan & Denda</h2>
+                <h2 class="text-xl sm:text-2xl font-bold mb-4">Tagihan & Denda</h2>
                 
-                <div class="bg-white shadow rounded-lg overflow-hidden mb-6">
-                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-gray-800">Daftar Tagihan & Riwayat Denda</h3>
+                <div class="bg-white shadow-sm sm:shadow rounded-lg overflow-hidden mb-6">
+                    <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <h3 class="text-sm sm:text-lg font-semibold text-gray-800">Daftar Tagihan & Riwayat Denda</h3>
                     </div>
-                    <div class="p-4 bg-gray-50">
+                    <div class="p-3 sm:p-4 bg-gray-50">
                         <div id="container-denda" class="flex flex-col gap-3"></div>
                     </div>
                 </div>
@@ -251,64 +248,80 @@
 
             <!-- KAS LAINNYA (Pemasukan & Pengeluaran Lainnya) -->
             <div id="page-kas-lainnya" class="page-content">
-                <h2 class="text-2xl font-bold mb-4">Pemasukan & Pengeluaran Lainnya</h2>
+                <h2 class="text-xl sm:text-2xl font-bold mb-4">Pemasukan & Pengeluaran Manual</h2>
                 
                 <!-- Form Catat Kas Lainnya (Hanya Admin) -->
-                <div id="form-kas-lainnya" class="bg-white shadow rounded-lg p-6 mb-6 border-t-4 border-green-500 hidden">
-                    <h3 class="text-lg font-semibold mb-4 text-green-800"><i class="fa-solid fa-money-bill-transfer mr-2"></i>Catat Pemasukan / Pengeluaran Manual</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div id="form-kas-lainnya" class="bg-white shadow-sm sm:shadow rounded-lg p-4 sm:p-6 mb-6 border-t-4 border-green-500 hidden">
+                    <h3 class="text-sm sm:text-lg font-bold mb-3 sm:mb-4 text-green-800 flex items-center"><i class="fa-solid fa-money-bill-transfer mr-2 text-green-600"></i>Catat Transaksi Kas</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Transaksi</label>
-                            <select id="input-kas-jenis" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-green-500 focus:border-green-500">
+                            <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Jenis Transaksi</label>
+                            <select id="input-kas-jenis" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-green-500 focus:border-green-500 text-sm">
                                 <option value="Pemasukan">Pemasukan (+)</option>
                                 <option value="Pengeluaran">Pengeluaran (-)</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                            <input type="date" id="input-kas-tgl" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-green-500 focus:border-green-500">
+                            <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Tanggal</label>
+                            <input type="date" id="input-kas-tgl" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-green-500 focus:border-green-500 text-sm">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nominal (Rp)</label>
-                            <input type="text" id="input-kas-nominal" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-green-500 focus:border-green-500" placeholder="0" oninput="formatInputRupiah(this)">
+                            <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Nominal (Rp)</label>
+                            <input type="text" id="input-kas-nominal" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-green-500 focus:border-green-500 text-sm" placeholder="0" oninput="formatInputRupiah(this)">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Keterangan Detail</label>
-                            <input type="text" id="input-kas-ket" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-green-500 focus:border-green-500" placeholder="Cth: Donasi, Beli Kopi...">
+                            <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Keterangan</label>
+                            <input type="text" id="input-kas-ket" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-green-500 focus:border-green-500 text-sm" placeholder="Cth: Donasi, Beli Kopi...">
                         </div>
                     </div>
                     <div class="mt-4 text-right">
-                        <button onclick="simpanKasLainnya()" class="bg-green-600 text-white px-5 py-2 rounded-md hover:bg-green-700 transition shadow font-semibold">
+                        <button onclick="simpanKasLainnya()" class="w-full sm:w-auto bg-green-600 text-white px-5 py-2.5 rounded-md hover:bg-green-700 transition shadow font-bold text-sm">
                             <i class="fa-solid fa-save mr-1"></i> Simpan Transaksi
                         </button>
                     </div>
                 </div>
 
-                <!-- List Baris Ringkas -->
-                <div class="bg-white shadow rounded-lg overflow-hidden mb-6">
-                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-gray-800">Riwayat Pemasukan & Pengeluaran Lainnya</h3>
+                <div class="bg-white shadow-sm sm:shadow rounded-lg overflow-hidden mb-6">
+                    <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+                        <h3 class="text-sm sm:text-lg font-semibold text-gray-800">Riwayat Kas Manual</h3>
                     </div>
-                    <div class="p-4 bg-gray-50">
+                    <div class="p-3 sm:p-4 bg-gray-50">
                         <div id="container-kas-lainnya" class="flex flex-col gap-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HALAMAN RIWAYAT KAS (Dulu Pop-up, sekarang Halaman Mandiri) -->
+            <div id="page-riwayat-kas" class="page-content">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                    <h2 class="text-xl sm:text-2xl font-bold">Riwayat Kas Keseluruhan</h2>
+                    <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between w-full sm:w-auto">
+                        <p class="text-xs sm:text-sm text-gray-600 font-bold uppercase mr-4">Saldo Saat Ini</p>
+                        <p class="text-xl sm:text-2xl font-bold text-green-600" id="halaman-total-kas">Rp 0</p>
+                    </div>
+                </div>
+
+                <div class="bg-white shadow-sm sm:shadow rounded-lg overflow-hidden mb-6">
+                    <div class="p-3 sm:p-4 bg-gray-50">
+                        <div id="container-riwayat-kas" class="flex flex-col gap-3"></div>
                     </div>
                 </div>
             </div>
 
             <!-- REALISASI ANGGARAN (PENGELUARAN & BUKTI) -->
             <div id="page-realisasi" class="page-content">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-3">
                     <div>
-                        <h2 class="text-2xl font-bold">Realisasi Anggaran</h2>
-                        <p class="text-sm text-gray-600">Laporan transparan penggunaan uang kas RT.</p>
+                        <h2 class="text-xl sm:text-2xl font-bold">Realisasi Anggaran</h2>
+                        <p class="text-xs sm:text-sm text-gray-600 mt-0.5">Laporan transparan penggunaan uang kas RT.</p>
                     </div>
-                    <button id="btn-tambah-realisasi" onclick="bukaModalPengeluaran()" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition shadow text-sm font-semibold whitespace-nowrap hidden">
-                        <i class="fa-solid fa-plus mr-1"></i> Catat Pengeluaran
+                    <button id="btn-tambah-realisasi" onclick="bukaModalPengeluaran()" class="w-full sm:w-auto bg-red-600 text-white px-4 py-2 sm:py-2.5 rounded-md hover:bg-red-700 transition shadow text-sm font-bold flex items-center justify-center hidden">
+                        <i class="fa-solid fa-plus mr-1.5"></i> Catat Pengeluaran
                     </button>
                 </div>
 
                 <!-- Grid Kontainer untuk Card Pengeluaran -->
-                <div id="container-realisasi" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="container-realisasi" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     <!-- Konten digenerate via Javascript -->
                 </div>
             </div>
@@ -316,35 +329,35 @@
             <!-- ASPIRASI & RENCANA PEMBANGUNAN -->
             <div id="page-aspirasi" class="page-content">
                 <!-- Rencana Pembangunan -->
-                <div class="mb-10">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                <div class="mb-8 sm:mb-10">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 sm:gap-3">
                         <div>
-                            <h2 class="text-2xl font-bold text-gray-800">Rencana Pembangunan RT01</h2>
-                            <p class="text-sm text-gray-600">Program kerja dan rencana pengurus RT ke depan.</p>
+                            <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Rencana Pembangunan RT01</h2>
+                            <p class="text-xs sm:text-sm text-gray-600 mt-0.5">Program kerja dan rencana pengurus RT ke depan.</p>
                         </div>
-                        <button id="btn-tambah-rencana" onclick="bukaModalRencana()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition shadow text-sm font-semibold whitespace-nowrap hidden">
-                            <i class="fa-solid fa-plus mr-1"></i> Tambah Rencana
+                        <button id="btn-tambah-rencana" onclick="bukaModalRencana()" class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 sm:py-2.5 rounded-md hover:bg-blue-700 transition shadow text-sm font-bold flex items-center justify-center hidden">
+                            <i class="fa-solid fa-plus mr-1.5"></i> Tambah Rencana
                         </button>
                     </div>
                     <div id="container-rencana" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
                 <!-- Aspirasi Warga -->
-                <div class="border-t border-gray-200 pt-8">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Suara & Aspirasi Warga</h2>
-                    <p class="text-sm text-gray-600 mb-4">Sampaikan kritik, saran, atau ide Anda untuk lingkungan kita di sini.</p>
+                <div class="border-t border-gray-200 pt-6 sm:pt-8">
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mb-1 sm:mb-2">Suara & Aspirasi Warga</h2>
+                    <p class="text-xs sm:text-sm text-gray-600 mb-4">Sampaikan kritik, saran, atau ide Anda untuk lingkungan kita di sini.</p>
                     
                     <!-- Form Tambah Aspirasi -->
-                    <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <div class="bg-white p-4 sm:p-5 rounded-lg shadow-sm border border-gray-200 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 mb-3">
                             <div>
-                                <input type="text" id="form-aspirasi-nama" placeholder="Nama Anda (Boleh Anonim/Dikosongkan)" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 text-sm">
+                                <input type="text" id="form-aspirasi-nama" placeholder="Nama Anda (Boleh Anonim)" class="w-full border border-gray-300 rounded-md p-2.5 focus:ring-blue-500 text-sm">
                             </div>
                         </div>
-                        <textarea id="form-aspirasi-teks" placeholder="Tuliskan aspirasi, usulan, atau kritik membangun..." class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 text-sm mb-3" rows="3"></textarea>
+                        <textarea id="form-aspirasi-teks" placeholder="Tuliskan aspirasi, usulan, atau kritik membangun..." class="w-full border border-gray-300 rounded-md p-2.5 focus:ring-blue-500 text-sm mb-3" rows="3"></textarea>
                         <div class="text-right">
-                            <button onclick="simpanAspirasi()" class="bg-green-600 text-white px-5 py-2 rounded-md hover:bg-green-700 transition shadow-sm text-sm font-bold">
-                                <i class="fa-solid fa-paper-plane mr-1"></i> Kirim Aspirasi
+                            <button onclick="simpanAspirasi()" class="w-full sm:w-auto bg-green-600 text-white px-5 py-2.5 rounded-md hover:bg-green-700 transition shadow-sm text-sm font-bold flex items-center justify-center">
+                                <i class="fa-solid fa-paper-plane mr-1.5"></i> Kirim Aspirasi
                             </button>
                         </div>
                     </div>
@@ -354,16 +367,16 @@
                 </div>
             </div>
 
-            <!-- DATA WARGA (Admin + Warga) - COLLAPSIBLE -->
+            <!-- DATA WARGA (Admin + Warga) -->
             <div id="page-warga" class="page-content">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
-                    <h2 class="text-2xl font-bold">Daftar Jadwal Regu & Warga</h2>
-                    <div class="flex space-x-2 w-full md:w-auto">
-                        <button id="btn-kelola-tipe" onclick="bukaModalTipe()" class="flex-1 md:flex-none bg-purple-600 text-white px-3 py-2 rounded-md hover:bg-purple-700 transition text-sm font-semibold shadow-sm">
-                            <i class="fa-solid fa-tags mr-1"></i> Tipe & Denda
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                    <h2 class="text-xl sm:text-2xl font-bold">Jadwal Regu & Warga</h2>
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+                        <button id="btn-kelola-tipe" onclick="bukaModalTipe()" class="w-full sm:w-auto bg-purple-600 text-white px-4 py-2 sm:py-2.5 rounded-md hover:bg-purple-700 transition text-sm font-bold shadow-sm flex justify-center items-center">
+                            <i class="fa-solid fa-tags mr-1.5"></i> Tipe & Denda
                         </button>
-                        <button id="btn-tambah-warga" onclick="bukaModalWarga()" class="flex-1 md:flex-none bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition text-sm font-semibold shadow-sm">
-                            <i class="fa-solid fa-user-plus mr-1"></i> Tambah Warga
+                        <button id="btn-tambah-warga" onclick="bukaModalWarga()" class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 sm:py-2.5 rounded-md hover:bg-blue-700 transition text-sm font-bold shadow-sm flex justify-center items-center">
+                            <i class="fa-solid fa-user-plus mr-1.5"></i> Tambah Warga
                         </button>
                     </div>
                 </div>
@@ -375,129 +388,91 @@
     </div> <!-- END APP CONTAINER -->
 
     <!-- Modal Tambah/Edit Warga -->
-    <div id="modal-warga" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-            <div class="px-6 py-4 border-b bg-gray-50">
+    <div id="modal-warga" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[100] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden">
+            <div class="px-5 py-4 border-b bg-gray-50">
                 <h3 id="modal-warga-title" class="text-lg font-bold text-gray-800">Tambah Warga Baru</h3>
             </div>
-            <div class="p-6 space-y-4">
+            <div class="p-5 space-y-4">
                 <input type="hidden" id="form-id-warga">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="form-nama" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Nama Lengkap</label>
+                    <input type="text" id="form-nama" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500 text-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Status / Tipe Warga</label>
-                    <select id="form-tipe" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500"></select>
-                    <p class="text-xs text-gray-500 mt-1">*Tambahkan tipe di menu 'Tipe & Denda'.</p>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Status / Tipe Warga</label>
+                    <select id="form-tipe" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 text-sm"></select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Jadwal Ronda</label>
-                    <select id="form-jadwal" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Jadwal Ronda</label>
+                    <select id="form-jadwal" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 text-sm">
                         <option value="Senin">Senin</option><option value="Selasa">Selasa</option><option value="Rabu">Rabu</option>
                         <option value="Kamis">Kamis</option><option value="Jumat">Jumat</option><option value="Sabtu">Sabtu</option><option value="Minggu">Minggu</option>
                     </select>
                 </div>
             </div>
-            <div class="px-6 py-4 bg-gray-50 flex justify-end space-x-3 border-t">
-                <button onclick="tutupModalWarga()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 font-medium">Batal</button>
-                <button onclick="simpanWarga()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 font-medium">Simpan Data</button>
+            <div class="px-5 py-4 bg-gray-50 flex justify-end space-x-2 border-t">
+                <button onclick="tutupModalWarga()" class="flex-1 sm:flex-none bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 font-bold text-sm">Batal</button>
+                <button onclick="simpanWarga()" class="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-bold text-sm shadow-sm">Simpan</button>
             </div>
         </div>
     </div>
 
     <!-- Modal Kelola Tipe & Tarif Denda -->
-    <div id="modal-tipe" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="px-6 py-4 border-b bg-purple-50 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-purple-900"><i class="fa-solid fa-tags mr-2"></i>Pengaturan Tipe & Tarif Denda</h3>
-                <button onclick="tutupModalTipe()" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-times text-xl"></i></button>
+    <div id="modal-tipe" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[100] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-5 py-4 border-b bg-purple-50 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-purple-900"><i class="fa-solid fa-tags mr-2"></i>Tipe & Tarif Denda</h3>
+                <button onclick="tutupModalTipe()" class="text-gray-500 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
             </div>
-            <div class="p-6 flex-grow overflow-y-auto">
-                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6">
-                    <h4 class="text-sm font-bold text-gray-700 mb-3">Tambah Tipe Baru</h4>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <input type="text" id="input-nama-tipe" placeholder="Nama Tipe" class="flex-1 border border-gray-300 rounded-md p-2 text-sm">
-                        <input type="text" id="input-nominal-tipe" placeholder="Denda (Rp)" class="w-full sm:w-32 border border-gray-300 rounded-md p-2 text-sm" oninput="formatInputRupiah(this)">
-                        <button onclick="tambahTipe()" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 text-sm font-bold"><i class="fa-solid fa-plus"></i> Tambah</button>
+            <div class="p-4 sm:p-5 flex-grow overflow-y-auto">
+                <div class="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-200 mb-4 sm:mb-5">
+                    <h4 class="text-sm font-bold text-gray-700 mb-2">Tambah Tipe Baru</h4>
+                    <div class="flex flex-col gap-2">
+                        <input type="text" id="input-nama-tipe" placeholder="Nama Tipe" class="w-full border border-gray-300 rounded-md p-2 text-sm">
+                        <div class="flex gap-2">
+                            <input type="text" id="input-nominal-tipe" placeholder="Denda (Rp)" class="flex-1 border border-gray-300 rounded-md p-2 text-sm" oninput="formatInputRupiah(this)">
+                            <button onclick="tambahTipe()" class="bg-purple-600 text-white px-3 py-2 rounded-md hover:bg-purple-700 text-sm font-bold shadow-sm shrink-0"><i class="fa-solid fa-plus"></i></button>
+                        </div>
                     </div>
                 </div>
-                <table class="min-w-full divide-y divide-gray-200 border rounded-lg overflow-hidden shadow-sm">
-                    <thead class="bg-gray-100">
-                        <tr>
-                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-600 uppercase">Nama Tipe</th>
-                            <th class="px-4 py-2 text-left text-xs font-bold text-gray-600 uppercase">Denda</th>
-                            <th class="px-4 py-2 text-center text-xs font-bold text-gray-600 uppercase">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabel-tipe-denda" class="bg-white divide-y divide-gray-200"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Mutasi Kas (Histori Singkat Dashboard) -->
-    <div id="modal-mutasi" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-            <div class="px-6 py-4 border-b flex justify-between items-center bg-green-50 rounded-t-lg">
-                <h3 class="text-lg font-bold text-green-900"><i class="fa-solid fa-book-open text-green-600 mr-2"></i>Riwayat Singkat Kas RT</h3>
-                <button onclick="tutupModalMutasi()" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-times text-xl"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto flex-grow">
-                <div class="flex justify-between items-center mb-4">
-                    <p class="text-sm text-gray-600">Saldo Kas Saat Ini: <br> <span class="font-bold text-2xl text-green-600" id="mutasi-total-kas">Rp 0</span></p>
-                </div>
-                <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-100">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Tanggal</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Jenis</th>
-                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Keterangan</th>
-                                <th class="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">Nominal</th>
-                                <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabel-mutasi" class="bg-white divide-y divide-gray-200"></tbody>
-                    </table>
-                </div>
+                <!-- Mengganti Table dengan Card List agar responsive -->
+                <div id="container-tipe-denda" class="flex flex-col gap-2"></div>
             </div>
         </div>
     </div>
 
     <!-- Modal Form Catat Pengeluaran & Upload Foto -->
-    <div id="modal-pengeluaran" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-[60] p-4">
-        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-lg border-t-4 border-red-500 max-h-[95vh] overflow-y-auto">
-            <h3 class="text-lg font-bold mb-4 text-red-700" id="modal-pengeluaran-title"><i class="fa-solid fa-money-check-dollar mr-2"></i>Catat Realisasi Pengeluaran</h3>
-            <div class="space-y-4">
+    <div id="modal-pengeluaran" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[120] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl p-5 sm:p-6 w-full max-w-sm sm:max-w-md border-t-4 border-red-500 max-h-[95vh] overflow-y-auto">
+            <h3 class="text-lg font-bold mb-4 text-red-700 flex items-center" id="modal-pengeluaran-title"><i class="fa-solid fa-money-check-dollar mr-2"></i>Catat Realisasi</h3>
+            <div class="space-y-3 sm:space-y-4">
                 <input type="hidden" id="form-pengeluaran-id">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                    <input type="date" id="form-pengeluaran-tgl" class="w-full border border-gray-300 rounded-md p-2 focus:ring-red-500">
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Tanggal</label>
+                    <input type="date" id="form-pengeluaran-tgl" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-red-500 text-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nominal (Rp)</label>
-                    <input type="text" id="form-pengeluaran-nominal" class="w-full border border-gray-300 rounded-md p-2 focus:ring-red-500" placeholder="50.000" oninput="formatInputRupiah(this)">
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Nominal (Rp)</label>
+                    <input type="text" id="form-pengeluaran-nominal" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-red-500 text-sm" placeholder="50.000" oninput="formatInputRupiah(this)">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Keperluan / Keterangan</label>
-                    <textarea id="form-pengeluaran-ket" class="w-full border border-gray-300 rounded-md p-2 focus:ring-red-500" rows="2" placeholder="Contoh: Beli kopi, servis lampu jalan..."></textarea>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Keperluan / Keterangan</label>
+                    <textarea id="form-pengeluaran-ket" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-red-500 text-sm" rows="2" placeholder="Cth: Servis lampu jalan..."></textarea>
                 </div>
-                <div class="bg-gray-50 p-3 rounded border border-gray-200">
-                    <label class="block text-sm font-medium text-gray-700 mb-1"><i class="fa-solid fa-camera mr-1"></i> Upload Bukti Foto (Bisa ditambah lebih dari 1)</label>
-                    <input type="file" id="form-pengeluaran-bukti" multiple accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 cursor-pointer" onchange="previewBukti(this)">
-                    <p class="text-[11px] text-gray-500 mt-1 italic">*Gambar otomatis dikompresi Firebase (Max 1MB). Tambah gambar berulang kali diperbolehkan.</p>
-                    
-                    <div class="flex justify-between items-center mt-3">
-                        <span class="text-xs font-semibold text-gray-600">Preview Foto:</span>
-                        <button type="button" onclick="clearBukti()" class="text-[10px] text-red-500 hover:text-red-700 bg-red-50 px-2 py-1 rounded border border-red-200 hidden shadow-sm" id="btn-clear-bukti"><i class="fa-solid fa-trash mr-1"></i> Hapus Semua</button>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-2"><i class="fa-solid fa-camera mr-1"></i> Upload Bukti Foto</label>
+                    <input type="file" id="form-pengeluaran-bukti" multiple accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-red-100 file:text-red-700 hover:file:bg-red-200 cursor-pointer" onchange="previewBukti(this)">
+                    <div class="flex justify-between items-center mt-3 border-t border-gray-200 pt-2">
+                        <span class="text-[10px] font-bold text-gray-500 uppercase">Preview:</span>
+                        <button type="button" onclick="clearBukti()" class="text-[10px] text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-2 py-1 rounded font-bold transition hidden shadow-sm" id="btn-clear-bukti"><i class="fa-solid fa-trash mr-1"></i> Hapus Semua</button>
                     </div>
-                    <div id="preview-bukti-container" class="mt-2 flex flex-wrap gap-2 hide-scroll pb-1"></div>
+                    <div id="preview-bukti-container" class="mt-2 flex flex-wrap gap-2 hide-scroll"></div>
                 </div>
             </div>
-            <div class="mt-6 flex justify-end space-x-3">
-                <button onclick="tutupModalPengeluaran()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 font-medium">Batal</button>
-                <button id="btn-simpan-pengeluaran" onclick="simpanPengeluaran()" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 font-medium shadow-md flex items-center">
+            <div class="mt-5 flex justify-end space-x-2">
+                <button onclick="tutupModalPengeluaran()" class="flex-1 sm:flex-none bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg hover:bg-gray-300 text-sm font-bold transition">Batal</button>
+                <button id="btn-simpan-pengeluaran" onclick="simpanPengeluaran()" class="flex-1 sm:flex-none bg-red-600 text-white px-4 py-2.5 rounded-lg hover:bg-red-700 text-sm font-bold shadow-sm transition flex items-center justify-center">
                     Simpan Laporan
                 </button>
             </div>
@@ -505,125 +480,126 @@
     </div>
 
     <!-- Lightbox Modal untuk Zoom Gambar -->
-    <div id="modal-lightbox" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center z-[100] p-4 transition-opacity cursor-zoom-out" onclick="tutupLightbox()">
+    <div id="modal-lightbox" class="fixed inset-0 bg-black/95 hidden flex items-center justify-center z-[300] p-2 sm:p-4 transition-opacity cursor-zoom-out" onclick="tutupLightbox()">
         <img id="lightbox-img" src="" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl cursor-default" onclick="event.stopPropagation()">
-        <button onclick="tutupLightbox()" class="absolute top-5 right-5 text-white hover:text-gray-300 text-4xl cursor-pointer"><i class="fa-solid fa-times"></i></button>
+        <button onclick="tutupLightbox()" class="absolute top-4 right-4 sm:top-6 sm:right-6 bg-black/50 text-white hover:text-red-400 text-2xl sm:text-3xl w-10 h-10 rounded-full flex items-center justify-center cursor-pointer transition"><i class="fa-solid fa-times"></i></button>
     </div>
 
     <!-- Modal Rencana Pembangunan -->
-    <div id="modal-rencana" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-[60] p-4">
-        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md border-t-4 border-blue-500">
-            <h3 class="text-lg font-bold mb-4 text-blue-800" id="modal-rencana-title"><i class="fa-solid fa-clipboard-list mr-2"></i>Form Rencana Pembangunan</h3>
-            <div class="space-y-4">
+    <div id="modal-rencana" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[100] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl p-5 sm:p-6 w-full max-w-sm border-t-4 border-blue-500">
+            <h3 class="text-lg font-bold mb-4 text-blue-800 flex items-center" id="modal-rencana-title"><i class="fa-solid fa-clipboard-list mr-2"></i>Form Rencana</h3>
+            <div class="space-y-3">
                 <input type="hidden" id="form-rencana-id">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Judul / Nama Program</label>
-                    <input type="text" id="form-rencana-judul" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 text-sm" placeholder="Contoh: Perbaikan Pos Kamling">
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Judul / Nama Program</label>
+                    <input type="text" id="form-rencana-judul" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 text-sm" placeholder="Contoh: Perbaikan Pos Kamling">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Status Pengerjaan</label>
-                    <select id="form-rencana-status" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 text-sm">
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Status Pengerjaan</label>
+                    <select id="form-rencana-status" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 text-sm font-semibold">
                         <option value="Direncanakan">Direncanakan</option>
                         <option value="Sedang Berjalan">Sedang Berjalan</option>
                         <option value="Selesai">Selesai</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi Detail</label>
-                    <textarea id="form-rencana-deskripsi" class="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 text-sm" rows="3" placeholder="Jelaskan detail rencana pembangunan..."></textarea>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Deskripsi Detail</label>
+                    <textarea id="form-rencana-deskripsi" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 text-sm" rows="3"></textarea>
                 </div>
             </div>
-            <div class="mt-6 flex justify-end space-x-3">
-                <button onclick="tutupModalRencana()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 text-sm font-medium">Batal</button>
-                <button onclick="simpanRencana()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm font-medium shadow-md">Simpan Rencana</button>
+            <div class="mt-5 flex justify-end space-x-2">
+                <button onclick="tutupModalRencana()" class="flex-1 sm:flex-none bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg hover:bg-gray-300 text-sm font-bold transition">Batal</button>
+                <button onclick="simpanRencana()" class="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 text-sm font-bold shadow-sm transition">Simpan</button>
             </div>
         </div>
     </div>
 
     <!-- Modal Tanggapan Aspirasi (Admin) -->
-    <div id="modal-tanggapan" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-[60] p-4">
-        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md border-t-4 border-green-500">
-            <h3 class="text-lg font-bold mb-4 text-green-800"><i class="fa-solid fa-reply mr-2"></i>Beri Tanggapan RT</h3>
-            <div class="space-y-4">
+    <div id="modal-tanggapan" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[100] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl p-5 sm:p-6 w-full max-w-sm border-t-4 border-green-500">
+            <h3 class="text-lg font-bold mb-4 text-green-800 flex items-center"><i class="fa-solid fa-reply mr-2"></i>Beri Tanggapan RT</h3>
+            <div class="space-y-3">
                 <input type="hidden" id="form-tanggapan-id">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Komentar / Jawaban Admin</label>
-                    <textarea id="form-tanggapan-teks" class="w-full border border-gray-300 rounded-md p-2 focus:ring-green-500 text-sm" rows="4" placeholder="Tuliskan tanggapan pengurus RT..."></textarea>
+                    <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Komentar / Jawaban Admin</label>
+                    <textarea id="form-tanggapan-teks" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-green-500 text-sm" rows="4"></textarea>
                 </div>
             </div>
-            <div class="mt-6 flex justify-end space-x-3">
-                <button onclick="tutupModalTanggapan()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 text-sm font-medium">Batal</button>
-                <button onclick="simpanTanggapan()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-sm font-medium shadow-md">Kirim Tanggapan</button>
+            <div class="mt-5 flex justify-end space-x-2">
+                <button onclick="tutupModalTanggapan()" class="flex-1 sm:flex-none bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg hover:bg-gray-300 text-sm font-bold transition">Batal</button>
+                <button onclick="simpanTanggapan()" class="flex-1 sm:flex-none bg-green-600 text-white px-4 py-2.5 rounded-lg hover:bg-green-700 text-sm font-bold shadow-sm transition">Kirim</button>
             </div>
         </div>
     </div>
 
     <!-- Modal Edit Kas Lainnya -->
-    <div id="modal-edit-kas" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-[70] p-4">
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-md border-t-4 border-yellow-500">
-            <div class="px-6 py-4 border-b bg-yellow-50 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-yellow-900"><i class="fa-solid fa-pen-to-square mr-2"></i>Edit Transaksi Kas</h3>
-                <button onclick="tutupModalEditKas()" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-times text-xl"></i></button>
+    <div id="modal-edit-kas" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[100] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm border-t-4 border-yellow-500 overflow-hidden">
+            <div class="px-5 py-4 border-b bg-yellow-50 flex justify-between items-center">
+                <h3 class="text-base sm:text-lg font-bold text-yellow-900 flex items-center"><i class="fa-solid fa-pen-to-square mr-2"></i>Edit Transaksi</h3>
+                <button onclick="tutupModalEditKas()" class="text-gray-500 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
             </div>
-            <div class="p-6 space-y-4">
+            <div class="p-5 space-y-3">
                 <input type="hidden" id="edit-kas-id">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Transaksi</label>
-                    <select id="edit-kas-jenis" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-yellow-500 text-sm">
-                        <option value="Pemasukan">Pemasukan (+)</option>
-                        <option value="Pengeluaran">Pengeluaran (-)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-                    <input type="date" id="edit-kas-tgl" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-yellow-500 text-sm">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nominal (Rp)</label>
-                    <input type="text" id="edit-kas-nominal" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-yellow-500 text-sm" oninput="formatInputRupiah(this)">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Keterangan Detail</label>
-                    <input type="text" id="edit-kas-ket" class="w-full border-gray-300 rounded-md shadow-sm border p-2 focus:ring-yellow-500 text-sm">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="col-span-2">
+                        <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Jenis Transaksi</label>
+                        <select id="edit-kas-jenis" class="w-full border-gray-300 rounded-lg p-2.5 focus:ring-yellow-500 text-sm font-semibold">
+                            <option value="Pemasukan">Pemasukan (+)</option>
+                            <option value="Pengeluaran">Pengeluaran (-)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Tanggal</label>
+                        <input type="date" id="edit-kas-tgl" class="w-full border-gray-300 rounded-lg p-2.5 focus:ring-yellow-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Nominal (Rp)</label>
+                        <input type="text" id="edit-kas-nominal" class="w-full border-gray-300 rounded-lg p-2.5 focus:ring-yellow-500 text-sm" oninput="formatInputRupiah(this)">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs sm:text-sm font-bold text-gray-700 mb-1">Keterangan Detail</label>
+                        <input type="text" id="edit-kas-ket" class="w-full border-gray-300 rounded-lg p-2.5 focus:ring-yellow-500 text-sm">
+                    </div>
                 </div>
             </div>
-            <div class="px-6 py-4 bg-gray-50 flex justify-between space-x-3 border-t">
-                <button id="btn-hapus-kas-modal" class="bg-red-100 text-red-600 px-4 py-2 rounded-md hover:bg-red-200 text-sm font-bold transition shadow-sm" title="Hapus Transaksi"><i class="fa-solid fa-trash"></i></button>
+            <div class="px-5 py-4 bg-gray-50 flex justify-between items-center border-t">
+                <button id="btn-hapus-kas-modal" class="bg-red-100 text-red-600 p-2.5 rounded-lg hover:bg-red-200 transition shadow-sm" title="Hapus Transaksi"><i class="fa-solid fa-trash"></i></button>
                 <div class="flex space-x-2">
-                    <button onclick="tutupModalEditKas()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 text-sm font-medium">Batal</button>
-                    <button onclick="simpanEditKas()" class="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 text-sm font-medium shadow-md">Simpan Perubahan</button>
+                    <button onclick="tutupModalEditKas()" class="bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg hover:bg-gray-300 text-sm font-bold transition">Batal</button>
+                    <button onclick="simpanEditKas()" class="bg-yellow-500 text-white px-4 py-2.5 rounded-lg hover:bg-yellow-600 text-sm font-bold shadow-sm transition">Simpan</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Custom Alert/Confirm Modal -->
-    <div id="custom-dialog" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[200] p-4 transition-opacity">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-100 transition-transform">
+    <div id="custom-dialog" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden flex items-center justify-center z-[500] p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden transform scale-100 transition-transform">
             <div class="p-6 text-center">
                 <div id="dialog-icon" class="mb-4 text-5xl"></div>
-                <h3 id="dialog-title" class="text-xl font-bold text-gray-800 mb-2">Konfirmasi</h3>
+                <h3 id="dialog-title" class="text-lg font-bold text-gray-800 mb-2">Konfirmasi</h3>
                 <p id="dialog-message" class="text-sm text-gray-600 mb-6 leading-relaxed"></p>
-                <div class="flex justify-center space-x-3">
-                    <button id="btn-dialog-cancel" class="bg-gray-100 text-gray-700 px-5 py-2 rounded-lg hover:bg-gray-200 font-bold transition shadow-sm hidden">Batal</button>
-                    <button id="btn-dialog-ok" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 font-bold transition shadow-sm">OK</button>
+                <div class="flex flex-col sm:flex-row justify-center gap-2">
+                    <button id="btn-dialog-cancel" class="w-full sm:w-auto bg-gray-100 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-200 font-bold transition shadow-sm hidden">Batal</button>
+                    <button id="btn-dialog-ok" class="w-full sm:w-auto bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 font-bold transition shadow-sm">OK</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Alert Sukses (Toast) -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-3 rounded shadow-xl transition-opacity duration-300 opacity-0 pointer-events-none z-[400] border-l-4 border-green-500 flex items-center font-medium">
-        <i class="fa-solid fa-circle-check text-green-400 mr-3 text-lg"></i> <span id="toast-msg">Berhasil!</span>
+    <div id="toast" class="fixed bottom-5 right-5 sm:bottom-8 sm:right-8 bg-gray-800 text-white px-4 sm:px-6 py-3 rounded-lg shadow-2xl transition-opacity duration-300 opacity-0 pointer-events-none z-[600] border-l-4 border-green-500 flex items-center font-medium text-sm sm:text-base max-w-[90vw]">
+        <i class="fa-solid fa-circle-check text-green-400 mr-2 sm:mr-3 text-lg"></i> <span id="toast-msg">Berhasil!</span>
     </div>
 
     <!-- FIREBASE & APP LOGIC -->
     <script>
-        // --- KONFIGURASI KEAMANAN (Ubah Ini Sebelum Dibagikan!) ---
-        // SECRET_KODE_RT: Digunakan untuk memisahkan data antar RT di database.
+        // --- KONFIGURASI KEAMANAN ---
         const SECRET_KODE_RT = 'KBN01'; 
-        const PIN_WARGA = '12345'; // PIN untuk sekadar melihat data
-        const PIN_ADMIN = '987654'; // PIN khusus pengurus RT
+        const PIN_WARGA = '12345'; 
+        const PIN_ADMIN = '987654'; 
 
         // --- SISTEM LOGIN ---
         function prosesLogin() {
@@ -658,14 +634,12 @@
         function masukAplikasi(kodeRT) {
             sessionStorage.setItem('ronda_logged_in', 'true');
             sessionStorage.setItem('ronda_role', userRole);
-            sessionStorage.setItem('ronda_kode_rt', kodeRT); // Simpan nama ruangan database
+            sessionStorage.setItem('ronda_kode_rt', kodeRT); 
             
-            // Sembunyikan layar login dan tampilkan aplikasi
             document.getElementById('login-screen').classList.add('opacity-0', 'pointer-events-none');
             setTimeout(() => {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
-                
                 document.getElementById('loading-overlay').classList.remove('opacity-0', 'pointer-events-none');
                 
                 initFirebase().then(() => {
@@ -676,9 +650,28 @@
 
         function logoutAplikasi() {
             showDialog('confirm', 'Keluar Aplikasi', 'Anda yakin ingin mengunci kembali aplikasi?', () => {
+                // 1. Hapus memori sesi
                 sessionStorage.removeItem('ronda_logged_in');
                 sessionStorage.removeItem('ronda_role');
-                window.location.reload(); // Muat ulang halaman untuk membersihkan memori dan state
+                sessionStorage.removeItem('ronda_kode_rt');
+                
+                // 2. Sembunyikan aplikasi utama
+                document.getElementById('app-container').classList.add('hidden');
+                
+                // 3. Munculkan kembali Lock Screen secara instan
+                const loginScreen = document.getElementById('login-screen');
+                loginScreen.classList.remove('hidden');
+                
+                // Sedikit jeda untuk efek transisi
+                setTimeout(() => {
+                    loginScreen.classList.remove('opacity-0', 'pointer-events-none');
+                }, 50);
+
+                // 4. Bersihkan form inputan sebelumnya
+                document.getElementById('input-kode-rt').value = '';
+                document.getElementById('input-pin').value = '';
+                
+                showToast('Aplikasi berhasil dikunci.');
             });
         }
 
@@ -686,7 +679,6 @@
             const isLoggedIn = sessionStorage.getItem('ronda_logged_in');
             const savedKodeRT = sessionStorage.getItem('ronda_kode_rt');
             
-            // Verifikasi sesi memastikan bahwa Kode RT sudah pernah terekam
             if (isLoggedIn === 'true' && savedKodeRT) {
                 userRole = sessionStorage.getItem('ronda_role') || 'warga';
                 document.getElementById('login-screen').classList.add('hidden');
@@ -696,7 +688,7 @@
                     terapkanRoleUI();
                 });
             } else {
-                 sessionStorage.clear(); // Bersihkan sesi rusak jika ada
+                 sessionStorage.clear(); 
             }
         }
 
@@ -718,13 +710,13 @@
             if (type === 'alert') {
                 icon.innerHTML = '<i class="fa-solid fa-circle-exclamation text-yellow-500"></i>';
                 newBtnCancel.classList.add('hidden');
-                newBtnOk.className = "bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-bold shadow-sm";
+                newBtnOk.className = "w-full sm:w-auto bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 font-bold shadow-sm";
                 newBtnOk.innerText = "Mengerti";
                 newBtnOk.onclick = () => { dialog.classList.add('hidden'); if(onConfirm) onConfirm(); };
             } else if (type === 'confirm') {
                 icon.innerHTML = '<i class="fa-solid fa-circle-question text-blue-500"></i>';
                 newBtnCancel.classList.remove('hidden');
-                newBtnOk.className = "bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-bold shadow-sm";
+                newBtnOk.className = "w-full sm:w-auto bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 font-bold shadow-sm";
                 newBtnOk.innerText = "Ya, Lanjutkan";
                 newBtnCancel.onclick = () => { dialog.classList.add('hidden'); };
                 newBtnOk.onclick = () => { dialog.classList.add('hidden'); if(onConfirm) onConfirm(); };
@@ -779,8 +771,6 @@
         let db, collection, doc, setDoc, deleteDoc, onSnapshot;
         let currentUser = null;
 
-        // DYNAMIC HELPER: Membuat Path Database Terisolasi berdasarkan Kode RT
-        // Contoh: Jika kode RT "KBN01", tabel warga akan bernama "KBN01_warga"
         const getColl = (name) => {
             const prefix = sessionStorage.getItem('ronda_kode_rt') || 'DEFAULT';
             return collection(db, `${prefix}_${name}`);
@@ -788,7 +778,6 @@
 
         async function initFirebase() {
             try {
-                // Dynamic Import Library Firebase
                 const appModule = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js");
                 const authModule = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js");
                 const firestoreModule = await import("https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js");
@@ -800,7 +789,6 @@
                 deleteDoc = firestoreModule.deleteDoc;
                 onSnapshot = firestoreModule.onSnapshot;
 
-                // Paste konfigurasi dari Langkah 2 di sini
                 const firebaseConfig = {
                     apiKey: "AIzaSyAmQN1gOPKs6Up2rxLK0d94t1_9f3flRAw",
                     authDomain: "e-ronda-kebonagung.firebaseapp.com",
@@ -814,10 +802,8 @@
                 const auth = authModule.getAuth(app);
                 db = firestoreModule.getFirestore(app);
 
-                // Cukup gunakan signInAnonymously
                 await authModule.signInAnonymously(auth);
 
-                // Kembalikan Promise yang terselesaikan ketika auth state berubah menjadi log in
                 return new Promise((resolve) => {
                     authModule.onAuthStateChanged(auth, (user) => {
                         if (user) {
@@ -827,7 +813,7 @@
                             if(loadingOverlay) {
                                 loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
                             }
-                            resolve(); // Selesaikan inisialisasi
+                            resolve(); 
                         }
                     });
                 });
@@ -839,7 +825,7 @@
                      loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
                 }
                 showDialog('alert', 'Error Server', 'Gagal terhubung ke Database Cloud. Periksa koneksi internet Anda.');
-                return Promise.reject(e); // Tolak inisialisasi jika ada error
+                return Promise.reject(e); 
             }
         }
 
@@ -847,10 +833,8 @@
         function setupRealtimeListeners() {
             if (!currentUser) return;
 
-            // Warga
             onSnapshot(getColl('warga'), (snap) => {
                 if(snap.empty && dataWarga.length === 0) {
-                    // Seed (Pancing) Data Default jika database kosong (Baru pertama kali run)
                     const baseWarga = [
                         { id: 1, nama: 'Eko hadi', tipe: 'Reguler', jadwal: 'Senin' }, { id: 2, nama: 'Nanang', tipe: 'Reguler', jadwal: 'Senin' },
                         { id: 8, nama: 'Dodo', tipe: 'Reguler', jadwal: 'Selasa' }, { id: 13, nama: 'Suminem', tipe: 'Janda', jadwal: 'Selasa' },
@@ -867,7 +851,6 @@
                 }
             }, (err) => console.error(err));
 
-            // Pengaturan Denda
             onSnapshot(getColl('pengaturan_denda'), (snap) => {
                 if(snap.empty && pengaturanDenda.length === 0) {
                     [{ id: 1, tipe: 'Reguler', nominal: 10000 }, { id: 2, tipe: 'Janda', nominal: 5000 }].forEach(p => {
@@ -879,30 +862,26 @@
                 }
             }, (err) => console.error(err));
 
-            // Denda (Tagihan)
             onSnapshot(getColl('denda'), (snap) => {
                 dataDenda = snap.docs.map(d => d.data());
                 if(document.getElementById('page-keuangan') && document.getElementById('page-keuangan').classList.contains('active')) renderTabelDenda();
                 updateDashboard();
             }, (err) => console.error(err));
 
-            // Mutasi (Kas)
             onSnapshot(getColl('mutasi'), (snap) => {
                 dataMutasi = snap.docs.map(d => d.data());
                 if(document.getElementById('page-kas-lainnya') && document.getElementById('page-kas-lainnya').classList.contains('active')) renderTabelKasLainnya();
                 if(document.getElementById('page-realisasi') && document.getElementById('page-realisasi').classList.contains('active')) renderRealisasi();
-                if(document.getElementById('modal-mutasi') && !document.getElementById('modal-mutasi').classList.contains('hidden')) bukaModalMutasi();
+                if(document.getElementById('page-riwayat-kas') && document.getElementById('page-riwayat-kas').classList.contains('active')) renderRiwayatKas();
                 updateDashboard();
             }, (err) => console.error(err));
 
-            // Presensi
             onSnapshot(getColl('presensi'), (snap) => {
                 dataPresensi = {};
                 snap.docs.forEach(d => { dataPresensi[d.id] = d.data(); });
                 if(document.getElementById('page-presensi') && document.getElementById('page-presensi').classList.contains('active')) loadPresensi();
             }, (err) => console.error(err));
 
-            // Rencana
             onSnapshot(getColl('rencana'), (snap) => {
                 if(snap.empty && dataRencana.length === 0) {
                     const defaultRencana = [{
@@ -917,7 +896,6 @@
                 }
             }, (err) => console.error(err));
 
-            // Aspirasi
             onSnapshot(getColl('aspirasi'), (snap) => {
                 dataAspirasi = snap.docs.map(d => d.data());
                 if(document.getElementById('page-aspirasi') && document.getElementById('page-aspirasi').classList.contains('active')) renderAspirasi();
@@ -926,12 +904,10 @@
 
         // --- SISTEM ROLE UI ---
         function terapkanRoleUI() {
-            // Cek apakah elemen ada sebelum mencoba mengaksesnya
             const badge = document.getElementById('badge-role');
             const navBadge = document.getElementById('nav-role-badge');
             const formKas = document.getElementById('form-kas-lainnya');
             
-            // Mencegah error jika elemen belum dirender
             if(!badge || !navBadge) return; 
 
             if (userRole === 'warga') {
@@ -943,29 +919,29 @@
                 if(formKas) formKas.classList.add('hidden');
                 
                 badge.innerText = "Mode Warga (Hanya Baca)";
-                badge.className = "bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-green-400";
+                badge.className = "bg-green-100 text-green-800 text-[10px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 rounded border border-green-400";
                 navBadge.innerText = "WARGA";
                 navBadge.className = "bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm border border-green-600";
                 
                 if(document.getElementById('page-presensi') && document.getElementById('page-presensi').classList.contains('active')) switchTab('dashboard');
             } else {
                 if(document.getElementById('tab-presensi')) document.getElementById('tab-presensi').style.display = 'inline-block';
-                if(document.getElementById('btn-tambah-warga')) document.getElementById('btn-tambah-warga').style.display = 'inline-block';
-                if(document.getElementById('btn-kelola-tipe')) document.getElementById('btn-kelola-tipe').style.display = 'inline-block';
-                if(document.getElementById('btn-tambah-realisasi')) document.getElementById('btn-tambah-realisasi').style.display = 'inline-block';
-                if(document.getElementById('btn-tambah-rencana')) document.getElementById('btn-tambah-rencana').style.display = 'inline-block';
+                if(document.getElementById('btn-tambah-warga')) document.getElementById('btn-tambah-warga').style.display = 'inline-flex';
+                if(document.getElementById('btn-kelola-tipe')) document.getElementById('btn-kelola-tipe').style.display = 'inline-flex';
+                if(document.getElementById('btn-tambah-realisasi')) document.getElementById('btn-tambah-realisasi').style.display = 'inline-flex';
+                if(document.getElementById('btn-tambah-rencana')) document.getElementById('btn-tambah-rencana').style.display = 'inline-flex';
                 if(formKas) formKas.classList.remove('hidden');
                 
                 badge.innerText = "Mode Admin (Akses Penuh)";
-                badge.className = "bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-blue-400";
+                badge.className = "bg-blue-100 text-blue-800 text-[10px] sm:text-xs font-semibold px-2 sm:px-2.5 py-0.5 rounded border border-blue-400";
                 navBadge.innerText = "ADMIN";
                 navBadge.className = "bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow-sm border border-red-600 animate-pulse";
             }
             
-            // Panggil render fungsi jika elemen tab-nya aktif
             if(document.getElementById('page-warga') && document.getElementById('page-warga').classList.contains('active')) renderTabelWarga();
             if(document.getElementById('page-keuangan') && document.getElementById('page-keuangan').classList.contains('active')) renderTabelDenda();
             if(document.getElementById('page-kas-lainnya') && document.getElementById('page-kas-lainnya').classList.contains('active')) renderTabelKasLainnya();
+            if(document.getElementById('page-riwayat-kas') && document.getElementById('page-riwayat-kas').classList.contains('active')) renderRiwayatKas();
             if(document.getElementById('page-realisasi') && document.getElementById('page-realisasi').classList.contains('active')) renderRealisasi();
             if(document.getElementById('page-aspirasi') && document.getElementById('page-aspirasi').classList.contains('active')) { renderRencana(); renderAspirasi(); }
         }
@@ -983,6 +959,7 @@
             if(tabId === 'dashboard') updateDashboard();
             if(tabId === 'warga') renderTabelWarga();
             if(tabId === 'keuangan') renderTabelDenda();
+            if(tabId === 'riwayat-kas') renderRiwayatKas();
             if(tabId === 'kas-lainnya') {
                 renderTabelKasLainnya();
                 const inputKasTgl = document.getElementById('input-kas-tgl');
@@ -1029,41 +1006,43 @@
         }
 
         function renderTabelPresensi(hari, tanggalStr) {
-            const tbody = document.getElementById('tabel-presensi');
+            const container = document.getElementById('container-presensi');
             const msgKosong = document.getElementById('pesan-kosong-presensi');
-            if(!tbody || !msgKosong) return;
+            if(!container || !msgKosong) return;
 
-            tbody.innerHTML = '';
+            container.innerHTML = '';
             const wargaRegu = dataWarga.filter(w => w.jadwal === hari);
 
             if(wargaRegu.length === 0) {
-                tbody.parentNode.classList.add('hidden');
+                container.parentNode.classList.add('hidden');
                 msgKosong.classList.remove('hidden'); return;
             }
 
-            tbody.parentNode.classList.remove('hidden');
+            container.parentNode.classList.remove('hidden');
             msgKosong.classList.add('hidden');
 
             wargaRegu.forEach(w => {
                 const status = (dataPresensi[tanggalStr] && dataPresensi[tanggalStr][w.id]) ? dataPresensi[tanggalStr][w.id] : 'Belum';
-                let badgeClass = 'bg-gray-100 text-gray-800';
-                if(status === 'Hadir') badgeClass = 'bg-green-100 text-green-800 border-green-200 border';
-                if(status === 'Absen') badgeClass = 'bg-red-100 text-red-800 border-red-200 border';
-                if(status === 'Izin') badgeClass = 'bg-yellow-100 text-yellow-800 border-yellow-200 border';
+                let badgeClass = 'bg-gray-100 text-gray-800 border-gray-200';
+                if(status === 'Hadir') badgeClass = 'bg-green-100 text-green-800 border-green-200';
+                if(status === 'Absen') badgeClass = 'bg-red-100 text-red-800 border-red-200';
+                if(status === 'Izin') badgeClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
 
-                tbody.innerHTML += `
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap"><div class="font-bold text-gray-800">${w.nama}</div></td>
-                        <td class="px-6 py-4 whitespace-nowrap"><span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-50 text-blue-700">${w.tipe}</span></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <div class="flex items-center justify-center space-x-2">
-                                ${status !== 'Belum' ? `<span class="px-3 py-1 text-xs rounded-md ${badgeClass} font-bold mr-2">${status}</span>` : ''}
-                                <button onclick="setPresensi('${tanggalStr}', ${w.id}, 'Hadir')" class="px-2 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600 transition shadow-sm" title="Hadir"><i class="fa-solid fa-check"></i></button>
-                                <button onclick="setPresensi('${tanggalStr}', ${w.id}, 'Izin')" class="px-2 py-1 bg-yellow-500 text-white text-xs rounded hover:bg-yellow-600 transition shadow-sm" title="Izin"><i class="fa-solid fa-envelope"></i></button>
-                                <button onclick="setPresensi('${tanggalStr}', ${w.id}, 'Absen')" class="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600 transition shadow-sm" title="Absen (Denda)"><i class="fa-solid fa-times"></i></button>
+                container.innerHTML += `
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 transition hover:shadow-md">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <h4 class="font-bold text-gray-800 text-sm truncate">${w.nama}</h4>
+                                <span class="px-2 py-0.5 inline-flex text-[10px] font-bold rounded-full bg-blue-50 text-blue-700 shrink-0 border border-blue-100">${w.tipe}</span>
                             </div>
-                        </td>
-                    </tr>
+                            ${status !== 'Belum' ? `<span class="px-2 py-0.5 text-[10px] rounded border ${badgeClass} font-bold inline-block uppercase tracking-wider">Status: ${status}</span>` : '<span class="text-[10px] text-gray-400 italic bg-gray-50 px-2 py-0.5 rounded border border-gray-100">Belum diproses</span>'}
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto mt-1 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-0 border-gray-100">
+                            <button onclick="setPresensi('${tanggalStr}', ${w.id}, 'Hadir')" class="flex-1 sm:flex-none px-3 py-2 bg-green-50 text-green-600 hover:bg-green-500 hover:text-white border border-green-200 hover:border-green-500 rounded text-xs transition shadow-sm font-bold flex items-center justify-center gap-1.5"><i class="fa-solid fa-check"></i> Hadir</button>
+                            <button onclick="setPresensi('${tanggalStr}', ${w.id}, 'Izin')" class="flex-1 sm:flex-none px-3 py-2 bg-yellow-50 text-yellow-600 hover:bg-yellow-500 hover:text-white border border-yellow-200 hover:border-yellow-500 rounded text-xs transition shadow-sm font-bold flex items-center justify-center gap-1.5"><i class="fa-solid fa-envelope"></i> Izin</button>
+                            <button onclick="setPresensi('${tanggalStr}', ${w.id}, 'Absen')" class="flex-1 sm:flex-none px-3 py-2 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-200 hover:border-red-500 rounded text-xs transition shadow-sm font-bold flex items-center justify-center gap-1.5"><i class="fa-solid fa-times"></i> Absen</button>
+                        </div>
+                    </div>
                 `;
             });
         }
@@ -1073,7 +1052,6 @@
             const prevStatus = (dataPresensi[tgl] && dataPresensi[tgl][wargaId]) ? dataPresensi[tgl][wargaId] : 'Belum';
             const warga = dataWarga.find(w => w.id === wargaId);
             
-            // Simpan Data Ke Firestore (merge map fields)
             setDoc(doc(getColl('presensi'), tgl), { [wargaId]: status }, { merge: true });
             
             if(status === 'Absen' && prevStatus !== 'Absen') {
@@ -1092,7 +1070,7 @@
                     deleteDoc(doc(getColl('denda'), denda.id.toString()));
                 }
             }
-            showToast(`${warga.nama} diset: ${status}`);
+            showToast(`Status ${warga.nama} diubah: ${status}`);
         }
 
         // --- WARGA ---
@@ -1122,25 +1100,28 @@
                 else if(hari === 'Minggu') malamSebelumnya = 'Sabtu Malam';
 
                 let listHtml = grouped[hari].map(w => `
-                    <div class="flex justify-between items-center py-2 border-b border-gray-100/50 last:border-0">
-                        <div><p class="font-bold text-gray-800 text-sm">${w.nama}</p><p class="text-[11px] text-gray-500">${w.tipe}</p></div>
-                        ${userRole === 'admin' ? `<button onclick="hapusWarga(${w.id})" class="text-red-500 hover:text-red-700 text-xs px-2 py-1 transition"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    <div class="flex justify-between items-center py-2.5 border-b border-gray-100/70 last:border-0 transition hover:bg-gray-50/50 rounded px-1">
+                        <div class="min-w-0 pr-2">
+                            <p class="font-bold text-gray-800 text-sm truncate">${w.nama}</p>
+                            <p class="text-[10px] sm:text-[11px] text-gray-500">${w.tipe}</p>
+                        </div>
+                        ${userRole === 'admin' ? `<button onclick="hapusWarga(${w.id})" class="text-red-400 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded transition shrink-0"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </div>
                 `).join('');
 
                 const isActive = hari === activeScheduleHari;
-                const cardClass = isActive ? "bg-orange-50 rounded-lg shadow-md border-2 border-orange-400 p-4 transition relative overflow-hidden ring-4 ring-orange-100" : "bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition relative";
-                const activeBadge = isActive ? `<span class="absolute top-0 right-0 bg-orange-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg animate-pulse shadow-sm"><i class="fa-solid fa-clock mr-1"></i> JADWAL HARI INI</span>` : "";
+                const cardClass = isActive ? "bg-orange-50 rounded-xl shadow-md border-2 border-orange-400 p-4 sm:p-5 transition relative overflow-hidden ring-4 ring-orange-100" : "bg-white rounded-xl shadow-sm sm:shadow border border-gray-200 p-4 sm:p-5 hover:shadow-md transition relative";
+                const activeBadge = isActive ? `<span class="absolute top-0 right-0 bg-orange-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-xl animate-pulse shadow-sm"><i class="fa-solid fa-clock mr-1"></i> HARI INI</span>` : "";
 
                 container.innerHTML += `
                     <div class="${cardClass}">
                         ${activeBadge}
-                        <div class="border-b-2 ${isActive ? 'border-orange-200' : 'border-blue-100'} pb-2 mb-3 mt-2">
-                            <h3 class="font-bold ${isActive ? 'text-orange-800' : 'text-blue-800'} flex items-center justify-between">
+                        <div class="border-b-2 ${isActive ? 'border-orange-200' : 'border-blue-100'} pb-3 mb-3 mt-1 sm:mt-2">
+                            <h3 class="font-bold ${isActive ? 'text-orange-800' : 'text-blue-800'} flex items-center justify-between text-base sm:text-lg">
                                 <span><i class="fa-regular fa-calendar-check mr-2"></i>Regu ${hari}</span>
-                                <span class="${isActive ? 'bg-orange-200 text-orange-800' : 'bg-blue-50 text-blue-600'} px-2 py-0.5 rounded text-[10px] uppercase font-bold shadow-sm">${grouped[hari].length} orang</span>
+                                <span class="${isActive ? 'bg-orange-200 text-orange-800' : 'bg-blue-50 text-blue-600'} px-2.5 py-0.5 rounded text-[10px] uppercase font-bold shadow-sm">${grouped[hari].length} orang</span>
                             </h3>
-                            <p class="text-xs ${isActive ? 'text-orange-700 bg-orange-100/70' : 'text-blue-700 bg-blue-50/50'} font-medium mt-1.5 p-1 rounded inline-block">
+                            <p class="text-xs ${isActive ? 'text-orange-700 bg-orange-100/70' : 'text-blue-700 bg-blue-50/50'} font-bold mt-2 p-1.5 rounded inline-block">
                                 <i class="fa-solid fa-moon mr-1"></i> Berjaga pada: ${malamSebelumnya}
                             </p>
                         </div><div>${listHtml}</div>
@@ -1181,14 +1162,16 @@
         function tutupModalTipe() { document.getElementById('modal-tipe').classList.add('hidden'); }
         
         function renderTabelTipe() {
-            const tbody = document.getElementById('tabel-tipe-denda');
-            if(!tbody) return;
-            tbody.innerHTML = pengaturanDenda.map(p => `
-                <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 text-sm font-semibold text-gray-800">${p.tipe}</td>
-                    <td class="px-4 py-3 text-sm text-red-600 font-bold">${formatRp(p.nominal)}</td>
-                    <td class="px-4 py-3 text-center"><button onclick="hapusTipe(${p.id})" class="text-red-500 hover:bg-red-50 rounded px-2 py-1 transition text-xs"><i class="fa-solid fa-trash"></i></button></td>
-                </tr>
+            const container = document.getElementById('container-tipe-denda');
+            if(!container) return;
+            container.innerHTML = pengaturanDenda.map(p => `
+                <div class="bg-white border border-gray-200 rounded-lg p-3 sm:p-4 flex justify-between items-center shadow-sm">
+                    <div>
+                        <p class="text-sm font-bold text-gray-800">${p.tipe}</p>
+                        <p class="text-xs text-red-600 font-bold mt-0.5"><i class="fa-solid fa-coins text-[10px] mr-1"></i>${formatRp(p.nominal)}</p>
+                    </div>
+                    <button onclick="hapusTipe(${p.id})" class="bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 rounded p-2.5 transition text-xs shadow-sm"><i class="fa-solid fa-trash"></i></button>
+                </div>
             `).join('');
         }
 
@@ -1223,7 +1206,7 @@
             
             const urutDenda = [...dataDenda].sort((a,b) => b.id - a.id);
             if(urutDenda.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 bg-white p-6 rounded-lg border border-gray-200">Belum ada data tagihan denda.</div>`;
+                container.innerHTML = `<div class="text-center text-gray-500 bg-white p-6 rounded-lg border border-gray-200 text-sm">Belum ada data tagihan denda.</div>`;
                 return;
             }
 
@@ -1233,19 +1216,19 @@
                 const pointerCls = (!isLunas && userRole === 'admin') ? 'cursor-pointer hover:border-green-400 hover:shadow-md group' : '';
                 
                 container.innerHTML += `
-                    <div class="bg-white rounded-lg shadow-sm border ${isLunas ? 'border-green-200 opacity-70' : 'border-red-200'} p-3 flex items-center justify-between transition ${pointerCls}" ${actionAttr}>
-                        <div class="flex items-center gap-3">
-                            <div class="h-10 w-10 shrink-0 rounded-full flex items-center justify-center font-bold text-lg ${isLunas ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600 group-hover:scale-110 transition'}">
+                    <div class="bg-white rounded-lg shadow-sm border ${isLunas ? 'border-green-200 opacity-70' : 'border-red-200'} p-3 sm:p-4 flex items-center justify-between transition ${pointerCls}" ${actionAttr}>
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center font-bold text-lg sm:text-xl ${isLunas ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600 group-hover:scale-110 transition'}">
                                 <i class="fa-solid ${isLunas ? 'fa-check' : 'fa-file-invoice-dollar'}"></i>
                             </div>
-                            <div>
-                                <h4 class="font-bold text-gray-800 text-sm leading-tight">${d.namaWarga}</h4>
-                                <p class="text-[11px] text-gray-500 mt-0.5"><i class="fa-solid fa-calendar-day mr-1"></i> ${d.tanggal} &bull; ${d.keterangan}</p>
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-gray-800 text-sm sm:text-base leading-tight truncate">${d.namaWarga}</h4>
+                                <p class="text-[10px] sm:text-xs text-gray-500 mt-1 truncate"><i class="fa-solid fa-calendar-day mr-1"></i> ${d.tanggal} &bull; ${d.keterangan}</p>
                             </div>
                         </div>
                         <div class="text-right shrink-0 ml-2 flex flex-col items-end">
-                            <p class="font-bold text-sm ${isLunas ? 'text-green-600' : 'text-red-600'}">${formatRp(d.nominal)}</p>
-                            ${userRole === 'admin' && !isLunas ? `<span class="text-[10px] bg-green-500 text-white px-2 py-0.5 rounded shadow-sm font-bold mt-1 inline-block group-hover:bg-green-600 transition">Klik Bayar <i class="fa-solid fa-chevron-right ml-1"></i></span>` : `<span class="text-[10px] font-bold uppercase ${isLunas ? 'text-green-500' : 'text-red-500'} mt-1 inline-block">${d.status}</span>`}
+                            <p class="font-bold text-sm sm:text-base ${isLunas ? 'text-green-600' : 'text-red-600'}">${formatRp(d.nominal)}</p>
+                            ${userRole === 'admin' && !isLunas ? `<span class="text-[10px] bg-green-500 text-white px-2 py-1 rounded shadow-sm font-bold mt-1 inline-block group-hover:bg-green-600 transition">Klik Bayar <i class="fa-solid fa-chevron-right ml-1"></i></span>` : `<span class="text-[10px] font-bold uppercase ${isLunas ? 'text-green-500 bg-green-50 border border-green-100 px-2 py-0.5 rounded' : 'text-red-500'} mt-1 inline-block">${d.status}</span>`}
                         </div>
                     </div>
                 `;
@@ -1271,6 +1254,72 @@
             }
         }
 
+        // --- HALAMAN RIWAYAT KAS (PENGGANTI POP-UP MODAL MUTASI) ---
+        function renderRiwayatKas() {
+            const container = document.getElementById('container-riwayat-kas');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            const totalKas = hitungTotalKas();
+            const halamanTotalKas = document.getElementById('halaman-total-kas');
+            if(halamanTotalKas) {
+                halamanTotalKas.innerText = formatRp(totalKas);
+                if(totalKas < 0) { halamanTotalKas.classList.remove('text-green-600'); halamanTotalKas.classList.add('text-red-600'); } 
+                else { halamanTotalKas.classList.remove('text-red-600'); halamanTotalKas.classList.add('text-green-600'); }
+            }
+
+            const mutasiUrut = [...dataMutasi].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+            if(mutasiUrut.length === 0) {
+                container.innerHTML = `<div class="p-6 text-center text-gray-500 font-medium bg-white rounded-lg border border-gray-200">Belum ada riwayat kas yang tercatat.</div>`; return;
+            }
+
+            mutasiUrut.forEach(m => {
+                const isMasuk = m.jenis === 'Pemasukan';
+                let stringTanggal = m.tanggal;
+                try {
+                    const dateObj = new Date(m.tanggal);
+                    if (!isNaN(dateObj.getTime())) { stringTanggal = `${namaHari[dateObj.getDay()]}, ${dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'})}`; }
+                } catch(e) {}
+
+                let btnAksi = '';
+                if (!isMasuk) {
+                    // Tombol Lihat Laporan untuk Pengeluaran
+                    btnAksi = `<button onclick="switchTab('realisasi'); setTimeout(() => lihatRealisasi(${m.id}), 300)" class="text-[10px] sm:text-xs bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg border border-blue-200 hover:border-blue-600 font-bold transition shadow-sm flex items-center"><i class="fa-solid fa-eye mr-1.5"></i> Lihat Laporan</button>`;
+                } else if (isMasuk && userRole === 'admin') {
+                    // Tombol Revisi Hapus untuk Pemasukan (Admin Only)
+                    btnAksi = `<button onclick="hapusRiwayatKas('${m.id}')" class="text-[10px] sm:text-xs bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-lg border border-red-200 hover:border-red-600 font-bold transition shadow-sm flex items-center"><i class="fa-solid fa-trash mr-1.5"></i> Revisi Hapus</button>`;
+                }
+
+                container.innerHTML += `
+                    <div class="bg-white border ${isMasuk ? 'border-green-200' : 'border-red-200'} rounded-xl p-3 sm:p-4 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 hover:shadow-md transition">
+                        <div class="w-full sm:w-auto min-w-0">
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold border border-gray-200 whitespace-nowrap"><i class="fa-solid fa-calendar-day mr-1"></i> ${stringTanggal}</span>
+                                <span class="px-2 py-1 inline-flex text-[10px] leading-tight font-bold rounded-full border ${isMasuk ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'} whitespace-nowrap">
+                                    ${isMasuk ? '<i class="fa-solid fa-arrow-down mr-1"></i> Masuk' : '<i class="fa-solid fa-arrow-up mr-1"></i> Keluar'}
+                                </span>
+                            </div>
+                            <p class="text-xs sm:text-sm text-gray-800 font-medium break-words whitespace-normal leading-snug">${m.keterangan}</p>
+                        </div>
+                        <div class="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto mt-1 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-0 border-gray-100 shrink-0 gap-2">
+                            <p class="font-bold text-sm sm:text-base ${isMasuk ? 'text-green-600' : 'text-red-600'}">${isMasuk ? '+' : '-'}${formatRp(m.nominal)}</p>
+                            ${btnAksi}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function hapusRiwayatKas(id) {
+            showDialog('confirm', 'Revisi Hapus Pemasukan', 'Yakin ingin menghapus riwayat pemasukan ini? Saldo total kas akan berkurang.', () => {
+                deleteDoc(doc(getColl('mutasi'), id.toString())).then(() => {
+                    showToast('Riwayat kas berhasil dihapus.');
+                    // Realtime listener will auto-update the page, 
+                    // but we can also force refresh just in case
+                });
+            });
+        }
+
         // --- REALISASI ANGGARAN ---
         function renderRealisasi() {
             const container = document.getElementById('container-realisasi');
@@ -1278,37 +1327,48 @@
             const pengeluaran = dataMutasi.filter(m => m.jenis === 'Pengeluaran').sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
 
             if(pengeluaran.length === 0) {
-                container.innerHTML = `<div class="col-span-full py-16 text-center bg-white rounded-lg shadow-sm border border-gray-200"><i class="fa-solid fa-folder-open text-gray-300 text-5xl mb-4"></i><p class="text-gray-500 font-medium">Belum ada catatan realisasi penggunaan dana kas.</p></div>`;
+                container.innerHTML = `<div class="col-span-full py-16 text-center bg-white rounded-lg shadow-sm border border-gray-200"><i class="fa-solid fa-folder-open text-gray-300 text-4xl sm:text-5xl mb-4"></i><p class="text-sm sm:text-base text-gray-500 font-medium">Belum ada catatan realisasi penggunaan dana kas.</p></div>`;
                 return;
             }
 
             container.innerHTML = pengeluaran.map(p => {
                 let fotoHtml = '';
                 if (p.bukti && p.bukti.length > 0) {
-                    let thumbs = p.bukti.map(src => `<img src="${src}" onclick="bukaLightbox('${src}')" class="w-16 h-16 object-cover rounded shadow-sm border border-gray-200 cursor-pointer hover:opacity-80 hover:scale-105 transition transform flex-shrink-0">`).join('');
-                    fotoHtml = `<div class="mt-3"><p class="text-[11px] font-bold text-gray-400 uppercase mb-1">Bukti Foto (${p.bukti.length}):</p><div class="flex gap-2 overflow-x-auto hide-scroll pb-2">${thumbs}</div></div>`;
+                    let thumbs = p.bukti.map(src => `<img src="${src}" onclick="bukaLightbox('${src}')" class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:opacity-80 hover:scale-105 transition transform flex-shrink-0">`).join('');
+                    fotoHtml = `<div class="mt-3 sm:mt-4"><p class="text-[10px] sm:text-[11px] font-bold text-gray-400 uppercase mb-1.5">Bukti Foto (${p.bukti.length}):</p><div class="flex gap-2 overflow-x-auto hide-scroll pb-2">${thumbs}</div></div>`;
                 } else {
-                    fotoHtml = `<div class="mt-3 text-xs text-gray-400 italic"><i class="fa-solid fa-image-slash mr-1"></i> Tidak ada foto dilampirkan.</div>`;
+                    fotoHtml = `<div class="mt-3 sm:mt-4 text-xs text-gray-400 italic bg-gray-50 p-2 rounded border border-gray-100 inline-block"><i class="fa-solid fa-image-slash mr-1"></i> Tidak ada foto dilampirkan</div>`;
                 }
 
                 return `
-                    <div id="realisasi-${p.id}" class="bg-white rounded-lg shadow-md border border-gray-200 p-5 hover:shadow-lg transition flex flex-col justify-between duration-300">
+                    <div id="realisasi-${p.id}" class="bg-white rounded-xl shadow-sm sm:shadow border border-gray-200 p-4 sm:p-5 hover:shadow-md transition flex flex-col justify-between duration-300">
                         <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="bg-red-50 text-red-700 text-xs font-bold px-2 py-1 rounded border border-red-100"><i class="fa-solid fa-calendar-day mr-1"></i> ${p.tanggal}</span>
-                                <span class="font-bold text-red-600 text-lg tracking-tight">- ${formatRp(p.nominal)}</span>
+                            <div class="flex justify-between items-start mb-3 gap-2">
+                                <span class="bg-red-50 text-red-700 text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-md border border-red-100 shrink-0"><i class="fa-solid fa-calendar-day mr-1"></i> ${p.tanggal}</span>
+                                <span class="font-bold text-red-600 text-base sm:text-lg tracking-tight whitespace-nowrap">- ${formatRp(p.nominal)}</span>
                             </div>
-                            <p class="text-gray-800 font-medium text-sm leading-snug mt-3 mb-1">${p.keterangan}</p>
-                            <div class="border-t border-gray-100 mt-3 pt-1">${fotoHtml}</div>
+                            <p class="text-gray-800 font-medium text-sm sm:text-base leading-relaxed mt-2">${p.keterangan}</p>
+                            <div class="border-t border-gray-100 mt-4 pt-1">${fotoHtml}</div>
                         </div>
                         ${userRole === 'admin' ? `
-                        <div class="mt-4 pt-3 border-t border-dashed border-gray-200 text-right">
-                            <button onclick="editPengeluaran(${p.id})" class="text-xs text-blue-500 hover:bg-blue-50 px-2 py-1 rounded font-medium transition mr-2"><i class="fa-solid fa-pen mr-1"></i> Edit Laporan</button>
-                            <button onclick="hapusPengeluaran(${p.id})" class="text-xs text-red-500 hover:bg-red-50 px-2 py-1 rounded font-medium transition"><i class="fa-solid fa-trash mr-1"></i> Hapus Catatan</button>
+                        <div class="mt-4 pt-3 border-t border-dashed border-gray-200 flex justify-end gap-2">
+                            <button onclick="editPengeluaran(${p.id})" class="text-xs text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg font-bold transition shadow-sm"><i class="fa-solid fa-pen mr-1"></i> Edit Laporan</button>
+                            <button onclick="hapusPengeluaran(${p.id})" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-lg font-bold transition shadow-sm"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>
                         </div>` : ''}
                     </div>
                 `;
             }).join('');
+        }
+
+        function lihatRealisasi(id) {
+            const el = document.getElementById(`realisasi-${id}`);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.classList.add('ring-4', 'ring-blue-400', 'scale-[1.02]', 'z-10');
+                setTimeout(() => el.classList.remove('ring-4', 'ring-blue-400', 'scale-[1.02]', 'z-10'), 2000);
+            } else {
+                showToast('Data realisasi tidak ditemukan di halaman ini.');
+            }
         }
 
         async function processFilesToBase64(files) {
@@ -1344,8 +1404,8 @@
             if(tempBuktiBase64.length > 0) {
                 container.innerHTML = tempBuktiBase64.map((src, index) => `
                     <div class="relative group mt-1">
-                        <img src="${src}" class="w-16 h-16 object-cover rounded border border-gray-300 shadow-sm cursor-pointer" onclick="bukaLightbox('${src}')">
-                        <button onclick="hapusSatuBukti(${index})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition shadow"><i class="fa-solid fa-times"></i></button>
+                        <img src="${src}" class="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-lg border border-gray-300 shadow-sm cursor-pointer" onclick="bukaLightbox('${src}')">
+                        <button onclick="hapusSatuBukti(${index})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] sm:opacity-0 group-hover:opacity-100 transition shadow"><i class="fa-solid fa-times"></i></button>
                     </div>
                 `).join('');
                 btnClear.classList.remove('hidden');
@@ -1363,7 +1423,7 @@
             const btnSimpan = document.getElementById('btn-simpan-pengeluaran');
             if(input.files && input.files.length > 0) {
                 if(tempBuktiBase64.length === 0) container.innerHTML = '';
-                container.insertAdjacentHTML('beforeend', '<span id="loading-img" class="text-xs text-blue-500 font-bold animate-pulse"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Memproses...</span>');
+                container.insertAdjacentHTML('beforeend', '<span id="loading-img" class="text-xs text-blue-500 font-bold animate-pulse mt-2"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Memproses...</span>');
                 btnSimpan.disabled = true; btnSimpan.classList.add('opacity-50', 'cursor-not-allowed');
 
                 try {
@@ -1467,7 +1527,7 @@
             const dataLainnya = dataMutasi.filter(m => m.kategori === 'Lainnya' || (!m.bukti && !m.keterangan.startsWith('Pembayaran Denda:'))).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
 
             if(dataLainnya.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 bg-white p-6 rounded-lg border border-gray-200">Belum ada riwayat kas manual lainnya.</div>`;
+                container.innerHTML = `<div class="text-center text-gray-500 bg-white p-6 rounded-lg border border-gray-200 text-sm">Belum ada riwayat kas manual lainnya.</div>`;
                 return;
             }
 
@@ -1477,19 +1537,21 @@
                 const pointerCls = (userRole === 'admin') ? 'cursor-pointer hover:border-blue-400 hover:shadow-md group' : '';
 
                 container.innerHTML += `
-                    <div class="bg-white rounded-lg shadow-sm border ${isMasuk ? 'border-green-200' : 'border-red-200'} p-3 flex items-center justify-between transition ${pointerCls}" ${actionAttr}>
-                        <div class="flex items-center gap-3 overflow-hidden">
-                            <div class="h-10 w-10 shrink-0 rounded-full flex items-center justify-center font-bold text-lg ${isMasuk ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
+                    <div class="bg-white rounded-lg shadow-sm border ${isMasuk ? 'border-green-200' : 'border-red-200'} p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between transition ${pointerCls}" ${actionAttr}>
+                        <div class="flex items-center gap-3 w-full sm:w-auto overflow-hidden">
+                            <div class="h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center font-bold text-lg sm:text-xl ${isMasuk ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
                                 <i class="fa-solid ${isMasuk ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
                             </div>
-                            <div class="min-w-0">
-                                <span class="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded text-[10px] font-bold border border-gray-200 inline-block mb-1"><i class="fa-solid fa-calendar-day mr-1"></i> ${m.tanggal}</span>
-                                <p class="text-xs text-gray-800 font-medium leading-snug truncate">${m.keterangan}</p>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-2 mb-1.5">
+                                    <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-bold border border-gray-200 whitespace-nowrap"><i class="fa-solid fa-calendar-day mr-1"></i> ${m.tanggal}</span>
+                                </div>
+                                <p class="text-xs sm:text-sm text-gray-800 font-medium leading-snug break-words whitespace-normal">${m.keterangan}</p>
                             </div>
                         </div>
-                        <div class="text-right shrink-0 ml-2 flex flex-col items-end">
-                            <p class="font-bold text-sm ${isMasuk ? 'text-green-600' : 'text-red-600'}">${isMasuk ? '+' : '-'}${formatRp(m.nominal)}</p>
-                            ${userRole === 'admin' ? `<span class="text-[10px] text-blue-500 font-bold opacity-0 group-hover:opacity-100 transition inline-block mt-1 bg-blue-50 px-2 py-0.5 rounded"><i class="fa-solid fa-pen mr-1"></i>Edit</span>` : ''}
+                        <div class="flex flex-row sm:flex-col justify-between items-center sm:items-end w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-0 border-gray-100 shrink-0 pl-0 sm:pl-2">
+                            <p class="font-bold text-sm sm:text-base ${isMasuk ? 'text-green-600' : 'text-red-600'}">${isMasuk ? '+' : '-'}${formatRp(m.nominal)}</p>
+                            ${userRole === 'admin' ? `<span class="text-[10px] text-blue-600 font-bold sm:opacity-0 group-hover:opacity-100 transition inline-block mt-1 bg-blue-50 px-2 py-1 rounded border border-blue-100 shadow-sm"><i class="fa-solid fa-pen mr-1"></i>Edit</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -1534,83 +1596,30 @@
             });
         }
 
-        function bukaModalMutasi() {
-            document.getElementById('modal-mutasi').classList.remove('hidden');
-            const tbody = document.getElementById('tabel-mutasi');
-            if(!tbody) return;
-            tbody.innerHTML = '';
-            
-            const totalKas = hitungTotalKas();
-            const mutasiTotalKasEl = document.getElementById('mutasi-total-kas');
-            if(mutasiTotalKasEl) {
-                mutasiTotalKasEl.innerText = formatRp(totalKas);
-                if(totalKas < 0) { mutasiTotalKasEl.classList.remove('text-green-600'); mutasiTotalKasEl.classList.add('text-red-600'); } 
-                else { mutasiTotalKasEl.classList.remove('text-red-600'); mutasiTotalKasEl.classList.add('text-green-600'); }
-            }
-
-            const mutasiUrut = [...dataMutasi].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
-            if(mutasiUrut.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-6 text-center text-gray-500 font-medium">Belum ada riwayat.</td></tr>`; return;
-            }
-
-            mutasiUrut.forEach(m => {
-                const isMasuk = m.jenis === 'Pemasukan';
-                let stringTanggal = m.tanggal;
-                try {
-                    const dateObj = new Date(m.tanggal);
-                    if (!isNaN(dateObj.getTime())) { stringTanggal = `${namaHari[dateObj.getDay()]}, ${dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'})}`; }
-                } catch(e) {}
-
-                let btnAksi = '';
-                if (!isMasuk) {
-                    btnAksi = `<button onclick="lihatRealisasi(${m.id})" class="text-[10px] bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-1 rounded border border-blue-200 font-bold transition whitespace-nowrap shadow-sm"><i class="fa-solid fa-eye mr-1"></i> Lihat</button>`;
-                }
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50 border-b border-gray-100">
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-800 font-semibold">${stringTanggal}</td>
-                        <td class="px-4 py-3 whitespace-nowrap"><span class="px-2 py-1 inline-flex text-xs leading-5 font-bold rounded-full border ${isMasuk ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}">${isMasuk ? '<i class="fa-solid fa-arrow-down mr-1"></i> Masuk' : '<i class="fa-solid fa-arrow-up mr-1"></i> Keluar'}</span></td>
-                        <td class="px-4 py-3 text-sm text-gray-800 font-medium">${m.keterangan}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-bold ${isMasuk ? 'text-green-600' : 'text-red-600'}">${isMasuk ? '+' : '-'}${formatRp(m.nominal)}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-center">${btnAksi}</td>
-                    </tr>
-                `;
-            });
-        }
-        function tutupModalMutasi() { document.getElementById('modal-mutasi').classList.add('hidden'); }
-
-        function lihatRealisasi(id) {
-            tutupModalMutasi(); switchTab('realisasi');
-            setTimeout(() => {
-                const el = document.getElementById(`realisasi-${id}`);
-                if (el) {
-                    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    el.classList.add('ring-4', 'ring-blue-400', 'scale-[1.02]', 'z-10');
-                    setTimeout(() => el.classList.remove('ring-4', 'ring-blue-400', 'scale-[1.02]', 'z-10'), 2000);
-                } else showToast('Data realisasi tidak ditemukan.');
-            }, 100);
-        }
-
         // --- RENCANA PEMBANGUNAN ---
         function renderRencana() {
             const container = document.getElementById('container-rencana'); 
             if(!container) return;
             container.innerHTML = '';
             if(dataRencana.length === 0) {
-                container.innerHTML = `<div class="col-span-full p-6 text-center text-gray-500 bg-white rounded-lg shadow-sm border border-gray-200">Belum ada data rencana.</div>`; return;
+                container.innerHTML = `<div class="col-span-full p-6 text-center text-gray-500 bg-white rounded-lg shadow-sm border border-gray-200 text-sm">Belum ada data rencana.</div>`; return;
             }
             dataRencana.forEach(r => {
                 let badgeColor = r.status === 'Selesai' ? 'bg-green-100 text-green-800 border-green-200' : (r.status === 'Sedang Berjalan' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 'bg-blue-100 text-blue-800 border-blue-200');
                 let adminHtml = userRole === 'admin' ? `
-                    <div class="mt-4 pt-3 border-t border-gray-100 flex justify-end space-x-2">
-                        <button onclick="bukaModalRencana(${r.id})" class="text-xs px-3 py-1 text-blue-600 hover:bg-blue-50 rounded border border-transparent hover:border-blue-200 transition"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
-                        <button onclick="hapusRencana(${r.id})" class="text-xs px-3 py-1 text-red-600 hover:bg-red-50 rounded border border-transparent hover:border-red-200 transition"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>
+                    <div class="mt-4 pt-3 border-t border-gray-100 flex justify-end gap-2">
+                        <button onclick="bukaModalRencana(${r.id})" class="text-[11px] sm:text-xs px-3 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg font-bold transition shadow-sm"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
+                        <button onclick="hapusRencana(${r.id})" class="text-[11px] sm:text-xs px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg font-bold transition shadow-sm"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>
                     </div>` : '';
                 container.innerHTML += `
-                    <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-md transition">
+                    <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-md transition">
                         <div>
-                            <div class="flex justify-between items-start mb-2 gap-2"><h4 class="font-bold text-gray-800 text-lg leading-tight">${r.judul}</h4><span class="px-2 py-1 whitespace-nowrap text-[10px] uppercase font-bold rounded-full border ${badgeColor}">${r.status}</span></div>
-                            <p class="text-xs text-gray-400 mb-2"><i class="fa-solid fa-calendar-alt mr-1"></i> Diupdate: ${r.tanggal}</p><p class="text-sm text-gray-600 leading-relaxed">${r.deskripsi}</p>
+                            <div class="flex justify-between items-start mb-2 gap-3">
+                                <h4 class="font-bold text-gray-800 text-base sm:text-lg leading-tight break-words">${r.judul}</h4>
+                                <span class="px-2 py-1 whitespace-nowrap text-[9px] sm:text-[10px] uppercase font-bold rounded-md border ${badgeColor} shrink-0">${r.status}</span>
+                            </div>
+                            <p class="text-[10px] sm:text-xs text-gray-400 mb-3"><i class="fa-solid fa-calendar-alt mr-1"></i> Diupdate: ${r.tanggal}</p>
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">${r.deskripsi}</p>
                         </div>${adminHtml}
                     </div>`;
             });
@@ -1668,22 +1677,28 @@
             if(!container) return;
             container.innerHTML = '';
             const aspirasiUrut = [...dataAspirasi].sort((a,b) => b.id - a.id);
-            if(aspirasiUrut.length === 0) { container.innerHTML = `<div class="p-6 text-center text-gray-500 bg-white rounded-lg shadow-sm border border-gray-200 italic">Belum ada aspirasi.</div>`; return; }
+            if(aspirasiUrut.length === 0) { container.innerHTML = `<div class="p-6 text-center text-gray-500 bg-white rounded-lg shadow-sm border border-gray-200 italic text-sm">Belum ada aspirasi.</div>`; return; }
 
             aspirasiUrut.forEach(a => {
-                let adminTanggapanHtml = a.tanggapan ? `<div class="mt-3 bg-green-50 border-l-4 border-green-500 p-3 rounded-r-md"><p class="text-xs font-bold text-green-800 mb-1"><i class="fa-solid fa-user-shield mr-1"></i> Tanggapan Pengurus RT:</p><p class="text-sm text-green-900 whitespace-pre-line">${a.tanggapan}</p></div>` : '';
+                let adminTanggapanHtml = a.tanggapan ? `<div class="mt-3 bg-green-50 border-l-4 border-green-500 p-3 sm:p-4 rounded-r-lg"><p class="text-[10px] sm:text-xs font-bold text-green-800 mb-1.5"><i class="fa-solid fa-user-shield mr-1"></i> Tanggapan Pengurus RT:</p><p class="text-xs sm:text-sm text-green-900 whitespace-pre-line leading-relaxed">${a.tanggapan}</p></div>` : '';
                 let aksiAdminHtml = userRole === 'admin' ? `
-                    <div class="mt-3 pt-3 border-t border-gray-100 flex justify-end space-x-2">
-                        <button onclick="bukaModalTanggapan(${a.id})" class="text-[11px] bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded shadow-sm font-bold transition"><i class="fa-solid fa-reply mr-1"></i> ${a.tanggapan ? 'Edit Tanggapan' : 'Beri Tanggapan'}</button>
-                        <button onclick="hapusAspirasi(${a.id})" class="text-[11px] bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded shadow-sm font-bold transition"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>
+                    <div class="mt-3 sm:mt-4 pt-3 border-t border-gray-100 flex justify-end gap-2">
+                        <button onclick="bukaModalTanggapan(${a.id})" class="text-[10px] sm:text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg shadow-sm font-bold transition"><i class="fa-solid fa-reply mr-1"></i> ${a.tanggapan ? 'Edit Tanggapan' : 'Beri Tanggapan'}</button>
+                        <button onclick="hapusAspirasi(${a.id})" class="text-[10px] sm:text-xs bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg shadow-sm font-bold transition"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>
                     </div>` : '';
                 container.innerHTML += `
-                    <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 transition hover:shadow-md">
-                        <div class="flex items-center justify-between mb-2">
-                            <div class="flex items-center"><div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3 shrink-0"><i class="fa-solid fa-user"></i></div><div><h4 class="font-bold text-sm text-gray-800">${a.nama}</h4><p class="text-[10px] text-gray-400">${a.tanggal}</p></div></div>
+                    <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-200 transition hover:shadow-md">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center w-full">
+                                <div class="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mr-3 shrink-0"><i class="fa-solid fa-user"></i></div>
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="font-bold text-sm sm:text-base text-gray-800 truncate">${a.nama}</h4>
+                                    <p class="text-[9px] sm:text-[10px] text-gray-400 mt-0.5 truncate">${a.tanggal}</p>
+                                </div>
+                            </div>
                         </div>
-                        <p class="text-sm text-gray-700 mt-2 whitespace-pre-line pl-11">${a.teks}</p>
-                        <div class="pl-11">${adminTanggapanHtml}${aksiAdminHtml}</div>
+                        <p class="text-xs sm:text-sm text-gray-700 mt-2 whitespace-pre-line pl-0 sm:pl-12 leading-relaxed">${a.teks}</p>
+                        <div class="pl-0 sm:pl-12">${adminTanggapanHtml}${aksiAdminHtml}</div>
                     </div>`;
             });
         }
@@ -1735,8 +1750,6 @@
         // INIT LOAD
         window.onload = () => { 
             cekSesi(); 
-            // Kita biarkan dashboard update dipanggil dari switchTab jika login, 
-            // atau biarkan kosong jika belum login untuk menghemat load
         };
 
     </script>
