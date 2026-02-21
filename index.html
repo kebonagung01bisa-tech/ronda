@@ -185,6 +185,19 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Riwayat Kehadiran Dashboard -->
+                <div class="bg-white shadow-sm sm:shadow rounded-lg p-4 sm:p-6 mb-6 border-t-4 border-indigo-500">
+                    <div class="flex justify-between items-center mb-3 sm:mb-4">
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-800 flex items-center"><i class="fa-solid fa-clipboard-check text-indigo-500 mr-2"></i>Riwayat Kehadiran</h3>
+                        <button onclick="switchTab('presensi')" class="text-[10px] sm:text-xs text-blue-600 font-bold hover:underline transition">Catat Baru</button>
+                    </div>
+                    <!-- Diubah menjadi flex-wrap agar tombol tanggal menyamping secara ringkas -->
+                    <div id="dashboard-riwayat-presensi" class="flex flex-wrap gap-2 sm:gap-3">
+                        <!-- Konten digenerate via Javascript -->
+                    </div>
+                </div>
+
                 <div class="bg-white shadow-sm sm:shadow rounded-lg p-4 sm:p-6 border-t-4 border-blue-600 text-sm">
                     <h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3"><i class="fa-solid fa-circle-info text-blue-500 mr-2"></i>Informasi & Aturan</h3>
                     <ul class="list-disc list-inside text-gray-600 space-y-1">
@@ -380,8 +393,8 @@
                         </button>
                     </div>
                 </div>
-                <!-- Grid 2 Kolom -->
-                <div id="container-warga" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-8"></div>
+                <!-- Grid 3 Kolom Minimalis -->
+                <div id="container-warga" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8"></div>
             </div>
 
         </main>
@@ -569,6 +582,32 @@
                 <div class="flex space-x-2">
                     <button onclick="tutupModalEditKas()" class="bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg hover:bg-gray-300 text-sm font-bold transition">Batal</button>
                     <button onclick="simpanEditKas()" class="bg-yellow-500 text-white px-4 py-2.5 rounded-lg hover:bg-yellow-600 text-sm font-bold shadow-sm transition">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Kehadiran Harian -->
+    <div id="modal-detail-presensi" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[150] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-5 py-4 border-b bg-indigo-50 flex justify-between items-center">
+                <div>
+                    <h3 class="text-sm font-bold text-indigo-900 leading-none">Detail Kehadiran</h3>
+                    <p class="text-[11px] text-indigo-600 font-medium mt-1" id="detail-presensi-tgl">-</p>
+                </div>
+                <button onclick="tutupDetailPresensi()" class="text-gray-500 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div class="p-5 flex-grow overflow-y-auto space-y-4">
+                <!-- Hadir -->
+                <div>
+                    <h4 class="text-xs font-bold text-green-700 bg-green-50 px-2 py-1 rounded inline-block mb-2"><i class="fa-solid fa-check mr-1"></i> Hadir</h4>
+                    <ul id="list-detail-hadir" class="pl-2 space-y-1 mt-1"></ul>
+                </div>
+                <hr class="border-gray-100">
+                <!-- Tidak Hadir -->
+                <div>
+                    <h4 class="text-xs font-bold text-red-700 bg-red-50 px-2 py-1 rounded inline-block mb-2"><i class="fa-solid fa-xmark mr-1"></i> Tidak Hadir</h4>
+                    <ul id="list-detail-tidakhadir" class="pl-2 space-y-1 mt-1"></ul>
                 </div>
             </div>
         </div>
@@ -992,6 +1031,87 @@
             
             const dashWarga = document.getElementById('dash-warga');
             if(dashWarga) dashWarga.innerText = `${dataWarga.length} Orang`;
+
+            renderDashboardPresensi();
+        }
+
+        // --- PRESENSI DASHBOARD ---
+        function renderDashboardPresensi() {
+            const container = document.getElementById('dashboard-riwayat-presensi');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const dates = Object.keys(dataPresensi).sort((a, b) => new Date(b) - new Date(a));
+
+            if (dates.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 w-full text-sm bg-gray-50 p-4 rounded-lg border border-gray-200">Belum ada data presensi yang dicatat.</div>`;
+                return;
+            }
+
+            // Ambil maksimal 7 riwayat terbaru agar menjadi tombol ringkas
+            const recentDates = dates.slice(0, 7);
+
+            recentDates.forEach(date => {
+                let stringTanggal = date;
+                try {
+                    const dateObj = new Date(date);
+                    if (!isNaN(dateObj.getTime())) {
+                        stringTanggal = `${dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'short'})}`;
+                    }
+                } catch(e) {}
+
+                // Membuat desain tombol minimalis yang bisa diklik
+                container.innerHTML += `
+                    <button onclick="bukaDetailPresensi('${date}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-calendar-day"></i> ${stringTanggal}
+                    </button>
+                `;
+            });
+        }
+
+        function bukaDetailPresensi(dateStr) {
+            const records = dataPresensi[dateStr];
+            let stringTanggal = dateStr;
+            let hariStr = '';
+            
+            try {
+                const dateObj = new Date(dateStr);
+                if (!isNaN(dateObj.getTime())) {
+                    stringTanggal = dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
+                    hariStr = namaHari[dateObj.getDay()];
+                }
+            } catch(e) {}
+
+            document.getElementById('detail-presensi-tgl').innerText = `${hariStr}, ${stringTanggal}`;
+            
+            let hadirList = [];
+            let tidakHadirList = []; 
+
+            // Cek jadwal warga pada hari tersebut
+            const wargaRegu = dataWarga.filter(w => w.jadwal === hariStr);
+            
+            wargaRegu.forEach(w => {
+                const status = records && records[w.id] ? records[w.id] : 'Belum';
+                if (status === 'Hadir') {
+                    hadirList.push(w.nama);
+                } else if (status === 'Izin' || status === 'Absen') {
+                    tidakHadirList.push(`${w.nama} <span class="text-[9px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded ml-1 tracking-widest uppercase">${status}</span>`);
+                }
+            });
+
+            document.getElementById('list-detail-hadir').innerHTML = hadirList.length > 0 
+                ? hadirList.map(n => `<li class="text-sm font-medium text-gray-800 flex items-center border-b border-gray-50 pb-1"><i class="fa-solid fa-user text-gray-300 text-xs mr-2 w-3"></i>${n}</li>`).join('') 
+                : '<li class="text-xs text-gray-400 italic">Tidak ada/Belum didata</li>';
+                
+            document.getElementById('list-detail-tidakhadir').innerHTML = tidakHadirList.length > 0 
+                ? tidakHadirList.map(n => `<li class="text-sm font-medium text-gray-800 flex items-center border-b border-gray-50 pb-1"><i class="fa-solid fa-user text-gray-300 text-xs mr-2 w-3"></i>${n}</li>`).join('') 
+                : '<li class="text-xs text-gray-400 italic">Tidak ada/Semua Hadir</li>';
+
+            document.getElementById('modal-detail-presensi').classList.remove('hidden');
+        }
+
+        function tutupDetailPresensi() {
+            document.getElementById('modal-detail-presensi').classList.add('hidden');
         }
 
         // --- PRESENSI ---
@@ -1099,32 +1219,36 @@
                 else if(hari === 'Sabtu') malamSebelumnya = 'Jumat Malam';
                 else if(hari === 'Minggu') malamSebelumnya = 'Sabtu Malam';
 
-                let listHtml = grouped[hari].map(w => `
-                    <div class="flex justify-between items-center py-2.5 border-b border-gray-100/70 last:border-0 transition hover:bg-gray-50/50 rounded px-1">
-                        <div class="min-w-0 pr-2">
-                            <p class="font-bold text-gray-800 text-sm truncate">${w.nama}</p>
-                            <p class="text-[10px] sm:text-[11px] text-gray-500">${w.tipe}</p>
+                let listHtml = grouped[hari].map((w, index) => `
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition px-1 rounded">
+                        <div class="flex items-center gap-2 min-w-0 pr-2">
+                            <span class="text-[10px] text-gray-400 font-mono w-3">${index + 1}.</span>
+                            <p class="font-medium text-gray-800 text-sm truncate">${w.nama}</p>
                         </div>
-                        ${userRole === 'admin' ? `<button onclick="hapusWarga(${w.id})" class="text-red-400 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded transition shrink-0"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        <div class="flex items-center gap-2 shrink-0 pl-2">
+                            <span class="text-[9px] text-gray-500 bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded uppercase tracking-wider">${w.tipe}</span>
+                            ${userRole === 'admin' ? `<button onclick="hapusWarga(${w.id})" class="text-red-400 hover:text-red-600 transition p-1"><i class="fa-solid fa-trash text-[11px]"></i></button>` : ''}
+                        </div>
                     </div>
                 `).join('');
 
                 const isActive = hari === activeScheduleHari;
-                const cardClass = isActive ? "bg-orange-50 rounded-xl shadow-md border-2 border-orange-400 p-4 sm:p-5 transition relative overflow-hidden ring-4 ring-orange-100" : "bg-white rounded-xl shadow-sm sm:shadow border border-gray-200 p-4 sm:p-5 hover:shadow-md transition relative";
-                const activeBadge = isActive ? `<span class="absolute top-0 right-0 bg-orange-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-xl animate-pulse shadow-sm"><i class="fa-solid fa-clock mr-1"></i> HARI INI</span>` : "";
+                const cardClass = isActive ? "bg-orange-50/30 rounded-xl shadow-sm border border-orange-300 p-4 transition relative overflow-hidden" : "bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow transition relative";
+                const activeBadge = isActive ? `<span class="absolute top-0 right-0 bg-orange-500 text-white text-[9px] font-bold px-2 py-1 rounded-bl-lg shadow-sm"><i class="fa-solid fa-clock mr-1"></i> HARI INI</span>` : "";
 
                 container.innerHTML += `
                     <div class="${cardClass}">
                         ${activeBadge}
-                        <div class="border-b-2 ${isActive ? 'border-orange-200' : 'border-blue-100'} pb-3 mb-3 mt-1 sm:mt-2">
-                            <h3 class="font-bold ${isActive ? 'text-orange-800' : 'text-blue-800'} flex items-center justify-between text-base sm:text-lg">
-                                <span><i class="fa-regular fa-calendar-check mr-2"></i>Regu ${hari}</span>
-                                <span class="${isActive ? 'bg-orange-200 text-orange-800' : 'bg-blue-50 text-blue-600'} px-2.5 py-0.5 rounded text-[10px] uppercase font-bold shadow-sm">${grouped[hari].length} orang</span>
+                        <div class="border-b ${isActive ? 'border-orange-200' : 'border-gray-100'} pb-2 mb-2">
+                            <h3 class="font-bold ${isActive ? 'text-orange-700' : 'text-gray-800'} text-base flex items-center justify-between pr-16">
+                                <span>Regu ${hari}</span>
+                                <span class="text-[10px] font-normal text-gray-500 bg-white px-1.5 py-0.5 rounded border border-gray-200 shadow-sm">${grouped[hari].length} org</span>
                             </h3>
-                            <p class="text-xs ${isActive ? 'text-orange-700 bg-orange-100/70' : 'text-blue-700 bg-blue-50/50'} font-bold mt-2 p-1.5 rounded inline-block">
-                                <i class="fa-solid fa-moon mr-1"></i> Berjaga pada: ${malamSebelumnya}
+                            <p class="text-[10px] ${isActive ? 'text-orange-600' : 'text-gray-500'} mt-0.5">
+                                Berjaga: ${malamSebelumnya}
                             </p>
-                        </div><div>${listHtml}</div>
+                        </div>
+                        <div class="flex flex-col mt-1">${listHtml}</div>
                     </div>
                 `;
             });
