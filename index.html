@@ -115,9 +115,6 @@
                     <button onclick="switchTab('presensi')" id="tab-presensi" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
                         <i class="fa-solid fa-clipboard-user mr-1"></i> Presensi Ronda
                     </button>
-                    <button onclick="switchTab('keuangan')" id="tab-keuangan" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
-                        <i class="fa-solid fa-wallet mr-1"></i> Tagihan & Denda
-                    </button>
                     <button onclick="switchTab('kas-lainnya')" id="tab-kas-lainnya" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
                         <i class="fa-solid fa-money-bill-transfer mr-1"></i> Kas Lainnya
                     </button>
@@ -126,9 +123,6 @@
                     </button>
                     <button onclick="switchTab('aspirasi')" id="tab-aspirasi" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
                         <i class="fa-solid fa-bullhorn mr-1"></i> Aspirasi
-                    </button>
-                    <button onclick="switchTab('warga')" id="tab-warga" class="tab-btn whitespace-nowrap py-3 sm:py-4 px-1 border-b-2 border-transparent text-xs sm:text-sm font-medium text-gray-500 hover:text-gray-700">
-                        <i class="fa-solid fa-users mr-1"></i> Warga
                     </button>
                 </div>
             </div>
@@ -167,27 +161,45 @@
                         </div>
                     </div>
                     <!-- Card Piutang Denda -->
-                    <div class="bg-white rounded-lg shadow-sm sm:shadow p-4 sm:p-6 border-l-4 border-red-500">
-                        <div class="flex items-center">
-                            <div class="p-2 sm:p-3 rounded-full bg-red-100 text-red-500 mr-3 sm:mr-4 shrink-0">
-                                <i class="fa-solid fa-file-invoice-dollar text-xl sm:text-2xl"></i>
+                    <div class="bg-white rounded-lg shadow-sm sm:shadow p-4 sm:p-6 border-l-4 border-red-500 cursor-pointer hover:shadow-lg hover:border-red-600 transition relative overflow-hidden group" onclick="switchTab('keuangan')">
+                        <div class="absolute inset-0 bg-red-50 opacity-0 group-hover:opacity-100 transition"></div>
+                        <div class="relative flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="p-2 sm:p-3 rounded-full bg-red-100 text-red-500 mr-3 sm:mr-4 group-hover:scale-110 transition shrink-0">
+                                    <i class="fa-solid fa-file-invoice-dollar text-xl sm:text-2xl"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-[10px] sm:text-sm text-gray-500 font-semibold uppercase truncate">Denda Belum Dibayar</p>
+                                    <p class="text-lg sm:text-2xl font-bold text-gray-800 truncate" id="dash-piutang">Rp 0</p>
+                                </div>
                             </div>
-                            <div class="min-w-0">
-                                <p class="text-[10px] sm:text-sm text-gray-500 font-semibold uppercase truncate">Denda Belum Dibayar</p>
-                                <p class="text-lg sm:text-2xl font-bold text-gray-800 truncate" id="dash-piutang">Rp 0</p>
+                            <div class="text-red-500 opacity-30 group-hover:opacity-100 transition shrink-0 ml-2">
+                                <i class="fa-solid fa-chevron-right text-lg sm:text-xl"></i>
                             </div>
+                        </div>
+                        <div class="relative mt-2 sm:mt-3 text-[10px] sm:text-xs text-red-700 font-medium opacity-0 group-hover:opacity-100 transition">
+                            <i class="fa-solid fa-hand-pointer mr-1"></i> Klik untuk kelola denda
                         </div>
                     </div>
                     <!-- Card Total Warga -->
-                    <div class="bg-white rounded-lg shadow-sm sm:shadow p-4 sm:p-6 border-l-4 border-blue-500">
-                        <div class="flex items-center">
-                            <div class="p-2 sm:p-3 rounded-full bg-blue-100 text-blue-500 mr-3 sm:mr-4 shrink-0">
-                                <i class="fa-solid fa-users-viewfinder text-xl sm:text-2xl"></i>
+                    <div class="bg-white rounded-lg shadow-sm sm:shadow p-4 sm:p-6 border-l-4 border-blue-500 cursor-pointer hover:shadow-lg hover:border-blue-600 transition relative overflow-hidden group" onclick="switchTab('warga')">
+                        <div class="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-100 transition"></div>
+                        <div class="relative flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="p-2 sm:p-3 rounded-full bg-blue-100 text-blue-500 mr-3 sm:mr-4 group-hover:scale-110 transition shrink-0">
+                                    <i class="fa-solid fa-users-viewfinder text-xl sm:text-2xl"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-[10px] sm:text-sm text-gray-500 font-semibold uppercase truncate">Total Warga Aktif</p>
+                                    <p class="text-lg sm:text-2xl font-bold text-gray-800 truncate" id="dash-warga">0 Orang</p>
+                                </div>
                             </div>
-                            <div class="min-w-0">
-                                <p class="text-[10px] sm:text-sm text-gray-500 font-semibold uppercase truncate">Total Warga Aktif</p>
-                                <p class="text-lg sm:text-2xl font-bold text-gray-800 truncate" id="dash-warga">0 Orang</p>
+                            <div class="text-blue-500 opacity-30 group-hover:opacity-100 transition shrink-0 ml-2">
+                                <i class="fa-solid fa-chevron-right text-lg sm:text-xl"></i>
                             </div>
+                        </div>
+                        <div class="relative mt-2 sm:mt-3 text-[10px] sm:text-xs text-blue-700 font-medium opacity-0 group-hover:opacity-100 transition">
+                            <i class="fa-solid fa-hand-pointer mr-1"></i> Klik untuk kelola warga
                         </div>
                     </div>
                 </div>
@@ -389,8 +401,8 @@
                         </button>
                     </div>
                 </div>
-                <!-- Grid 3 Kolom Minimalis -->
-                <div id="container-warga" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-8"></div>
+                <!-- Grid 3 Kolom di Mobile, 4 Kolom di Desktop -->
+                <div id="container-warga" class="grid grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4 pb-8"></div>
             </div>
 
         </main>
@@ -1236,45 +1248,43 @@
             urutanHari.forEach(h => grouped[h] = []);
             dataWarga.forEach(w => { if(grouped[w.jadwal]) grouped[w.jadwal].push(w); });
 
+            // Tema Warna Unik untuk Setiap Hari
+            const colors = {
+                'Senin': { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-800', badge: 'bg-blue-200 text-blue-800' },
+                'Selasa': { bg: 'bg-pink-50', border: 'border-pink-200', text: 'text-pink-800', badge: 'bg-pink-200 text-pink-800' },
+                'Rabu': { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-800', badge: 'bg-emerald-200 text-emerald-800' },
+                'Kamis': { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-800', badge: 'bg-amber-200 text-amber-800' },
+                'Jumat': { bg: 'bg-purple-50', border: 'border-purple-200', text: 'text-purple-800', badge: 'bg-purple-200 text-purple-800' },
+                'Sabtu': { bg: 'bg-cyan-50', border: 'border-cyan-200', text: 'text-cyan-800', badge: 'bg-cyan-200 text-cyan-800' },
+                'Minggu': { bg: 'bg-rose-50', border: 'border-rose-200', text: 'text-rose-800', badge: 'bg-rose-200 text-rose-800' }
+            };
+
             urutanHari.forEach(hari => {
                 if(grouped[hari].length === 0) return;
-                let malamSebelumnya = '';
-                if(hari === 'Senin') malamSebelumnya = 'Minggu Malam';
-                else if(hari === 'Selasa') malamSebelumnya = 'Senin Malam';
-                else if(hari === 'Rabu') malamSebelumnya = 'Selasa Malam';
-                else if(hari === 'Kamis') malamSebelumnya = 'Rabu Malam';
-                else if(hari === 'Jumat') malamSebelumnya = 'Kamis Malam';
-                else if(hari === 'Sabtu') malamSebelumnya = 'Jumat Malam';
-                else if(hari === 'Minggu') malamSebelumnya = 'Sabtu Malam';
+                const c = colors[hari];
 
                 let listHtml = grouped[hari].map((w, index) => `
-                    <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition px-1 rounded">
-                        <div class="flex items-center gap-2 min-w-0 pr-2">
-                            <span class="text-[10px] text-gray-400 font-mono w-3">${index + 1}.</span>
-                            <p class="font-medium text-gray-800 text-sm truncate">${w.nama}</p>
+                    <div class="flex flex-col py-1.5 border-b border-black/5 last:border-0 hover:bg-black/5 transition px-1 rounded min-w-0">
+                        <div class="flex justify-between items-center w-full min-w-0">
+                            <p class="font-bold text-gray-800 text-[9px] sm:text-xs truncate w-full pr-1">${index + 1}. ${w.nama}</p>
+                            ${userRole === 'admin' ? `<button onclick="hapusWarga(${w.id})" class="text-red-400 hover:text-red-600 transition shrink-0 ml-1"><i class="fa-solid fa-trash text-[8px] sm:text-[10px]"></i></button>` : ''}
                         </div>
-                        <div class="flex items-center gap-2 shrink-0 pl-2">
-                            <span class="text-[9px] text-gray-500 bg-gray-100 border border-gray-200 px-1.5 py-0.5 rounded uppercase tracking-wider">${w.tipe}</span>
-                            ${userRole === 'admin' ? `<button onclick="hapusWarga(${w.id})" class="text-red-400 hover:text-red-600 transition p-1"><i class="fa-solid fa-trash text-[11px]"></i></button>` : ''}
-                        </div>
+                        <span class="text-[7px] sm:text-[9px] ${c.text} opacity-80 mt-0.5 inline-block uppercase tracking-wider font-bold truncate">${w.tipe}</span>
                     </div>
                 `).join('');
 
                 const isActive = hari === activeScheduleHari;
-                const cardClass = isActive ? "bg-orange-50/30 rounded-xl shadow-sm border border-orange-300 p-4 transition relative overflow-hidden" : "bg-white rounded-xl shadow-sm border border-gray-200 p-4 hover:shadow transition relative";
-                const activeBadge = isActive ? `<span class="absolute top-0 right-0 bg-orange-500 text-white text-[9px] font-bold px-2 py-1 rounded-bl-lg shadow-sm"><i class="fa-solid fa-clock mr-1"></i> HARI INI</span>` : "";
+                const cardClass = `${c.bg} rounded-xl shadow-sm border ${isActive ? 'border-orange-400 ring-2 ring-orange-200' : c.border} p-2 sm:p-4 transition relative overflow-hidden`;
+                const activeBadge = isActive ? `<span class="absolute top-0 right-0 bg-orange-500 text-white text-[7px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-bl-lg shadow-sm">HARI INI</span>` : "";
 
                 container.innerHTML += `
                     <div class="${cardClass}">
                         ${activeBadge}
-                        <div class="border-b ${isActive ? 'border-orange-200' : 'border-gray-100'} pb-2 mb-2">
-                            <h3 class="font-bold ${isActive ? 'text-orange-700' : 'text-gray-800'} text-base flex items-center justify-between pr-16">
-                                <span>Regu ${hari}</span>
-                                <span class="text-[10px] font-normal text-gray-500 bg-white px-1.5 py-0.5 rounded border border-gray-200 shadow-sm">${grouped[hari].length} org</span>
+                        <div class="border-b border-black/10 pb-1.5 sm:pb-2 mb-1.5 sm:mb-2 text-center sm:text-left flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                            <h3 class="font-extrabold ${c.text} text-[11px] sm:text-sm uppercase tracking-wider">
+                                ${hari}
                             </h3>
-                            <p class="text-[10px] ${isActive ? 'text-orange-600' : 'text-gray-500'} mt-0.5">
-                                Berjaga: ${malamSebelumnya}
-                            </p>
+                            <span class="${c.badge} px-1.5 py-0.5 rounded text-[7px] sm:text-[9px] font-bold inline-block mx-auto sm:mx-0 shadow-sm whitespace-nowrap">${grouped[hari].length} org</span>
                         </div>
                         <div class="flex flex-col mt-1">${listHtml}</div>
                     </div>
