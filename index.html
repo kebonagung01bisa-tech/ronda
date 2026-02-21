@@ -25,12 +25,21 @@
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans min-h-screen pb-24">
 
+    <!-- SPLASH SCREEN (Layar Pembuka) -->
+    <div id="splash-screen" class="fixed inset-0 bg-white z-[400] flex flex-col items-center justify-center transition-opacity duration-700">
+        <img src="https://i.ibb.co.com/21BpG3JY/RT-01.png" alt="Logo RT-01" class="w-3/4 max-w-xs sm:max-w-sm object-contain animate-pulse drop-shadow-2xl mb-8">
+        <div class="flex flex-col items-center">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-800 tracking-widest drop-shadow-sm">E-RONDA</h1>
+            <p class="text-gray-600 font-bold mt-2 text-sm sm:text-base uppercase tracking-widest">RT.01 / RW.05 KebonAgung</p>
+        </div>
+    </div>
+
     <!-- LOGIN SCREEN (LOCK) -->
     <div id="login-screen" class="fixed inset-0 bg-blue-700 z-[300] flex flex-col items-center justify-center text-white transition-opacity duration-500 p-4">
         <div class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-sm text-gray-800 transform transition-all scale-100" id="login-box">
             <div class="text-center mb-6">
-                <div class="bg-blue-50 p-3 rounded-full inline-block mb-3 shadow-inner">
-                    <img src="https://i.ibb.co.com/rRk3kXpr/LOGO-KABUPATEN-KEBUMEN.png" alt="Logo Kabupaten Kebumen" class="h-14 mx-auto object-contain" style="mix-blend-mode: multiply;">
+                <div class="bg-blue-50 p-2 sm:p-3 rounded-full inline-block mb-3 shadow-inner">
+                    <img src="https://i.ibb.co.com/21BpG3JY/RT-01.png" alt="Logo RT-01" class="h-16 sm:h-20 mx-auto object-contain">
                 </div>
                 <h2 class="text-xl sm:text-2xl font-bold text-blue-800 leading-tight">E-RONDA</h2>
                 <p class="text-xs sm:text-sm text-gray-600 mt-1 font-bold">Dk. KebonAgung RT.01/RW.05</p>
@@ -64,22 +73,14 @@
     <!-- MAIN APP CONTAINER (Tersembunyi sebelum login) -->
     <div id="app-container" class="hidden">
         
-        <!-- LOADING INDICATOR -->
-        <div id="loading-overlay" class="fixed inset-0 bg-gray-100/80 z-40 flex justify-center items-center rounded-lg backdrop-blur-sm transition-opacity duration-500 pointer-events-none opacity-0">
-            <div class="text-center p-4">
-                <i class="fa-solid fa-circle-notch fa-spin text-blue-600 text-4xl mb-3"></i>
-                <p class="text-blue-800 font-bold animate-pulse text-sm sm:text-base">Menghubungkan ke Database Cloud...</p>
-            </div>
-        </div>
-
         <!-- Navbar Header -->
         <nav class="bg-blue-600 text-white shadow-md relative z-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
                     <!-- Header Title dengan Logo Baru -->
                     <div class="flex items-center">
-                        <div class="bg-white p-1 rounded-full mr-2 sm:mr-3 shadow-md h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center shrink-0">
-                            <img src="https://i.ibb.co.com/rRk3kXpr/LOGO-KABUPATEN-KEBUMEN.png" alt="Logo Kabupaten Kebumen" class="max-h-full max-w-full object-contain" style="mix-blend-mode: multiply;">
+                        <div class="bg-white p-0.5 sm:p-1 rounded-full mr-2 sm:mr-3 shadow-md h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center shrink-0 overflow-hidden">
+                            <img src="https://i.ibb.co.com/21BpG3JY/RT-01.png" alt="Logo RT-01" class="max-h-full max-w-full object-contain">
                         </div>
                         <div class="flex flex-col min-w-0">
                             <span class="font-bold text-base sm:text-lg md:text-xl tracking-tight leading-tight truncate">E-Ronda RT001</span>
@@ -662,6 +663,18 @@
                     <h4 class="text-xs font-bold text-red-700 bg-red-50 px-2 py-1 rounded inline-block mb-2"><i class="fa-solid fa-xmark mr-1"></i> Tidak Hadir</h4>
                     <ul id="list-detail-tidakhadir" class="pl-1 space-y-1 mt-1"></ul>
                 </div>
+                <hr class="border-gray-100">
+                <!-- Bukti Foto -->
+                <div>
+                    <h4 class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded inline-block mb-2"><i class="fa-solid fa-camera mr-1"></i> Bukti Foto Kegiatan</h4>
+                    <div id="container-bukti-presensi" class="flex flex-wrap gap-2 mb-2 hide-scroll"></div>
+                    <!-- Upload Input (Khusus Admin) -->
+                    <div id="admin-upload-presensi" class="hidden mt-2 border-t border-dashed border-gray-200 pt-2">
+                        <label class="block text-[10px] font-bold text-gray-500 mb-1 uppercase tracking-wider">Tambah Foto (Admin)</label>
+                        <input type="file" id="input-foto-presensi" multiple accept="image/*" class="w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 cursor-pointer" onchange="prosesUploadBuktiPresensi(this)">
+                        <span id="loading-upload-presensi" class="hidden text-xs text-blue-500 font-bold mt-1 inline-block"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Mengunggah...</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -750,10 +763,14 @@
             sessionStorage.setItem('ronda_kode_rt', kodeRT); 
             
             document.getElementById('login-screen').classList.add('opacity-0', 'pointer-events-none');
+            
+            // Tampilkan kembali Splash Screen sebagai indikator loading
+            const splash = document.getElementById('splash-screen');
+            splash.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+
             setTimeout(() => {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-container').classList.remove('hidden');
-                document.getElementById('loading-overlay').classList.remove('opacity-0', 'pointer-events-none');
                 
                 initFirebase().then(() => {
                     terapkanRoleUI();
@@ -802,6 +819,14 @@
                 });
             } else {
                  sessionStorage.clear(); 
+                 // Sembunyikan splash screen jika tidak login (kasih jeda agar terlihat dulu)
+                 setTimeout(() => {
+                     const splash = document.getElementById('splash-screen');
+                     if(splash) {
+                         splash.classList.add('opacity-0', 'pointer-events-none');
+                         setTimeout(() => splash.classList.add('hidden'), 700);
+                     }
+                 }, 1500);
             }
         }
 
@@ -899,6 +924,21 @@
         // --- FIREBASE SETUP ---
         let db, collection, doc, setDoc, deleteDoc, onSnapshot, deleteField;
         let currentUser = null;
+        let initialLoadCount = 0;
+
+        function cekSelesaiLoading() {
+            initialLoadCount++;
+            // Tunggu beberapa koleksi utama selesai ditarik agar UI tidak berkedip
+            if (initialLoadCount >= 4) {
+                setTimeout(() => {
+                    const splash = document.getElementById('splash-screen');
+                    if (splash) {
+                        splash.classList.add('opacity-0', 'pointer-events-none');
+                        setTimeout(() => splash.classList.add('hidden'), 700);
+                    }
+                }, 300); // Sedikit jeda agar layar beranda sempat ter-render sebelum splash menghilang
+            }
+        }
 
         const getColl = (name) => {
             const prefix = sessionStorage.getItem('ronda_kode_rt') || 'DEFAULT';
@@ -938,11 +978,9 @@
                     authModule.onAuthStateChanged(auth, (user) => {
                         if (user) {
                             currentUser = user;
+                            initialLoadCount = 0; // Reset counter
                             setupRealtimeListeners();
-                            const loadingOverlay = document.getElementById('loading-overlay');
-                            if(loadingOverlay) {
-                                loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
-                            }
+                            // Splash screen disembunyikan oleh cekSelesaiLoading() nanti
                             resolve(); 
                         }
                     });
@@ -950,9 +988,10 @@
                 
             } catch(e) {
                 console.error("Firebase init error:", e);
-                const loadingOverlay = document.getElementById('loading-overlay');
-                if (loadingOverlay) {
-                     loadingOverlay.classList.add('opacity-0', 'pointer-events-none');
+                const splash = document.getElementById('splash-screen');
+                if (splash) {
+                     splash.classList.add('opacity-0', 'pointer-events-none');
+                     setTimeout(() => splash.classList.add('hidden'), 700);
                 }
                 showDialog('alert', 'Error Server', 'Gagal terhubung ke Database Cloud. Periksa koneksi internet Anda.');
                 return Promise.reject(e); 
@@ -962,6 +1001,8 @@
         // --- REAL-TIME DATA SYNC ---
         function setupRealtimeListeners() {
             if (!currentUser) return;
+
+            let isFirstWarga = true, isFirstDenda = true, isFirstMutasi = true, isFirstPresensi = true;
 
             onSnapshot(getColl('warga'), (snap) => {
                 if(snap.empty && dataWarga.length === 0) {
@@ -979,6 +1020,7 @@
                     updateDashboard();
                     if(document.getElementById('page-presensi') && document.getElementById('page-presensi').classList.contains('active')) loadPresensi();
                 }
+                if(isFirstWarga) { isFirstWarga = false; cekSelesaiLoading(); }
             }, (err) => console.error(err));
 
             onSnapshot(getColl('pengaturan_denda'), (snap) => {
@@ -996,25 +1038,39 @@
                 dataDenda = snap.docs.map(d => d.data());
                 if(document.getElementById('page-keuangan') && document.getElementById('page-keuangan').classList.contains('active')) renderTabelDenda();
                 updateDashboard();
+                if(isFirstDenda) { isFirstDenda = false; cekSelesaiLoading(); }
             }, (err) => console.error(err));
 
             onSnapshot(getColl('mutasi'), (snap) => {
-                dataMutasi = snap.docs.map(d => d.data());
-                if(document.getElementById('page-kas-lainnya') && document.getElementById('page-kas-lainnya').classList.contains('active')) renderTabelKasLainnya();
-                if(document.getElementById('page-realisasi') && document.getElementById('page-realisasi').classList.contains('active')) renderRealisasi();
-                if(document.getElementById('page-riwayat-kas') && document.getElementById('page-riwayat-kas').classList.contains('active')) renderRiwayatKas();
-                updateDashboard();
+                // Gunakan setTimeout agar proses rendering data besar tidak memblokir UI thread secara bersamaan
+                setTimeout(() => {
+                    dataMutasi = snap.docs.map(d => d.data());
+                    if(document.getElementById('page-kas-lainnya') && document.getElementById('page-kas-lainnya').classList.contains('active')) renderTabelKasLainnya();
+                    if(document.getElementById('page-realisasi') && document.getElementById('page-realisasi').classList.contains('active')) renderRealisasi();
+                    if(document.getElementById('page-riwayat-kas') && document.getElementById('page-riwayat-kas').classList.contains('active')) renderRiwayatKas();
+                    updateDashboard();
+                    if(isFirstMutasi) { isFirstMutasi = false; cekSelesaiLoading(); }
+                }, 0);
             }, (err) => console.error(err));
 
             onSnapshot(getColl('presensi'), (snap) => {
-                dataPresensi = {};
-                snap.docs.forEach(d => { dataPresensi[d.id] = d.data(); });
-                if(document.getElementById('page-presensi') && document.getElementById('page-presensi').classList.contains('active')) loadPresensi();
-                
-                // Segarkan pop-up riwayat kehadiran secara otomatis jika terbuka
-                if (currentModalDateStr && !document.getElementById('modal-detail-presensi').classList.contains('hidden')) {
-                    bukaDetailPresensi(currentModalDateStr);
-                }
+                setTimeout(() => {
+                    dataPresensi = {};
+                    snap.docs.forEach(d => { dataPresensi[d.id] = d.data(); });
+                    
+                    // Render ulang dashboard langsung setelah data presensi masuk
+                    if(document.getElementById('page-dashboard') && document.getElementById('page-dashboard').classList.contains('active')) {
+                        renderDashboardPresensi();
+                    }
+
+                    if(document.getElementById('page-presensi') && document.getElementById('page-presensi').classList.contains('active')) loadPresensi();
+                    
+                    // Segarkan pop-up riwayat kehadiran secara otomatis jika terbuka
+                    if (currentModalDateStr && !document.getElementById('modal-detail-presensi').classList.contains('hidden')) {
+                        bukaDetailPresensi(currentModalDateStr);
+                    }
+                    if(isFirstPresensi) { isFirstPresensi = false; cekSelesaiLoading(); }
+                }, 0);
             }, (err) => console.error(err));
 
             onSnapshot(getColl('rencana'), (snap) => {
@@ -1142,7 +1198,8 @@
             if (!container) return;
             container.innerHTML = '';
 
-            const dates = Object.keys(dataPresensi).sort((a, b) => new Date(b) - new Date(a));
+            // Menggunakan localeCompare untuk sorting string tanggal jauh lebih cepat daripada new Date()
+            const dates = Object.keys(dataPresensi).sort((a, b) => b.localeCompare(a));
 
             if (dates.length === 0) {
                 container.innerHTML = `<div class="text-center text-gray-500 w-full text-sm bg-gray-50 p-4 rounded-lg border border-gray-200">Belum ada data presensi yang dicatat.</div>`;
@@ -1154,18 +1211,23 @@
 
             recentDates.forEach(date => {
                 let stringTanggal = date;
+                let adaFoto = false;
                 try {
                     const dateObj = new Date(date);
                     if (!isNaN(dateObj.getTime())) {
                         const namaHariStr = namaHari[dateObj.getDay()];
                         stringTanggal = `${namaHariStr}, ${dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'short'})}`;
                     }
+                    if (dataPresensi[date] && dataPresensi[date].bukti_foto && dataPresensi[date].bukti_foto.length > 0) {
+                        adaFoto = true;
+                    }
                 } catch(e) {}
 
                 // Membuat desain tombol minimalis yang bisa diklik
                 container.innerHTML += `
-                    <button onclick="bukaDetailPresensi('${date}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm flex items-center gap-1.5">
+                    <button onclick="bukaDetailPresensi('${date}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm flex items-center gap-1.5 relative">
                         <i class="fa-solid fa-calendar-day"></i> ${stringTanggal}
+                        ${adaFoto ? '<span class="absolute -top-1.5 -right-1.5 bg-blue-500 text-white text-[8px] px-1 rounded-full"><i class="fa-solid fa-image"></i></span>' : ''}
                     </button>
                 `;
             });
@@ -1224,7 +1286,73 @@
                 ? tidakHadirList.join('') 
                 : '<li class="text-xs text-gray-400 italic py-1">Tidak ada/Semua Hadir</li>';
 
+            // Atur Tampilan Upload Gambar Berdasarkan Role
+            const adminUploadDiv = document.getElementById('admin-upload-presensi');
+            if (userRole === 'admin') {
+                adminUploadDiv.classList.remove('hidden');
+            } else {
+                adminUploadDiv.classList.add('hidden');
+            }
+
+            renderBuktiPresensi(dateStr);
             document.getElementById('modal-detail-presensi').classList.remove('hidden');
+        }
+
+        function renderBuktiPresensi(tgl) {
+            const container = document.getElementById('container-bukti-presensi');
+            const records = dataPresensi[tgl] || {};
+            const fotos = records.bukti_foto || [];
+
+            if (fotos.length > 0) {
+                container.innerHTML = fotos.map((src, idx) => `
+                    <div class="relative group mt-1">
+                        <img src="${src}" class="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border border-gray-300 shadow-sm cursor-pointer hover:opacity-80 transition" onclick="bukaLightbox('${src}')">
+                        ${userRole === 'admin' ? `<button onclick="hapusBuktiPresensi('${tgl}', ${idx})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] sm:opacity-0 group-hover:opacity-100 transition shadow"><i class="fa-solid fa-times"></i></button>` : ''}
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<span class="text-xs text-gray-400 italic">Belum ada foto bukti.</span>';
+            }
+        }
+
+        async function prosesUploadBuktiPresensi(input) {
+            if(!input.files || input.files.length === 0) return;
+            const tgl = currentModalDateStr;
+            if(!tgl) return;
+
+            const loadingStr = document.getElementById('loading-upload-presensi');
+            loadingStr.classList.remove('hidden');
+            input.disabled = true;
+
+            try {
+                // Konversi gambar yang diupload ke Base64 (menggunakan fungsi processFilesToBase64 yang sudah ada)
+                const base64Baru = await processFilesToBase64(input.files);
+                const records = dataPresensi[tgl] || {};
+                const existingFotos = records.bukti_foto || [];
+                const updatedFotos = existingFotos.concat(base64Baru);
+
+                // Update ke Firebase khusus untuk tanggal ini
+                await setDoc(doc(getColl('presensi'), tgl), { bukti_foto: updatedFotos }, { merge: true });
+                showToast('Foto bukti kegiatan berhasil ditambahkan.');
+            } catch (e) {
+                showDialog('alert', 'Error', 'Gagal memproses gambar. Pastikan ukuran file tidak terlalu besar.');
+            } finally {
+                loadingStr.classList.add('hidden');
+                input.disabled = false;
+                input.value = '';
+            }
+        }
+
+        function hapusBuktiPresensi(tgl, idx) {
+            showDialog('confirm', 'Hapus Foto', 'Yakin ingin menghapus foto bukti ini?', () => {
+                const records = dataPresensi[tgl] || {};
+                let fotos = records.bukti_foto || [];
+                fotos.splice(idx, 1);
+                
+                setDoc(doc(getColl('presensi'), tgl), { bukti_foto: fotos }, { merge: true }).then(() => {
+                    showToast('Foto bukti berhasil dihapus.');
+                });
+            });
         }
 
         function tutupDetailPresensi() {
