@@ -29,8 +29,9 @@
                 <div class="bg-blue-50 p-3 rounded-full inline-block mb-3 shadow-inner">
                     <img src="https://i.ibb.co.com/rRk3kXpr/LOGO-KABUPATEN-KEBUMEN.png" alt="Logo Kabupaten Kebumen" class="h-14 mx-auto object-contain" style="mix-blend-mode: multiply;">
                 </div>
-                <h2 class="text-2xl font-bold text-blue-800 leading-tight">E-Ronda</h2>
-                <p class="text-sm text-gray-500 mt-1">Sistem Keamanan & Kas Warga</p>
+                <h2 class="text-xl sm:text-2xl font-bold text-blue-800 leading-tight">E-RONDA</h2>
+                <p class="text-xs sm:text-sm text-gray-600 mt-1 font-bold">Dk. KebonAgung RT.01/RW.05</p>
+                <p class="text-[10px] text-gray-500 mt-0.5 font-medium uppercase tracking-wide">Jatinegara, Sempor, Kebumen</p>
             </div>
             
             <div id="login-error" class="bg-red-50 text-red-600 text-xs text-center p-2 rounded mb-4 hidden border border-red-200 font-bold">
@@ -87,6 +88,11 @@
                     
                     <!-- Role Indicator & Logout -->
                     <div class="flex items-center space-x-2 sm:space-x-3 shrink-0 ml-2">
+                        <!-- Tombol Informasi & Aturan -->
+                        <button onclick="bukaModalInfo()" class="text-blue-100 hover:text-white bg-blue-700 hover:bg-blue-800 h-8 w-8 sm:h-9 sm:w-9 rounded-full flex items-center justify-center transition shadow-inner mr-1" title="Informasi & Aturan">
+                            <i class="fa-solid fa-circle-info text-lg"></i>
+                        </button>
+                        
                         <div class="flex flex-col items-end">
                             <span class="text-[8px] sm:text-[10px] text-blue-200 uppercase font-bold tracking-wider">Akses</span>
                             <span id="nav-role-badge" class="bg-blue-800 text-white text-[10px] sm:text-xs font-bold px-1.5 sm:px-2 py-0.5 rounded shadow-inner">Admin</span>
@@ -190,22 +196,12 @@
                 <div class="bg-white shadow-sm sm:shadow rounded-lg p-4 sm:p-6 mb-6 border-t-4 border-indigo-500">
                     <div class="flex justify-between items-center mb-3 sm:mb-4">
                         <h3 class="text-base sm:text-lg font-semibold text-gray-800 flex items-center"><i class="fa-solid fa-clipboard-check text-indigo-500 mr-2"></i>Riwayat Kehadiran</h3>
-                        <button onclick="switchTab('presensi')" class="text-[10px] sm:text-xs text-blue-600 font-bold hover:underline transition">Catat Baru</button>
+                        <button id="btn-catat-presensi" onclick="switchTab('presensi')" class="text-[10px] sm:text-xs text-blue-600 font-bold hover:underline transition">Catat Baru</button>
                     </div>
                     <!-- Diubah menjadi flex-wrap agar tombol tanggal menyamping secara ringkas -->
                     <div id="dashboard-riwayat-presensi" class="flex flex-wrap gap-2 sm:gap-3">
                         <!-- Konten digenerate via Javascript -->
                     </div>
-                </div>
-
-                <div class="bg-white shadow-sm sm:shadow rounded-lg p-4 sm:p-6 border-t-4 border-blue-600 text-sm">
-                    <h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-3"><i class="fa-solid fa-circle-info text-blue-500 mr-2"></i>Informasi & Aturan</h3>
-                    <ul class="list-disc list-inside text-gray-600 space-y-1">
-                        <li>Sistem ini terhubung ke <b>Database Cloud</b>. Perubahan tersimpan secara real-time.</li>
-                        <li>Warga wajib mengikuti jadwal ronda. Jika berhalangan/absen akan dikenakan denda kedisiplinan.</li>
-                        <li>Besaran tarif denda bervariasi tergantung status warga yang sudah disepakati.</li>
-                        <li>Uang hasil denda 100% masuk ke Kas RT. Pengeluaran serta bukti foto realisasinya transparan.</li>
-                    </ul>
                 </div>
             </div>
 
@@ -613,6 +609,27 @@
         </div>
     </div>
 
+    <!-- Modal Informasi & Aturan -->
+    <div id="modal-informasi" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[200] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden">
+            <div class="px-5 py-4 border-b bg-blue-50 flex justify-between items-center">
+                <h3 class="text-base font-bold text-blue-900 flex items-center"><i class="fa-solid fa-circle-info mr-2 text-blue-600"></i>Informasi & Aturan</h3>
+                <button onclick="tutupModalInfo()" class="text-gray-500 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div class="p-5 text-sm">
+                <ul class="list-disc list-outside ml-4 text-gray-600 space-y-2.5">
+                    <li>Sistem ini terhubung ke <b>Database Cloud</b>. Perubahan tersimpan secara real-time.</li>
+                    <li>Warga wajib mengikuti jadwal ronda. Jika berhalangan/absen akan dikenakan denda kedisiplinan.</li>
+                    <li>Besaran tarif denda bervariasi tergantung status warga yang sudah disepakati bersama.</li>
+                    <li>Uang hasil denda 100% masuk ke Kas RT. Pengeluaran serta bukti foto realisasinya transparan dan dapat dilihat oleh semua warga.</li>
+                </ul>
+            </div>
+            <div class="px-5 py-3 bg-gray-50 border-t text-center">
+                <button onclick="tutupModalInfo()" class="w-full bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold shadow-sm hover:bg-blue-700 transition">Tutup Informasi</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Custom Alert/Confirm Modal -->
     <div id="custom-dialog" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden flex items-center justify-center z-[500] p-4 transition-opacity">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xs overflow-hidden transform scale-100 transition-transform">
@@ -778,6 +795,14 @@
             document.getElementById('toast-msg').innerText = msg;
             toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-10');
             setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-10'), 3000);
+        }
+
+        // --- FUNGSI MODAL INFORMASI ---
+        function bukaModalInfo() {
+            document.getElementById('modal-informasi').classList.remove('hidden');
+        }
+        function tutupModalInfo() {
+            document.getElementById('modal-informasi').classList.add('hidden');
         }
 
         // --- GLOBAL STATE ---
@@ -955,6 +980,7 @@
                 if(document.getElementById('btn-kelola-tipe')) document.getElementById('btn-kelola-tipe').style.display = 'none';
                 if(document.getElementById('btn-tambah-realisasi')) document.getElementById('btn-tambah-realisasi').style.display = 'none';
                 if(document.getElementById('btn-tambah-rencana')) document.getElementById('btn-tambah-rencana').style.display = 'none';
+                if(document.getElementById('btn-catat-presensi')) document.getElementById('btn-catat-presensi').style.display = 'none';
                 if(formKas) formKas.classList.add('hidden');
                 
                 badge.innerText = "Mode Warga (Hanya Baca)";
@@ -969,6 +995,7 @@
                 if(document.getElementById('btn-kelola-tipe')) document.getElementById('btn-kelola-tipe').style.display = 'inline-flex';
                 if(document.getElementById('btn-tambah-realisasi')) document.getElementById('btn-tambah-realisasi').style.display = 'inline-flex';
                 if(document.getElementById('btn-tambah-rencana')) document.getElementById('btn-tambah-rencana').style.display = 'inline-flex';
+                if(document.getElementById('btn-catat-presensi')) document.getElementById('btn-catat-presensi').style.display = 'inline-block';
                 if(formKas) formKas.classList.remove('hidden');
                 
                 badge.innerText = "Mode Admin (Akses Penuh)";
@@ -1056,7 +1083,8 @@
                 try {
                     const dateObj = new Date(date);
                     if (!isNaN(dateObj.getTime())) {
-                        stringTanggal = `${dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'short'})}`;
+                        const namaHariStr = namaHari[dateObj.getDay()];
+                        stringTanggal = `${namaHariStr}, ${dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'short'})}`;
                     }
                 } catch(e) {}
 
@@ -1341,7 +1369,7 @@
                 
                 container.innerHTML += `
                     <div class="bg-white rounded-lg shadow-sm border ${isLunas ? 'border-green-200 opacity-70' : 'border-red-200'} p-3 sm:p-4 flex items-center justify-between transition ${pointerCls}" ${actionAttr}>
-                        <div class="flex items-center gap-3 min-w-0">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
                             <div class="h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center font-bold text-lg sm:text-xl ${isLunas ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600 group-hover:scale-110 transition'}">
                                 <i class="fa-solid ${isLunas ? 'fa-check' : 'fa-file-invoice-dollar'}"></i>
                             </div>
@@ -1350,12 +1378,24 @@
                                 <p class="text-[10px] sm:text-xs text-gray-500 mt-1 truncate"><i class="fa-solid fa-calendar-day mr-1"></i> ${d.tanggal} &bull; ${d.keterangan}</p>
                             </div>
                         </div>
-                        <div class="text-right shrink-0 ml-2 flex flex-col items-end">
-                            <p class="font-bold text-sm sm:text-base ${isLunas ? 'text-green-600' : 'text-red-600'}">${formatRp(d.nominal)}</p>
-                            ${userRole === 'admin' && !isLunas ? `<span class="text-[10px] bg-green-500 text-white px-2 py-1 rounded shadow-sm font-bold mt-1 inline-block group-hover:bg-green-600 transition">Klik Bayar <i class="fa-solid fa-chevron-right ml-1"></i></span>` : `<span class="text-[10px] font-bold uppercase ${isLunas ? 'text-green-500 bg-green-50 border border-green-100 px-2 py-0.5 rounded' : 'text-red-500'} mt-1 inline-block">${d.status}</span>`}
+                        <div class="text-right shrink-0 ml-2 flex flex-col items-end justify-center relative z-10">
+                            <p class="font-bold text-sm sm:text-base mb-1.5 ${isLunas ? 'text-green-600' : 'text-red-600'}">${formatRp(d.nominal)}</p>
+                            <div class="flex items-center gap-1.5">
+                                ${userRole === 'admin' ? `<button onclick="hapusDenda(${d.id}, event)" class="bg-red-50 hover:bg-red-500 text-red-500 hover:text-white px-2 py-1 rounded transition shadow-sm" title="Hapus Denda"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
+                                ${userRole === 'admin' && !isLunas ? `<span class="text-[10px] bg-green-500 text-white px-2 py-1 rounded shadow-sm font-bold inline-block group-hover:bg-green-600 transition cursor-pointer">Bayar <i class="fa-solid fa-chevron-right ml-1"></i></span>` : `<span class="text-[10px] font-bold uppercase ${isLunas ? 'text-green-500 bg-green-50 border border-green-100' : 'text-red-500 bg-red-50 border border-red-100'} px-2 py-0.5 rounded inline-block">${d.status}</span>`}
+                            </div>
                         </div>
                     </div>
                 `;
+            });
+        }
+
+        function hapusDenda(id, event) {
+            if(event) event.stopPropagation(); // Mencegah klik card secara tidak sengaja
+            showDialog('confirm', 'Hapus Tagihan Denda', 'Anda yakin ingin menghapus tagihan denda ini secara manual?', () => {
+                deleteDoc(doc(getColl('denda'), id.toString())).then(() => {
+                    showToast('Tagihan denda berhasil dihapus.');
+                });
             });
         }
 
