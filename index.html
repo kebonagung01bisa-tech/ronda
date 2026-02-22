@@ -1765,6 +1765,20 @@
         }
 
         async function processFilesToBase64(files) {
+            // Load logo watermark terlebih dahulu
+            let logoImg = null;
+            try {
+                logoImg = new Image();
+                logoImg.crossOrigin = "Anonymous";
+                await new Promise((resolve, reject) => {
+                    logoImg.onload = resolve;
+                    logoImg.onerror = reject;
+                    logoImg.src = "https://i.ibb.co.com/21BpG3JY/RT-01.png";
+                });
+            } catch (e) {
+                console.warn("Gagal memuat watermark logo", e);
+            }
+
             const promises = Array.from(files).map(file => {
                 return new Promise((resolve) => {
                     const reader = new FileReader();
@@ -1774,12 +1788,71 @@
                             const canvas = document.createElement('canvas');
                             const MAX_WIDTH = 800; const MAX_HEIGHT = 800;
                             let width = img.width; let height = img.height;
-                            if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
-                            else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                            
+                            if (width > height) { 
+                                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } 
+                            } else { 
+                                if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } 
+                            }
+                            
                             canvas.width = width; canvas.height = height;
                             const ctx = canvas.getContext('2d');
+                            
+                            // 1. Gambar foto asli
                             ctx.drawImage(img, 0, 0, width, height);
-                            resolve(canvas.toDataURL('image/jpeg', 0.7)); 
+
+                            // 2. Siapkan ukuran dan posisi teks tanggal di pojok kanan bawah
+                            const now = new Date();
+                            const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) + " " + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                            
+                            const fontSize = Math.max(12, Math.floor(width * 0.035));
+                            ctx.font = `bold ${fontSize}px sans-serif`;
+                            const textWidth = ctx.measureText(dateStr).width;
+                            const padding = fontSize * 0.5;
+                            
+                            const textX = width - textWidth - padding * 2 - 10;
+                            const textY = height - fontSize - padding * 2 - 10;
+
+                            // 3. Tambahkan Watermark Logo (Tidak Transparan, Di atas tanggal)
+                            if (logoImg) {
+                                ctx.save();
+                                const logoSize = Math.max(50, Math.floor(width * 0.12)); // Ukuran proporsional sekitar 12% dari lebar gambar
+                                const logoX = width - logoSize - 10; // Rata kanan (margin 10)
+                                const logoY = textY - logoSize - 8; // 8px tepat di atas kotak teks tanggal
+                                ctx.globalAlpha = 1.0; // Pastikan solid/tidak transparan
+                                ctx.drawImage(logoImg, logoX, logoY, logoSize, logoSize);
+                                ctx.restore();
+                            }
+
+                            // 4. Gambar background teks dan teks tanggal
+                            ctx.save();
+                            ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+                            ctx.fillRect(textX, textY, textWidth + padding * 2, fontSize + padding * 2);
+                            
+                            ctx.fillStyle = "white";
+                            ctx.textAlign = "left";
+                            ctx.textBaseline = "top";
+                            ctx.font = `bold ${fontSize}px sans-serif`;
+                            ctx.fillText(dateStr, textX + padding, textY + padding);
+                            ctx.restore();
+
+                            try {
+                                resolve(canvas.toDataURL('image/jpeg', 0.8)); 
+                            } catch (err) {
+                                // Fallback darurat jika terkena policy CORS dari server gambar
+                                console.warn("CORS taint pada canvas, menggunakan fallback tanpa logo", err);
+                                const fallbackCanvas = document.createElement('canvas');
+                                fallbackCanvas.width = width; fallbackCanvas.height = height;
+                                const fCtx = fallbackCanvas.getContext('2d');
+                                fCtx.drawImage(img, 0, 0, width, height);
+                                
+                                fCtx.fillStyle = "rgba(0, 0, 0, 0.6)";
+                                fCtx.fillRect(textX, textY, textWidth + padding * 2, fontSize + padding * 2);
+                                fCtx.fillStyle = "white"; fCtx.textAlign = "left"; fCtx.textBaseline = "top"; fCtx.font = `bold ${fontSize}px sans-serif`;
+                                fCtx.fillText(dateStr, textX + padding, textY + padding);
+                                
+                                resolve(fallbackCanvas.toDataURL('image/jpeg', 0.8));
+                            }
                         };
                         img.src = e.target.result;
                     };
