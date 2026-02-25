@@ -51,11 +51,6 @@
             </div>
 
             <div>
-                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Kode Lingkungan / RT</label>
-                <input type="text" id="input-kode-rt" class="w-full border-2 border-gray-300 rounded-lg p-3 text-center text-lg font-bold tracking-widest focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none mb-4 uppercase transition" placeholder="Cth: KBN01" onkeypress="if(event.key === 'Enter') document.getElementById('input-pin').focus()">
-            </div>
-
-            <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1">PIN Akses Warga / Admin</label>
                 <input type="password" id="input-pin" class="w-full border-2 border-gray-300 rounded-lg p-3 text-center text-2xl tracking-[0.5em] focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none mb-6 font-mono transition" placeholder="••••" onkeypress="if(event.key === 'Enter') prosesLogin()">
             </div>
@@ -64,8 +59,11 @@
                 <i class="fa-solid fa-lock-open mr-2"></i> Buka Aplikasi
             </button>
             
-            <div class="mt-6 pt-4 border-t border-gray-100 text-[10px] text-center text-gray-400">
-                <i class="fa-solid fa-shield-halved mr-1"></i> Data dienkripsi dan diisolasi per lingkungan RT. Hubungi Pengurus untuk meminta Kode Lingkungan dan PIN Anda.
+            <div class="mt-6 pt-4 border-t border-gray-100 text-[11px] text-center text-gray-500 font-medium leading-relaxed">
+                Untuk PIN bisa minta sama Pak RT atau Pak Muji.<br>Klik tombol di bawah untuk meminta PIN:
+                <button onclick="window.open('https://wa.me/6285157467216', '_blank')" class="mt-3 w-full bg-green-50 hover:bg-green-500 text-green-600 hover:text-white border border-green-200 hover:border-green-500 py-2.5 rounded-lg transition shadow-sm font-bold flex items-center justify-center">
+                    <i class="fa-brands fa-whatsapp text-xl mr-2"></i> Chat WA Pak RT
+                </button>
             </div>
         </div>
     </div>
@@ -186,12 +184,12 @@
                 </div>
 
                 <!-- Riwayat Kehadiran Dashboard -->
-                <div class="bg-white shadow-sm sm:shadow rounded-lg p-4 sm:p-6 mb-6 border-t-4 border-indigo-500">
+                <div id="wrapper-riwayat-presensi" class="bg-white shadow-sm sm:shadow rounded-lg p-4 sm:p-6 mb-6 border-t-4 border-indigo-500 hidden">
                     <div class="flex justify-between items-center mb-3 sm:mb-4">
                         <h3 class="text-base sm:text-lg font-semibold text-gray-800 flex items-center"><i class="fa-solid fa-clipboard-check text-indigo-500 mr-2"></i>Riwayat Kehadiran</h3>
                         <button id="btn-catat-presensi" onclick="switchTab('presensi')" class="text-[10px] sm:text-xs text-blue-600 font-bold hover:underline transition">Catat Baru</button>
                     </div>
-                    <div id="dashboard-riwayat-presensi" class="flex flex-wrap gap-2 sm:gap-3">
+                    <div id="dashboard-riwayat-presensi" class="flex flex-col gap-2">
                         <!-- Konten digenerate via Javascript -->
                     </div>
                 </div>
@@ -284,7 +282,7 @@
 
                 <div class="bg-white shadow-sm sm:shadow rounded-lg overflow-hidden mb-6">
                     <div class="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                        <h3 class="text-sm sm:text-lg font-semibold text-gray-800">Riwayat Kas Manual</h3>
+                        <h3 class="text-sm sm:text-lg font-semibold text-gray-800">Riwayat Seluruh Transaksi Kas</h3>
                     </div>
                     <div class="p-3 sm:p-4 bg-gray-50">
                         <div id="container-kas-lainnya" class="flex flex-col gap-3"></div>
@@ -471,6 +469,10 @@
                     <select id="form-tipe" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 text-sm"></select>
                 </div>
                 <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">No. WhatsApp <span class="text-xs text-gray-400 font-normal">(Opsional)</span></label>
+                    <input type="number" id="form-wa" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 text-sm" placeholder="Contoh: 08123456789">
+                </div>
+                <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">Jadwal Ronda</label>
                     <select id="form-jadwal" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-blue-500 text-sm">
                         <option value="Senin">Senin</option><option value="Selasa">Selasa</option><option value="Rabu">Rabu</option>
@@ -578,6 +580,28 @@
             <div class="mt-5 flex justify-end space-x-2">
                 <button onclick="tutupModalRencana()" class="flex-1 sm:flex-none bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg hover:bg-gray-300 text-sm font-bold transition">Batal</button>
                 <button onclick="simpanRencana()" class="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 text-sm font-bold shadow-sm transition">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Rencana Pembangunan -->
+    <div id="modal-detail-rencana" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[150] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-5 py-4 border-b bg-blue-50 flex justify-between items-start gap-3">
+                <h3 id="detail-rencana-judul" class="text-base sm:text-lg font-bold text-blue-900 leading-tight">Judul</h3>
+                <button onclick="tutupDetailRencana()" class="text-gray-500 hover:text-red-500 transition shrink-0"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div class="p-4 sm:p-5 flex-grow overflow-y-auto">
+                <div class="flex items-center gap-2 mb-4">
+                    <span id="detail-rencana-status" class="px-2.5 py-1 text-[10px] sm:text-xs font-bold rounded-md border inline-block uppercase">Status</span>
+                    <span id="detail-rencana-tgl" class="text-xs text-gray-500"><i class="fa-solid fa-calendar-alt mr-1"></i> Tanggal</span>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                    <p id="detail-rencana-deskripsi" class="text-sm text-gray-800 leading-relaxed whitespace-pre-line"></p>
+                </div>
+            </div>
+            <div class="px-5 py-3 bg-gray-50 border-t flex justify-end">
+                <button onclick="tutupDetailRencana()" class="bg-gray-200 text-gray-800 px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-gray-300 transition shadow-sm">Tutup Detail</button>
             </div>
         </div>
     </div>
@@ -729,20 +753,14 @@
 
         // --- SISTEM LOGIN ---
         function prosesLogin() {
-            const inputKode = document.getElementById('input-kode-rt').value.trim().toUpperCase();
             const inputPin = document.getElementById('input-pin').value;
             
-            if (inputKode !== SECRET_KODE_RT) {
-                tampilkanError('Kode Lingkungan tidak valid/tidak ditemukan!');
-                return;
-            }
-
             if (inputPin === PIN_ADMIN) {
                 userRole = 'admin';
-                masukAplikasi(inputKode);
+                masukAplikasi(SECRET_KODE_RT);
             } else if (inputPin === PIN_WARGA) {
                 userRole = 'warga';
-                masukAplikasi(inputKode);
+                masukAplikasi(SECRET_KODE_RT);
             } else {
                 tampilkanError('PIN yang Anda masukkan salah!');
             }
@@ -798,7 +816,6 @@
                 }, 50);
 
                 // 4. Bersihkan form inputan sebelumnya
-                document.getElementById('input-kode-rt').value = '';
                 document.getElementById('input-pin').value = '';
                 
                 showToast('Aplikasi berhasil dikunci.');
@@ -915,6 +932,14 @@
 
         function hitungTotalKas() {
             return dataMutasi.reduce((total, m) => m.jenis === 'Pemasukan' ? total + m.nominal : total - m.nominal, 0);
+        }
+
+        function formatNoWA(no) {
+            let formatted = no.replace(/\D/g, '');
+            if (formatted.startsWith('0')) {
+                formatted = '62' + formatted.substring(1);
+            }
+            return formatted;
         }
 
         const formatRp = (angka) => {
@@ -1194,20 +1219,30 @@
 
         // --- PRESENSI DASHBOARD ---
         function renderDashboardPresensi() {
+            const wrapper = document.getElementById('wrapper-riwayat-presensi');
             const container = document.getElementById('dashboard-riwayat-presensi');
-            if (!container) return;
+            if (!container || !wrapper) return;
             container.innerHTML = '';
 
-            // Menggunakan localeCompare untuk sorting string tanggal jauh lebih cepat daripada new Date()
-            const dates = Object.keys(dataPresensi).sort((a, b) => b.localeCompare(a));
+            // Filter data kosong (hanya tampilkan yang ada isinya / fotonya)
+            const validDates = Object.keys(dataPresensi).filter(date => {
+                const records = dataPresensi[date];
+                if (!records) return false;
+                const keys = Object.keys(records);
+                const hasPresensi = keys.some(k => k !== 'bukti_foto' && records[k] !== 'Belum' && records[k] !== null);
+                const hasFoto = records.bukti_foto && records.bukti_foto.length > 0;
+                return hasPresensi || hasFoto;
+            }).sort((a, b) => b.localeCompare(a)); // Urut sesuai tanggal dari atas ke bawah (terbaru di atas)
 
-            if (dates.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 w-full text-sm bg-gray-50 p-4 rounded-lg border border-gray-200">Belum ada data presensi yang dicatat.</div>`;
+            if (validDates.length === 0) {
+                wrapper.classList.add('hidden');
                 return;
+            } else {
+                wrapper.classList.remove('hidden');
             }
 
-            // Ambil maksimal 7 riwayat terbaru agar menjadi tombol ringkas
-            const recentDates = dates.slice(0, 7);
+            // Ambil maksimal 7 riwayat terbaru
+            const recentDates = validDates.slice(0, 7);
 
             recentDates.forEach(date => {
                 let stringTanggal = date;
@@ -1216,18 +1251,23 @@
                     const dateObj = new Date(date);
                     if (!isNaN(dateObj.getTime())) {
                         const namaHariStr = namaHari[dateObj.getDay()];
-                        stringTanggal = `${namaHariStr}, ${dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'short'})}`;
+                        stringTanggal = `${namaHariStr}, ${dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}`;
                     }
                     if (dataPresensi[date] && dataPresensi[date].bukti_foto && dataPresensi[date].bukti_foto.length > 0) {
                         adaFoto = true;
                     }
                 } catch(e) {}
 
-                // Membuat desain tombol minimalis yang bisa diklik
+                // Membuat desain list vertikal
                 container.innerHTML += `
-                    <button onclick="bukaDetailPresensi('${date}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm flex items-center gap-1.5 relative">
-                        <i class="fa-solid fa-calendar-day"></i> ${stringTanggal}
-                        ${adaFoto ? '<span class="absolute -top-1.5 -right-1.5 bg-blue-500 text-white text-[8px] px-1 rounded-full"><i class="fa-solid fa-image"></i></span>' : ''}
+                    <button onclick="bukaDetailPresensi('${date}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 px-3 sm:px-4 py-3 rounded-lg text-xs sm:text-sm font-bold transition shadow-sm flex items-center justify-between w-full text-left group">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <div class="bg-white rounded-full shadow-sm text-indigo-500 w-8 h-8 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </div>
+                            <span class="truncate">${stringTanggal}</span>
+                        </div>
+                        ${adaFoto ? '<span class="bg-blue-500 text-white text-[9px] sm:text-[10px] px-2 py-1.5 rounded-md flex items-center gap-1.5 shadow-sm shrink-0 ml-2"><i class="fa-solid fa-image"></i> <span class="hidden sm:inline">Ada Foto</span></span>' : '<i class="fa-solid fa-chevron-right text-indigo-300 shrink-0 ml-2"></i>'}
                     </button>
                 `;
             });
@@ -1482,15 +1522,28 @@
                 if(grouped[hari].length === 0) return;
                 const c = colors[hari];
 
-                let listHtml = grouped[hari].map((w, index) => `
-                    <div class="flex flex-col py-1.5 border-b border-black/5 last:border-0 hover:bg-black/5 transition px-1 rounded min-w-0">
+                let listHtml = grouped[hari].map((w, index) => {
+                    let actionBtns = '';
+                    if (userRole === 'admin') {
+                        actionBtns = `
+                            <div class="flex gap-2 items-center ml-2 shrink-0">
+                                <button onclick="editWarga(${w.id}, event)" class="text-blue-400 hover:text-blue-600 transition p-1 bg-white rounded shadow-sm border border-gray-100" title="Edit Warga"><i class="fa-solid fa-pen text-[9px] sm:text-[10px]"></i></button>
+                                <button onclick="hapusWarga(${w.id})" class="text-red-400 hover:text-red-600 transition p-1 bg-white rounded shadow-sm border border-gray-100" title="Hapus Warga"><i class="fa-solid fa-trash text-[9px] sm:text-[10px]"></i></button>
+                            </div>
+                        `;
+                    }
+                    return `
+                    <div class="flex flex-col py-2 border-b border-black/5 last:border-0 hover:bg-black/5 transition px-1.5 rounded min-w-0">
                         <div class="flex justify-between items-center w-full min-w-0">
-                            <p class="font-bold text-gray-800 text-[9px] sm:text-xs truncate w-full pr-1">${index + 1}. ${w.nama}</p>
-                            ${userRole === 'admin' ? `<button onclick="hapusWarga(${w.id})" class="text-red-400 hover:text-red-600 transition shrink-0 ml-1"><i class="fa-solid fa-trash text-[8px] sm:text-[10px]"></i></button>` : ''}
+                            <p class="font-bold text-gray-800 text-[10px] sm:text-xs truncate w-full pr-1">${index + 1}. ${w.nama}</p>
+                            ${actionBtns}
                         </div>
-                        <span class="text-[7px] sm:text-[9px] ${c.text} opacity-80 mt-0.5 inline-block uppercase tracking-wider font-bold truncate">${w.tipe}</span>
+                        <div class="flex justify-between items-center mt-0.5">
+                            <span class="text-[8px] sm:text-[9px] ${c.text} opacity-80 inline-block uppercase tracking-wider font-bold truncate">${w.tipe}</span>
+                            ${w.wa ? `<span class="text-[8px] sm:text-[9px] text-green-600 font-bold bg-green-50 px-1 rounded truncate ml-1"><i class="fa-brands fa-whatsapp"></i> Aktif</span>` : ''}
+                        </div>
                     </div>
-                `).join('');
+                `}).join('');
 
                 const isActive = hari === activeScheduleHari;
                 const cardClass = `${c.bg} rounded-xl shadow-sm border ${isActive ? 'border-orange-400 ring-2 ring-orange-200' : c.border} p-2 sm:p-4 transition relative overflow-hidden`;
@@ -1512,23 +1565,47 @@
         }
 
         function bukaModalWarga() { 
+            document.getElementById('form-id-warga').value = '';
             const sel = document.getElementById('form-tipe');
             if(sel) sel.innerHTML = pengaturanDenda.map(p => `<option value="${p.tipe}">${p.tipe}</option>`).join('');
             document.getElementById('form-nama').value = '';
+            document.getElementById('form-wa').value = '';
+            document.getElementById('modal-warga-title').innerText = 'Tambah Warga Baru';
             document.getElementById('modal-warga').classList.remove('hidden'); 
         }
         function tutupModalWarga() { document.getElementById('modal-warga').classList.add('hidden'); }
         
+        function editWarga(id, event) {
+            if(event) event.stopPropagation();
+            const w = dataWarga.find(x => x.id === id);
+            if(w) {
+                document.getElementById('form-id-warga').value = w.id;
+                document.getElementById('form-nama').value = w.nama;
+                const sel = document.getElementById('form-tipe');
+                sel.innerHTML = pengaturanDenda.map(p => `<option value="${p.tipe}">${p.tipe}</option>`).join('');
+                sel.value = w.tipe;
+                document.getElementById('form-jadwal').value = w.jadwal;
+                document.getElementById('form-wa').value = w.wa || '';
+                document.getElementById('modal-warga-title').innerText = 'Edit Data Warga';
+                document.getElementById('modal-warga').classList.remove('hidden');
+            }
+        }
+
         function simpanWarga() {
+            const idForm = document.getElementById('form-id-warga').value;
             const nama = document.getElementById('form-nama').value.trim();
             const tipe = document.getElementById('form-tipe').value;
             const jadwal = document.getElementById('form-jadwal').value;
+            const wa = document.getElementById('form-wa').value.trim();
             if(!nama) return showDialog('alert', 'Perhatian', 'Nama lengkap wajib diisi!');
             
-            const id = Date.now();
-            setDoc(doc(getColl('warga'), id.toString()), { id, nama, tipe, jadwal }).then(() => {
+            const payload = { nama, tipe, jadwal, wa };
+            const id = idForm ? Number(idForm) : Date.now();
+            if(!idForm) payload.id = id;
+
+            setDoc(doc(getColl('warga'), id.toString()), payload, { merge: true }).then(() => {
                 tutupModalWarga();
-                showToast('Warga baru berhasil ditambahkan.');
+                showToast(`Data warga berhasil ${idForm ? 'diperbarui' : 'ditambahkan'}.`);
             });
         }
 
@@ -1596,22 +1673,37 @@
                 const actionAttr = (!isLunas && userRole === 'admin') ? `onclick="bayarDenda(${d.id})"` : '';
                 const pointerCls = (!isLunas && userRole === 'admin') ? 'cursor-pointer hover:border-green-400 hover:shadow-md group' : '';
                 
+                const wargaData = dataWarga.find(w => w.id === d.wargaId);
+                const noWA = wargaData && wargaData.wa ? formatNoWA(wargaData.wa) : '';
+
+                let tagihBtn = '';
+                if (userRole === 'admin' && !isLunas && noWA) {
+                    const pesan = `Halo Bpk/Ibu ${d.namaWarga},%0A%0AMengingatkan bahwa terdapat tunggakan denda ronda sebesar *${formatRp(d.nominal)}* untuk tanggal ${d.tanggal} (${d.keterangan}).%0A%0AMohon agar segera diselesaikan. Terima kasih.%0A%0A- Pengurus RT 01`;
+                    tagihBtn = `<a href="https://wa.me/${noWA}?text=${pesan}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] bg-green-50 hover:bg-green-500 text-green-600 hover:text-white border border-green-200 hover:border-green-500 px-2.5 py-1.5 rounded transition shadow-sm font-bold inline-flex items-center group-hover:opacity-100 sm:opacity-50"><i class="fa-brands fa-whatsapp mr-1 text-sm"></i> Tagih</a>`;
+                }
+
                 container.innerHTML += `
-                    <div class="bg-white rounded-lg shadow-sm border ${isLunas ? 'border-green-200 opacity-70' : 'border-red-200'} p-3 sm:p-4 flex items-center justify-between transition ${pointerCls}" ${actionAttr}>
-                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <div class="bg-white rounded-lg shadow-sm border ${isLunas ? 'border-green-200 opacity-70' : 'border-red-200'} p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between transition ${pointerCls}" ${actionAttr}>
+                        <div class="flex items-center gap-3 min-w-0 w-full sm:w-auto mb-3 sm:mb-0">
                             <div class="h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center font-bold text-lg sm:text-xl ${isLunas ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600 group-hover:scale-110 transition'}">
                                 <i class="fa-solid ${isLunas ? 'fa-check' : 'fa-file-invoice-dollar'}"></i>
                             </div>
-                            <div class="min-w-0">
+                            <div class="min-w-0 flex-1">
                                 <h4 class="font-bold text-gray-800 text-sm sm:text-base leading-tight truncate">${d.namaWarga}</h4>
                                 <p class="text-[10px] sm:text-xs text-gray-500 mt-1 truncate"><i class="fa-solid fa-calendar-day mr-1"></i> ${d.tanggal} &bull; ${d.keterangan}</p>
                             </div>
                         </div>
-                        <div class="text-right shrink-0 ml-2 flex flex-col items-end justify-center relative z-10">
-                            <p class="font-bold text-sm sm:text-base mb-1.5 ${isLunas ? 'text-green-600' : 'text-red-600'}">${formatRp(d.nominal)}</p>
+                        <div class="w-full sm:w-auto flex flex-row sm:flex-col items-center sm:items-end justify-between border-t sm:border-0 border-gray-100 pt-3 sm:pt-0 shrink-0 sm:ml-2 gap-2">
+                            <div class="flex items-center gap-2 sm:hidden">
+                                <p class="font-bold text-sm ${isLunas ? 'text-green-600' : 'text-red-600'}">${formatRp(d.nominal)}</p>
+                            </div>
+                            <div class="hidden sm:block text-right mb-1.5">
+                                <p class="font-bold text-base ${isLunas ? 'text-green-600' : 'text-red-600'}">${formatRp(d.nominal)}</p>
+                            </div>
                             <div class="flex items-center gap-1.5">
-                                ${userRole === 'admin' ? `<button onclick="hapusDenda(${d.id}, event)" class="bg-red-50 hover:bg-red-500 text-red-500 hover:text-white px-2 py-1 rounded transition shadow-sm" title="Hapus Denda"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
-                                ${userRole === 'admin' && !isLunas ? `<span class="text-[10px] bg-green-500 text-white px-2 py-1 rounded shadow-sm font-bold inline-block group-hover:bg-green-600 transition cursor-pointer">Bayar <i class="fa-solid fa-chevron-right ml-1"></i></span>` : `<span class="text-[10px] font-bold uppercase ${isLunas ? 'text-green-500 bg-green-50 border border-green-100' : 'text-red-500 bg-red-50 border border-red-100'} px-2 py-0.5 rounded inline-block">${d.status}</span>`}
+                                ${tagihBtn}
+                                ${userRole === 'admin' ? `<button onclick="hapusDenda(${d.id}, event)" class="bg-red-50 hover:bg-red-500 text-red-500 hover:text-white px-2.5 py-1.5 rounded transition shadow-sm sm:opacity-50 group-hover:opacity-100" title="Hapus Denda"><i class="fa-solid fa-trash text-xs"></i></button>` : ''}
+                                ${userRole === 'admin' && !isLunas ? `<span class="text-[10px] bg-blue-500 text-white px-3 py-1.5 rounded shadow-sm font-bold inline-block hover:bg-blue-600 transition cursor-pointer">Bayar <i class="fa-solid fa-chevron-right ml-1"></i></span>` : `<span class="text-[10px] font-bold uppercase ${isLunas ? 'text-green-500 bg-green-50 border border-green-100' : 'text-red-500 bg-red-50 border border-red-100'} px-2 py-0.5 rounded inline-block">${d.status}</span>`}
                             </div>
                         </div>
                     </div>
@@ -1990,17 +2082,19 @@
             if(!container) return;
             container.innerHTML = '';
 
-            const dataLainnya = dataMutasi.filter(m => m.kategori === 'Lainnya' || (!m.bukti && !m.keterangan.startsWith('Pembayaran Denda:'))).sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
+            // Menampilkan SELURUH riwayat mutasi kas (Manual + Otomatis Denda/Realisasi)
+            const dataLainnya = [...dataMutasi].sort((a,b) => new Date(b.tanggal) - new Date(a.tanggal));
 
             if(dataLainnya.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 bg-white p-6 rounded-lg border border-gray-200 text-sm">Belum ada riwayat kas manual lainnya.</div>`;
+                container.innerHTML = `<div class="text-center text-gray-500 bg-white p-6 rounded-lg border border-gray-200 text-sm">Belum ada riwayat transaksi kas.</div>`;
                 return;
             }
 
             dataLainnya.forEach(m => {
                 const isMasuk = m.jenis === 'Pemasukan';
-                const actionAttr = (userRole === 'admin') ? `onclick="editKasLainnya(${m.id})"` : '';
-                const pointerCls = (userRole === 'admin') ? 'cursor-pointer hover:border-blue-400 hover:shadow-md group' : '';
+                const isManual = m.kategori === 'Lainnya'; // Hanya transaksi manual yang bisa di-edit dari menu ini
+                const actionAttr = (userRole === 'admin' && isManual) ? `onclick="editKasLainnya(${m.id})"` : '';
+                const pointerCls = (userRole === 'admin' && isManual) ? 'cursor-pointer hover:border-blue-400 hover:shadow-md group' : '';
 
                 container.innerHTML += `
                     <div class="bg-white rounded-lg shadow-sm border ${isMasuk ? 'border-green-200' : 'border-red-200'} p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between transition ${pointerCls}" ${actionAttr}>
@@ -2011,13 +2105,14 @@
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-2 mb-1.5">
                                     <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-bold border border-gray-200 whitespace-nowrap"><i class="fa-solid fa-calendar-day mr-1"></i> ${m.tanggal}</span>
+                                    ${!isManual ? `<span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded text-[10px] font-bold border border-blue-200 whitespace-nowrap"><i class="fa-solid fa-robot mr-1"></i> Sistem</span>` : ''}
                                 </div>
                                 <p class="text-xs sm:text-sm text-gray-800 font-medium leading-snug break-words whitespace-normal">${m.keterangan}</p>
                             </div>
                         </div>
                         <div class="flex flex-row sm:flex-col justify-between items-center sm:items-end w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-0 border-gray-100 shrink-0 pl-0 sm:pl-2">
                             <p class="font-bold text-sm sm:text-base ${isMasuk ? 'text-green-600' : 'text-red-600'}">${isMasuk ? '+' : '-'}${formatRp(m.nominal)}</p>
-                            ${userRole === 'admin' ? `<span class="text-[10px] text-blue-600 font-bold sm:opacity-0 group-hover:opacity-100 transition inline-block mt-1 bg-blue-50 px-2 py-1 rounded border border-blue-100 shadow-sm"><i class="fa-solid fa-pen mr-1"></i>Edit</span>` : ''}
+                            ${userRole === 'admin' && isManual ? `<span class="text-[10px] text-blue-600 font-bold sm:opacity-0 group-hover:opacity-100 transition inline-block mt-1 bg-blue-50 px-2 py-1 rounded border border-blue-100 shadow-sm"><i class="fa-solid fa-pen mr-1"></i>Edit</span>` : ''}
                         </div>
                     </div>
                 `;
@@ -2074,21 +2169,40 @@
                 let badgeColor = r.status === 'Selesai' ? 'bg-green-100 text-green-800 border-green-200' : (r.status === 'Sedang Berjalan' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 'bg-blue-100 text-blue-800 border-blue-200');
                 let adminHtml = userRole === 'admin' ? `
                     <div class="mt-4 pt-3 border-t border-gray-100 flex justify-end gap-2">
-                        <button onclick="bukaModalRencana(${r.id})" class="text-[11px] sm:text-xs px-3 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg font-bold transition shadow-sm"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
-                        <button onclick="hapusRencana(${r.id})" class="text-[11px] sm:text-xs px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg font-bold transition shadow-sm"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>
+                        <button onclick="bukaModalRencana(${r.id}); event.stopPropagation();" class="text-[11px] sm:text-xs px-3 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg font-bold transition shadow-sm"><i class="fa-solid fa-pen mr-1"></i> Edit</button>
+                        <button onclick="hapusRencana(${r.id}); event.stopPropagation();" class="text-[11px] sm:text-xs px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg font-bold transition shadow-sm"><i class="fa-solid fa-trash mr-1"></i> Hapus</button>
                     </div>` : '';
                 container.innerHTML += `
-                    <div class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-md transition">
+                    <div onclick="bukaDetailRencana(${r.id})" class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-gray-200 flex flex-col justify-between hover:shadow-md transition cursor-pointer group">
                         <div>
                             <div class="flex justify-between items-start mb-2 gap-3">
-                                <h4 class="font-bold text-gray-800 text-base sm:text-lg leading-tight break-words">${r.judul}</h4>
+                                <h4 class="font-bold text-gray-800 text-base sm:text-lg leading-tight break-words group-hover:text-blue-600 transition">${r.judul}</h4>
                                 <span class="px-2 py-1 whitespace-nowrap text-[9px] sm:text-[10px] uppercase font-bold rounded-md border ${badgeColor} shrink-0">${r.status}</span>
                             </div>
                             <p class="text-[10px] sm:text-xs text-gray-400 mb-3"><i class="fa-solid fa-calendar-alt mr-1"></i> Diupdate: ${r.tanggal}</p>
-                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed whitespace-pre-line">${r.deskripsi}</p>
+                            <p class="text-xs sm:text-sm text-gray-600 leading-relaxed line-clamp-2">${r.deskripsi}</p>
+                            <p class="text-[10px] text-blue-500 font-bold mt-2 opacity-0 group-hover:opacity-100 transition inline-block bg-blue-50 px-2 py-1 rounded">Klik untuk selengkapnya <i class="fa-solid fa-arrow-right ml-1"></i></p>
                         </div>${adminHtml}
                     </div>`;
             });
+        }
+
+        function bukaDetailRencana(id) {
+            const r = dataRencana.find(x => x.id === id);
+            if(r) {
+                document.getElementById('detail-rencana-judul').innerText = r.judul;
+                let badgeColor = r.status === 'Selesai' ? 'bg-green-100 text-green-800 border-green-200' : (r.status === 'Sedang Berjalan' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 'bg-blue-100 text-blue-800 border-blue-200');
+                const statusEl = document.getElementById('detail-rencana-status');
+                statusEl.className = `px-2.5 py-1 text-[10px] sm:text-xs font-bold rounded-md border inline-block uppercase ${badgeColor}`;
+                statusEl.innerText = r.status;
+                document.getElementById('detail-rencana-tgl').innerHTML = `<i class="fa-solid fa-calendar-alt mr-1"></i> Diupdate: ${r.tanggal}`;
+                document.getElementById('detail-rencana-deskripsi').innerText = r.deskripsi;
+                document.getElementById('modal-detail-rencana').classList.remove('hidden');
+            }
+        }
+
+        function tutupDetailRencana() {
+            document.getElementById('modal-detail-rencana').classList.add('hidden');
         }
 
         function bukaModalRencana(id = null) {
