@@ -744,6 +744,20 @@
         <i class="fa-solid fa-circle-check text-green-400 mr-2 sm:mr-3 text-lg"></i> <span id="toast-msg">Berhasil!</span>
     </div>
 
+    <!-- Modal PWA Virtual Aggressive -->
+    <div id="pwa-install-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden flex items-center justify-center z-[1000] p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform scale-100 p-6 text-center relative border-t-4 border-blue-500 animate-bounce-short">
+            <button onclick="tutupModalInstall()" class="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
+            <img src="https://i.ibb.co.com/wFKTHKyj/RT-01.png" alt="RONDA Icon" class="w-20 h-20 mx-auto drop-shadow-md mb-4 object-contain">
+            <h3 class="text-xl font-bold text-gray-800 mb-1">Install Aplikasi RONDA</h3>
+            <p class="text-sm text-gray-600 mb-6 font-medium">Pasang aplikasi E-Ronda di layar utama HP Anda sekarang! Akses lebih cepat dan layar penuh layaknya aplikasi asli.</p>
+            <button onclick="prosesInstallPWA()" class="w-full bg-blue-600 text-white px-5 py-3 rounded-xl hover:bg-blue-700 font-bold transition shadow-[0_4px_15px_rgba(37,99,235,0.4)] flex items-center justify-center transform hover:scale-105 duration-200">
+                <i class="fa-solid fa-download mr-2"></i> Install ke Layar Utama
+            </button>
+            <p class="text-[10px] text-gray-400 mt-3">*Sangat direkomendasikan untuk seluruh warga</p>
+        </div>
+    </div>
+
     <!-- FIREBASE & APP LOGIC -->
     <script>
         // --- KONFIGURASI KEAMANAN ---
@@ -2367,7 +2381,88 @@
         window.onload = () => { 
             cekSesi(); 
             setupBackButtonHandler();
+            initVirtualPWA(); // Inisialisasi Sistem PWA Virtual
         };
+
+        // --- SISTEM PWA VIRTUAL (AGRESIF 5 MENIT) ---
+        let deferredPrompt;
+        let isPWAInstalled = false;
+
+        function initVirtualPWA() {
+            // 1. Buat Manifest Virtual secara Dinamis agar terdeteksi browser
+            const manifestJSON = {
+                "name": "RONDA",
+                "short_name": "RONDA",
+                "start_url": location.href,
+                "display": "standalone",
+                "background_color": "#ffffff",
+                "theme_color": "#2563eb",
+                "icons": [{
+                    "src": "https://i.ibb.co.com/wFKTHKyj/RT-01.png",
+                    "sizes": "512x512",
+                    "type": "image/png"
+                }]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifestJSON)], {type: 'application/manifest+json'});
+            const manifestURL = URL.createObjectURL(manifestBlob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestURL;
+            document.head.appendChild(link);
+
+            // 2. Tangkap event native dari browser jika support install otomatis
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault(); // Cegah prompt bawaan browser
+                deferredPrompt = e; // Simpan untuk dipanggil manual
+            });
+
+            // Deteksi jika pengguna sudah berhasil menginstall
+            window.addEventListener('appinstalled', () => {
+                isPWAInstalled = true;
+                tutupModalInstall();
+                showToast('Aplikasi RONDA berhasil dipasang!');
+            });
+
+            // 3. Tampilkan pertama kali setelah 15 detik untuk perkenalan awal
+            setTimeout(tampilkanModalInstall, 15000);
+
+            // 4. Set Agresif Interval setiap 5 Menit (300.000 ms)
+            setInterval(tampilkanModalInstall, 300000);
+        }
+
+        function tampilkanModalInstall() {
+            // Cek apakah sudah berjalan di mode layar penuh (standalone) atau sudah terinstall
+            if (!isPWAInstalled && !window.matchMedia('(display-mode: standalone)').matches) {
+                const modal = document.getElementById('pwa-install-modal');
+                if(modal) {
+                    modal.classList.remove('hidden');
+                    // Tambahkan animasi kejut singkat setiap muncul
+                    const dialog = modal.querySelector('div');
+                    dialog.classList.add('animate-pulse');
+                    setTimeout(() => dialog.classList.remove('animate-pulse'), 1000);
+                }
+            }
+        }
+
+        function tutupModalInstall() {
+            const modal = document.getElementById('pwa-install-modal');
+            if(modal) modal.classList.add('hidden');
+        }
+
+        async function prosesInstallPWA() {
+            tutupModalInstall();
+            if (deferredPrompt) {
+                // Munculkan dialog instalasi bawaan browser (Android/Chrome/Edge)
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    deferredPrompt = null; 
+                }
+            } else {
+                // Fallback untuk browser yang tidak dukung prompt otomatis (Seperti iOS Safari)
+                showDialog('alert', 'Pemasangan Manual (iOS / Browser Lain)', 'Sistem otomatis diblokir oleh browser. \n\nSilakan tap ikon Share/Bagikan di browser Anda, lalu pilih opsi "Add to Home Screen" (Tambahkan ke Layar Utama) secara manual.');
+            }
+        }
 
     </script>
 </body>
