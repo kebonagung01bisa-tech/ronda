@@ -319,7 +319,7 @@
                 </div>
                 <div>
                     <span class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Draf Pesan Sopan:</span>
-                    <textarea id="nota-pesan" class="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-700 focus:ring-green-500 bg-white" rows="6"></textarea>
+                    <textarea id="nota-pesan" class="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-700 focus:ring-green-500 bg-white" rows="8"></textarea>
                     <p class="text-[9px] text-gray-400 mt-1">*Pesan dapat diubah sebelum dikirim.</p>
                 </div>
             </div>
@@ -1116,19 +1116,31 @@
             renderDashboardPresensi();
         }
 
-        // --- NOTA TAGIHAN WA (BARU) ---
-        let currentNotaDenda = null;
+        // --- NOTA TAGIHAN WA (GABUNGAN) ---
+        let currentNotaDendaList = [];
+        let currentWargaNota = null;
         let currentNotaBase64 = null;
 
-        async function bukaModalNota(id, event) {
+        async function bukaModalNotaGabungan(wargaId, event) {
             if(event) event.stopPropagation();
-            const denda = dataDenda.find(d => d.id === id);
-            if(!denda) return;
-            const warga = dataWarga.find(w => w.id === denda.wargaId);
             
-            currentNotaDenda = denda;
+            // Ambil semua tagihan denda milik warga ini yang berstatus "Belum Dibayar"
+            const dendaList = dataDenda
+                .filter(d => d.wargaId === wargaId && d.status === 'Belum Dibayar')
+                .sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
+                
+            if(dendaList.length === 0) return showToast('Warga ini tidak memiliki tunggakan denda.');
             
-            const pesan = `Assalamu'alaikum Wr. Wb.\nMohon maaf mengganggu waktunya Bpk/Ibu *${warga.nama}*. 🙏\n\nBerikut kami lampirkan nota tagihan kas/denda ronda untuk tanggal *${denda.tanggal}* dengan keterangan: _${denda.keterangan}_.\n\nTotal Tagihan: *${formatRp(denda.nominal)}*\n\nMohon perkenannya untuk dapat diselesaikan. Terima kasih banyak atas partisipasi dan kerjasamanya.\n\nSehat selalu untuk keluarga.\n\nHormat kami,\n*Pengurus RT 01 / RW 05 KebonAgung*`;
+            const warga = dataWarga.find(w => w.id === wargaId);
+            
+            currentNotaDendaList = dendaList;
+            currentWargaNota = warga;
+            
+            // Format daftar rincian untuk draf pesan WhatsApp
+            let listPesan = dendaList.map((d, i) => `${i+1}. Tgl ${d.tanggal} - ${d.keterangan} (*${formatRp(d.nominal)}*)`).join('\n');
+            let totalNominal = dendaList.reduce((sum, d) => sum + d.nominal, 0);
+            
+            const pesan = `Assalamu'alaikum Wr. Wb.\nMohon maaf mengganggu waktunya Bpk/Ibu *${warga.nama}*. 🙏\n\nBerikut kami lampirkan nota rekap tagihan kas/denda ronda yang belum diselesaikan:\n\n${listPesan}\n\n*Total Tagihan: ${formatRp(totalNominal)}*\n\nMohon perkenannya untuk dapat diselesaikan. Terima kasih banyak atas partisipasi dan kerjasamanya.\n\nSehat selalu untuk keluarga.\n\nHormat kami,\n*Pengurus RT 01 / RW 05 KebonAgung*`;
             
             document.getElementById('nota-pesan').value = pesan;
             
@@ -1136,7 +1148,7 @@
             imgEl.src = ''; 
             
             try {
-                currentNotaBase64 = await generateNotaCanvas(denda, warga);
+                currentNotaBase64 = await generateNotaCanvasGabungan(dendaList, warga);
                 imgEl.src = currentNotaBase64;
                 document.getElementById('modal-nota').classList.remove('hidden');
             } catch (err) {
@@ -1148,10 +1160,14 @@
             document.getElementById('modal-nota').classList.add('hidden');
         }
 
-        async function generateNotaCanvas(denda, warga) {
+        async function generateNotaCanvasGabungan(dendaList, warga) {
+            const itemHeight = 35;
+            const baseHeight = 360; 
+            const canvasHeight = baseHeight + (dendaList.length * itemHeight);
+
             const canvas = document.createElement('canvas');
             canvas.width = 600;
-            canvas.height = 420;
+            canvas.height = canvasHeight;
             const ctx = canvas.getContext('2d');
 
             // Background Putih
@@ -1175,7 +1191,7 @@
             ctx.shadowColor = 'rgba(0,0,0,0.1)';
             ctx.shadowBlur = 15;
             ctx.shadowOffsetY = 4;
-            ctx.fillRect(30, 110, 540, 270);
+            ctx.fillRect(30, 110, 540, canvasHeight - 160);
             ctx.shadowColor = 'transparent'; // Reset bayangan
 
             // Isi Konten
@@ -1200,51 +1216,62 @@
             ctx.fillStyle = '#64748b';
             ctx.fillText('Rincian Tagihan:', 60, 230);
 
-            ctx.font = 'bold 16px sans-serif';
-            ctx.fillStyle = '#334155';
-            ctx.fillText('Tanggal', 60, 260);
-            ctx.fillText(': ' + denda.tanggal, 180, 260);
-            ctx.fillText('Keterangan', 60, 290);
+            let currentY = 265;
+            let total = 0;
             
-            // Handle Keterangan text wrap if too long
-            const maxChars = 35;
-            let ketText = denda.keterangan;
-            if(ketText.length > maxChars) { ketText = ketText.substring(0, maxChars) + '...'; }
-            ctx.fillText(': ' + ketText, 180, 290);
+            // Loop untuk mencetak semua tagihan
+            ctx.fillStyle = '#334155';
+            dendaList.forEach((d, index) => {
+                ctx.font = 'bold 14px sans-serif';
+                ctx.fillText(`${index + 1}.  ${d.tanggal}`, 60, currentY);
+                
+                ctx.font = '14px sans-serif';
+                let ketText = d.keterangan;
+                if(ketText.length > 25) { ketText = ketText.substring(0, 25) + '...'; }
+                ctx.fillText(ketText, 200, currentY);
+                
+                ctx.textAlign = 'right';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.fillText(formatRp(d.nominal), 540, currentY);
+                ctx.textAlign = 'left';
+                
+                total += d.nominal;
+                currentY += itemHeight;
+            });
 
             // Kotak Nominal
+            const totalBoxY = currentY + 10;
             ctx.fillStyle = '#fef2f2'; // red-50
-            ctx.fillRect(60, 315, 480, 50);
+            ctx.fillRect(60, totalBoxY, 480, 50);
             ctx.strokeStyle = '#fca5a5'; // red-300
-            ctx.strokeRect(60, 315, 480, 50);
+            ctx.strokeRect(60, totalBoxY, 480, 50);
 
             ctx.fillStyle = '#dc2626'; // red-600
             ctx.font = 'bold 18px sans-serif';
-            ctx.fillText('TOTAL NOMINAL', 80, 347);
+            ctx.fillText('TOTAL NOMINAL', 80, totalBoxY + 32);
             ctx.textAlign = 'right';
             ctx.font = 'bold 24px sans-serif';
-            ctx.fillText(formatRp(denda.nominal), 520, 348);
+            ctx.fillText(formatRp(total), 520, totalBoxY + 33);
 
             // Footer (Dicetak Tgl)
             ctx.textAlign = 'center';
             ctx.font = '12px sans-serif';
             ctx.fillStyle = '#94a3b8';
-            ctx.fillText('Dicetak otomatis oleh Sistem E-Ronda pada: ' + new Date().toLocaleString('id-ID'), 300, 405);
+            ctx.fillText('Dicetak otomatis oleh Sistem E-Ronda pada: ' + new Date().toLocaleString('id-ID'), 300, canvasHeight - 20);
 
             return canvas.toDataURL('image/png', 1.0);
         }
 
         async function kirimNotaWA() {
-            if(!currentNotaDenda || !currentNotaBase64) return;
-            const denda = currentNotaDenda;
-            const warga = dataWarga.find(w => w.id === denda.wargaId);
+            if(currentNotaDendaList.length === 0 || !currentNotaBase64 || !currentWargaNota) return;
+            const warga = currentWargaNota;
             const textMsg = document.getElementById('nota-pesan').value;
             const noWA = warga.wa ? formatNoWA(warga.wa) : '';
 
             // Convert Base64 ke File Object (dibutuhkan untuk web share API)
             const res = await fetch(currentNotaBase64);
             const blob = await res.blob();
-            const file = new File([blob], `Nota_${warga.nama.replace(/\s+/g, '_')}_${denda.tanggal}.png`, { type: 'image/png' });
+            const file = new File([blob], `Nota_Total_${warga.nama.replace(/\s+/g, '_')}.png`, { type: 'image/png' });
 
             // Cek apakah HP/Browser support fitur Share File secara native (biasanya berjalan mulus di HP)
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -1868,17 +1895,16 @@
                 const totalText = hasTunggakan ? `Total Tunggakan: ${formatRp(group.totalBelum)}` : `Riwayat Lunas: ${formatRp(group.totalLunas)}`;
                 const headerColor = hasTunggakan ? 'text-red-600' : 'text-green-600';
                 const bgIconColor = hasTunggakan ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600';
+                const wargaIdInt = parseInt(wargaId);
+
+                // Tombol Tagih Gabungan diletakkan di header per Warga
+                let tagihGroupBtn = '';
+                if (userRole === 'admin' && hasTunggakan) {
+                    tagihGroupBtn = `<button onclick="bukaModalNotaGabungan(${wargaIdInt}, event)" class="ml-2 text-[10px] sm:text-xs bg-green-500 hover:bg-green-600 text-white px-2.5 py-1 rounded transition shadow-sm font-bold inline-flex items-center"><i class="fa-brands fa-whatsapp mr-1"></i> Kirim Nota</button>`;
+                }
 
                 let detailsHtml = group.items.map(d => {
                     const isLunas = d.status === 'Lunas';
-                    const wargaData = dataWarga.find(w => w.id === d.wargaId);
-                    const noWA = wargaData && wargaData.wa ? formatNoWA(wargaData.wa) : '';
-
-                    let tagihBtn = '';
-                    if (userRole === 'admin' && !isLunas) {
-                        tagihBtn = `<button onclick="bukaModalNota(${d.id}, event)" class="text-[10px] bg-green-50 hover:bg-green-500 text-green-600 hover:text-white border border-green-200 hover:border-green-500 px-2 py-1 rounded transition shadow-sm font-bold inline-flex items-center"><i class="fa-solid fa-file-invoice mr-1 text-sm"></i> Kirim Nota WA</button>`;
-                    }
-                    
                     const tampilNominal = d.status === 'Lunas' && d.nominalAsli ? formatRp(d.nominalAsli) : formatRp(d.nominal);
 
                     return `
@@ -1889,7 +1915,6 @@
                             <div class="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-2 shrink-0 border-t sm:border-0 border-gray-100 pt-2 sm:pt-0 mt-1 sm:mt-0">
                                 <p class="font-bold text-xs sm:text-sm ${isLunas ? 'text-green-600' : 'text-red-600'} w-16 sm:w-auto text-right">${tampilNominal}</p>
                                 <div class="flex items-center gap-1.5">
-                                    ${tagihBtn}
                                     ${userRole === 'admin' ? `
                                     <button onclick="editDenda(${d.id}, event)" class="bg-yellow-50 hover:bg-yellow-500 text-yellow-600 hover:text-white px-2 py-1 rounded transition shadow-sm" title="Edit"><i class="fa-solid fa-pen text-[10px]"></i></button>
                                     <button onclick="hapusDenda(${d.id}, event)" class="bg-red-50 hover:bg-red-500 text-red-500 hover:text-white px-2 py-1 rounded transition shadow-sm" title="Hapus"><i class="fa-solid fa-trash text-[10px]"></i></button>
@@ -1904,15 +1929,16 @@
                 container.innerHTML += `
                     <div class="bg-white rounded-lg shadow-sm border ${hasTunggakan ? 'border-red-300' : 'border-green-200'} overflow-hidden">
                         <div class="p-3 sm:p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition" onclick="toggleDetailDenda('detail-warga-${wargaId}')">
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-3 w-full">
                                 <div class="h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center font-bold text-lg sm:text-xl ${bgIconColor}">
                                     <i class="fa-solid fa-user"></i>
                                 </div>
-                                <div>
-                                    <h4 class="font-bold text-gray-800 text-sm sm:text-base">${group.nama}</h4>
-                                    <div class="flex items-center gap-1.5 mt-0.5">
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="font-bold text-gray-800 text-sm sm:text-base truncate">${group.nama}</h4>
+                                    <div class="flex items-center flex-wrap gap-1 mt-0.5">
                                         <p class="text-[10px] sm:text-xs font-bold ${headerColor}">${totalText}</p>
-                                        <span class="text-[8px] sm:text-[9px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full font-bold">${group.items.length} Data</span>
+                                        <span class="text-[8px] sm:text-[9px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full font-bold ml-1">${group.items.length} Data</span>
+                                        ${tagihGroupBtn}
                                     </div>
                                 </div>
                             </div>
