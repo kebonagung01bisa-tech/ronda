@@ -51,6 +51,14 @@
                 <button onclick="prosesLogin()" class="w-full bg-blue-600 text-white font-bold text-sm px-4 py-3 rounded-xl hover:bg-blue-700 transition shadow-[0_4px_15px_rgba(37,99,235,0.4)] hover:scale-[1.02] transform duration-200 mt-2">MASUK <i class="fa-solid fa-arrow-right ml-1"></i></button>
             </div>
             <p class="text-[10px] text-gray-400 mt-5 font-medium relative z-10">Akses Admin/Warga terpisah sesuai PIN</p>
+            
+            <!-- Tambahan Tombol Kontak RT untuk PIN -->
+            <div class="mt-6 pt-4 border-t border-gray-100 relative z-10">
+                <p class="text-[10px] sm:text-xs text-gray-500 mb-2 font-medium">Untuk PIN silakan hubungi Pak RT.01 di:</p>
+                <a href="https://wa.me/6285157467216" target="_blank" class="inline-flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-bold text-xs sm:text-sm px-5 py-2.5 rounded-full transition shadow-sm hover:shadow-md">
+                    <i class="fa-brands fa-whatsapp text-lg mr-1.5"></i> Hubungi via WA
+                </a>
+            </div>
         </div>
     </div>
 
@@ -264,22 +272,30 @@
         </main>
 
         <!-- BOTTOM NAVBAR -->
-        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-200 z-50 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] pb-1">
-            <div class="flex justify-around items-center px-2 py-1.5 h-16">
-                <button id="tab-dashboard" onclick="switchTab('dashboard')" class="tab-btn active flex flex-col items-center justify-center w-14 h-full">
+        <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-200 z-50 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] pb-1 rounded-t-2xl">
+            <div class="flex justify-between items-center px-2 py-1.5 h-16">
+                <button id="tab-dashboard" onclick="switchTab('dashboard')" class="tab-btn active flex flex-col items-center justify-center flex-1 h-full">
                     <i class="fa-solid fa-home text-lg mb-1 transition-transform"></i>
                     <span class="text-[9px] font-bold">Beranda</span>
                 </button>
-                <button id="tab-warga" onclick="switchTab('warga')" class="tab-btn flex flex-col items-center justify-center w-14 h-full">
+                <button id="tab-warga" onclick="switchTab('warga')" class="tab-btn flex flex-col items-center justify-center flex-1 h-full">
                     <i class="fa-solid fa-users text-lg mb-1 transition-transform"></i>
                     <span class="text-[9px] font-bold">Jadwal</span>
                 </button>
-                <button id="tab-keuangan" onclick="switchTab('keuangan')" class="tab-btn flex flex-col items-center justify-center w-14 h-full relative">
+                
+                <!-- Floating WhatsApp Button (Tombol Menonjol di Tengah) -->
+                <div class="flex-1 flex justify-center h-full relative">
+                    <a href="https://wa.me/6285157467216" target="_blank" class="absolute -top-7 bg-gradient-to-tr from-green-500 to-green-400 text-white h-14 w-14 rounded-full flex items-center justify-center shadow-[0_6px_15px_rgba(34,197,94,0.4)] hover:scale-110 transition-transform duration-300 border-4 border-white z-10" title="Hubungi Pak RT">
+                        <i class="fa-brands fa-whatsapp text-3xl"></i>
+                    </a>
+                    <span class="text-[8px] sm:text-[9px] font-bold text-gray-400 mt-auto mb-1">Hub. RT</span>
+                </div>
+
+                <button id="tab-keuangan" onclick="switchTab('keuangan')" class="tab-btn flex flex-col items-center justify-center flex-1 h-full relative">
                     <i class="fa-solid fa-file-invoice-dollar text-lg mb-1 transition-transform"></i>
                     <span class="text-[9px] font-bold">Tagihan</span>
                 </button>
-                <!-- Tombol Presensi Diganti Menjadi Deposit -->
-                <button id="tab-deposit" onclick="switchTab('deposit')" class="tab-btn flex flex-col items-center justify-center w-14 h-full relative">
+                <button id="tab-deposit" onclick="switchTab('deposit')" class="tab-btn flex flex-col items-center justify-center flex-1 h-full relative">
                     <i class="fa-solid fa-piggy-bank text-lg mb-1 transition-transform"></i>
                     <span class="text-[9px] font-bold">Deposit</span>
                 </button>
@@ -288,6 +304,32 @@
     </div>
 
     <!-- SEMUA MODAL POP-UP MULAI DARI SINI -->
+
+    <!-- Modal Buat Nota & Bagikan ke WA -->
+    <div id="modal-nota" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden flex items-center justify-center z-[130] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm border-t-4 border-green-500 overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-5 py-4 border-b bg-green-50 flex justify-between items-center shrink-0">
+                <h3 class="text-base font-bold text-green-800 flex items-center"><i class="fa-brands fa-whatsapp mr-2 text-green-600 text-lg"></i>Kirim Nota WhatsApp</h3>
+                <button onclick="tutupModalNota()" class="text-gray-500 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-grow bg-gray-50 space-y-4">
+                <div>
+                    <span class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Preview Gambar Nota:</span>
+                    <img id="nota-img-preview" src="" class="w-full border border-gray-300 rounded-lg shadow-sm bg-white" alt="Preview Nota">
+                </div>
+                <div>
+                    <span class="block text-[10px] font-bold text-gray-500 mb-1 uppercase">Draf Pesan Sopan:</span>
+                    <textarea id="nota-pesan" class="w-full border border-gray-300 rounded-lg p-2.5 text-xs text-gray-700 focus:ring-green-500 bg-white" rows="6"></textarea>
+                    <p class="text-[9px] text-gray-400 mt-1">*Pesan dapat diubah sebelum dikirim.</p>
+                </div>
+            </div>
+            <div class="px-4 py-3 bg-white border-t shrink-0">
+                <button onclick="kirimNotaWA()" class="w-full bg-green-600 text-white font-bold text-sm px-4 py-3 rounded-lg hover:bg-green-700 transition shadow-sm flex justify-center items-center gap-2">
+                    <i class="fa-solid fa-share-nodes"></i> Download & Bagikan via WA
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal Tambah Deposit -->
     <div id="modal-deposit" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[100] p-4 transition-opacity">
@@ -1074,6 +1116,173 @@
             renderDashboardPresensi();
         }
 
+        // --- NOTA TAGIHAN WA (BARU) ---
+        let currentNotaDenda = null;
+        let currentNotaBase64 = null;
+
+        async function bukaModalNota(id, event) {
+            if(event) event.stopPropagation();
+            const denda = dataDenda.find(d => d.id === id);
+            if(!denda) return;
+            const warga = dataWarga.find(w => w.id === denda.wargaId);
+            
+            currentNotaDenda = denda;
+            
+            const pesan = `Assalamu'alaikum Wr. Wb.\nMohon maaf mengganggu waktunya Bpk/Ibu *${warga.nama}*. 🙏\n\nBerikut kami lampirkan nota tagihan kas/denda ronda untuk tanggal *${denda.tanggal}* dengan keterangan: _${denda.keterangan}_.\n\nTotal Tagihan: *${formatRp(denda.nominal)}*\n\nMohon perkenannya untuk dapat diselesaikan. Terima kasih banyak atas partisipasi dan kerjasamanya.\n\nSehat selalu untuk keluarga.\n\nHormat kami,\n*Pengurus RT 01 / RW 05 KebonAgung*`;
+            
+            document.getElementById('nota-pesan').value = pesan;
+            
+            const imgEl = document.getElementById('nota-img-preview');
+            imgEl.src = ''; 
+            
+            try {
+                currentNotaBase64 = await generateNotaCanvas(denda, warga);
+                imgEl.src = currentNotaBase64;
+                document.getElementById('modal-nota').classList.remove('hidden');
+            } catch (err) {
+                showDialog('alert', 'Error', 'Gagal memproses gambar Nota.');
+            }
+        }
+
+        function tutupModalNota() {
+            document.getElementById('modal-nota').classList.add('hidden');
+        }
+
+        async function generateNotaCanvas(denda, warga) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+            canvas.height = 420;
+            const ctx = canvas.getContext('2d');
+
+            // Background Putih
+            ctx.fillStyle = '#f8fafc'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Header Biru
+            ctx.fillStyle = '#2563eb'; 
+            ctx.fillRect(0, 0, canvas.width, 90);
+
+            // Teks Header
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 28px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('NOTA TAGIHAN E-RONDA', 300, 42);
+            ctx.font = '16px sans-serif';
+            ctx.fillText('RT. 01 / RW. 05 KebonAgung', 300, 70);
+
+            // Bayangan Kotak Konten
+            ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = 'rgba(0,0,0,0.1)';
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetY = 4;
+            ctx.fillRect(30, 110, 540, 270);
+            ctx.shadowColor = 'transparent'; // Reset bayangan
+
+            // Isi Konten
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#334155';
+            ctx.font = '16px sans-serif';
+            ctx.fillText('Kepada Yth,', 60, 150);
+            ctx.font = 'bold 22px sans-serif';
+            ctx.fillStyle = '#0f172a';
+            ctx.fillText('Bpk/Ibu ' + warga.nama, 60, 180);
+
+            // Garis Pemisah
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(60, 200);
+            ctx.lineTo(540, 200);
+            ctx.stroke();
+
+            // Rincian
+            ctx.font = '16px sans-serif';
+            ctx.fillStyle = '#64748b';
+            ctx.fillText('Rincian Tagihan:', 60, 230);
+
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillStyle = '#334155';
+            ctx.fillText('Tanggal', 60, 260);
+            ctx.fillText(': ' + denda.tanggal, 180, 260);
+            ctx.fillText('Keterangan', 60, 290);
+            
+            // Handle Keterangan text wrap if too long
+            const maxChars = 35;
+            let ketText = denda.keterangan;
+            if(ketText.length > maxChars) { ketText = ketText.substring(0, maxChars) + '...'; }
+            ctx.fillText(': ' + ketText, 180, 290);
+
+            // Kotak Nominal
+            ctx.fillStyle = '#fef2f2'; // red-50
+            ctx.fillRect(60, 315, 480, 50);
+            ctx.strokeStyle = '#fca5a5'; // red-300
+            ctx.strokeRect(60, 315, 480, 50);
+
+            ctx.fillStyle = '#dc2626'; // red-600
+            ctx.font = 'bold 18px sans-serif';
+            ctx.fillText('TOTAL NOMINAL', 80, 347);
+            ctx.textAlign = 'right';
+            ctx.font = 'bold 24px sans-serif';
+            ctx.fillText(formatRp(denda.nominal), 520, 348);
+
+            // Footer (Dicetak Tgl)
+            ctx.textAlign = 'center';
+            ctx.font = '12px sans-serif';
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillText('Dicetak otomatis oleh Sistem E-Ronda pada: ' + new Date().toLocaleString('id-ID'), 300, 405);
+
+            return canvas.toDataURL('image/png', 1.0);
+        }
+
+        async function kirimNotaWA() {
+            if(!currentNotaDenda || !currentNotaBase64) return;
+            const denda = currentNotaDenda;
+            const warga = dataWarga.find(w => w.id === denda.wargaId);
+            const textMsg = document.getElementById('nota-pesan').value;
+            const noWA = warga.wa ? formatNoWA(warga.wa) : '';
+
+            // Convert Base64 ke File Object (dibutuhkan untuk web share API)
+            const res = await fetch(currentNotaBase64);
+            const blob = await res.blob();
+            const file = new File([blob], `Nota_${warga.nama.replace(/\s+/g, '_')}_${denda.tanggal}.png`, { type: 'image/png' });
+
+            // Cek apakah HP/Browser support fitur Share File secara native (biasanya berjalan mulus di HP)
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        title: 'Nota Tagihan Ronda',
+                        text: textMsg,
+                        files: [file]
+                    });
+                    tutupModalNota();
+                    showToast('Silakan pilih kontak WhatsApp untuk mengirim nota.');
+                    return;
+                } catch (e) {
+                    console.log("Share dibatalkan atau gagal", e);
+                }
+            }
+
+            // FALLBACK jika dibuka di PC/Laptop atau browser yang tidak support share file
+            // Otomatis download file gambar nota, lalu buka link WhatsApp web/app
+            const link = document.createElement('a');
+            link.download = file.name;
+            link.href = currentNotaBase64;
+            link.click(); // Trigger auto download gambar
+
+            tutupModalNota();
+            if (noWA) {
+                showToast('Gambar Nota diunduh. Membuka WhatsApp...');
+                setTimeout(() => {
+                    // Beri tahu user untuk attach/melampirkan gambar nota yang baru saja didownload
+                    alert('INFO: Gambar Nota Tagihan telah otomatis didownload ke perangkat Anda.\n\nSilakan "Lampirkan/Kirim Gambar" nota tersebut di kolom obrolan WhatsApp yang akan terbuka setelah ini.');
+                    window.open(`https://wa.me/${noWA}?text=${encodeURIComponent(textMsg)}`, '_blank');
+                }, 800);
+            } else {
+                showDialog('alert', 'Nomor WA Kosong', 'Gambar Nota telah diunduh. Namun warga ini tidak memiliki nomor WA yang tercatat, silakan kirim secara manual.');
+            }
+        }
+
+
         // --- MANAJEMEN DEPOSIT ---
         function renderTabelDeposit() {
             const container = document.getElementById('container-deposit');
@@ -1666,9 +1875,8 @@
                     const noWA = wargaData && wargaData.wa ? formatNoWA(wargaData.wa) : '';
 
                     let tagihBtn = '';
-                    if (userRole === 'admin' && !isLunas && noWA) {
-                        const pesan = `Halo Bpk/Ibu ${d.namaWarga},%0A%0AMengingatkan bahwa terdapat tunggakan denda ronda sebesar *${formatRp(d.nominal)}* untuk tanggal ${d.tanggal} (${d.keterangan}).%0A%0AMohon agar segera diselesaikan. Terima kasih.%0A%0A- Pengurus RT 01`;
-                        tagihBtn = `<a href="https://wa.me/${noWA}?text=${pesan}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] bg-green-50 hover:bg-green-500 text-green-600 hover:text-white border border-green-200 hover:border-green-500 px-2 py-1 rounded transition shadow-sm font-bold inline-flex items-center"><i class="fa-brands fa-whatsapp mr-1 text-sm"></i> Tagih</a>`;
+                    if (userRole === 'admin' && !isLunas) {
+                        tagihBtn = `<button onclick="bukaModalNota(${d.id}, event)" class="text-[10px] bg-green-50 hover:bg-green-500 text-green-600 hover:text-white border border-green-200 hover:border-green-500 px-2 py-1 rounded transition shadow-sm font-bold inline-flex items-center"><i class="fa-solid fa-file-invoice mr-1 text-sm"></i> Kirim Nota WA</button>`;
                     }
                     
                     const tampilNominal = d.status === 'Lunas' && d.nominalAsli ? formatRp(d.nominalAsli) : formatRp(d.nominal);
