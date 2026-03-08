@@ -159,7 +159,10 @@
             <div id="page-keuangan" class="page-content p-4">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-bold text-gray-800">Tagihan & Denda</h2>
-                    <button onclick="downloadPDFDenda()" class="text-[10px] bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-red-700 transition flex items-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                    <div class="flex gap-2">
+                        <button id="btn-cetak-nota" onclick="cetakSemuaNotaPDF()" class="text-[10px] bg-green-600 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-green-700 transition flex items-center gap-1.5"><i class="fa-solid fa-print"></i> Nota A4</button>
+                        <button onclick="downloadPDFDenda()" class="text-[10px] bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-red-700 transition flex items-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> Rekap</button>
+                    </div>
                 </div>
                 <div id="container-denda" class="space-y-3"></div>
             </div>
@@ -1036,6 +1039,7 @@
                 if(document.getElementById('btn-tambah-rencana')) document.getElementById('btn-tambah-rencana').style.display = 'none';
                 if(document.getElementById('btn-catat-presensi')) document.getElementById('btn-catat-presensi').style.display = 'none';
                 if(document.getElementById('btn-tambah-deposit')) document.getElementById('btn-tambah-deposit').style.display = 'none';
+                if(document.getElementById('btn-cetak-nota')) document.getElementById('btn-cetak-nota').style.display = 'none';
                 if(formKas) formKas.classList.add('hidden');
                 
                 badge.innerText = "Mode Warga";
@@ -1047,6 +1051,7 @@
                 if(document.getElementById('btn-tambah-rencana')) document.getElementById('btn-tambah-rencana').style.display = 'inline-flex';
                 if(document.getElementById('btn-catat-presensi')) document.getElementById('btn-catat-presensi').style.display = 'flex';
                 if(document.getElementById('btn-tambah-deposit')) document.getElementById('btn-tambah-deposit').style.display = 'inline-flex';
+                if(document.getElementById('btn-cetak-nota')) document.getElementById('btn-cetak-nota').style.display = 'inline-flex';
                 if(formKas) formKas.classList.remove('hidden');
                 
                 badge.innerText = "Mode Admin";
@@ -2012,6 +2017,142 @@
             doc.setFontSize(10); doc.setFont('helvetica', 'bold');
             doc.text(`Total Keseluruhan Tunggakan Warga: ${formatRp(totalTunggakanKeseluruhan)}`, 14, finalY + 8);
             doc.save(`Rekap_Denda_RT01_${Date.now()}.pdf`);
+        }
+
+        function cetakSemuaNotaPDF() {
+            if(typeof window.jspdf === 'undefined') { showToast('Fitur PDF belum siap, mohon tunggu.'); return; }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4'); // Kertas A4
+
+            // Kelompokkan tagihan yang statusnya belum dibayar berdasarkan warga
+            const grouped = {};
+            dataDenda.forEach(d => {
+                if (d.status === 'Belum Dibayar') {
+                    if(!grouped[d.wargaId]) {
+                        grouped[d.wargaId] = { nama: d.namaWarga, total: 0, items: [] };
+                    }
+                    grouped[d.wargaId].items.push(d);
+                    grouped[d.wargaId].total += d.nominal;
+                }
+            });
+
+            const wargaKeys = Object.keys(grouped);
+            if(wargaKeys.length === 0) {
+                showToast('Tidak ada tagihan yang belum dibayar saat ini.');
+                return;
+            }
+
+            showToast('Menyiapkan dokumen Nota A4...');
+
+            // Dimensi layout untuk 6 kotak per A4 (2 kolom x 3 baris)
+            const notaW = 90;
+            const notaH = 88;
+            const startX = 10;
+            const startY = 10;
+            const gapX = 10;
+            const gapY = 10;
+
+            wargaKeys.forEach((wargaId, index) => {
+                const data = grouped[wargaId];
+                data.items.sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
+
+                // Tambah lembar baru jika sudah lebih dari 6 nota di halaman ini
+                if (index > 0 && index % 6 === 0) {
+                    doc.addPage();
+                }
+
+                // Kalkulasi posisi x dan y
+                const colIdx = (index % 6) % 2;
+                const rowIdx = Math.floor((index % 6) / 2);
+
+                const x = startX + colIdx * (notaW + gapX);
+                const y = startY + rowIdx * (notaH + gapY);
+
+                // Buat Kotak Luar Nota
+                doc.setDrawColor(0);
+                doc.setLineWidth(0.3);
+                doc.rect(x, y, notaW, notaH);
+
+                // Header Nota
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(37, 99, 235); // Biru
+                doc.text('NOTA TAGIHAN E-RONDA', x + notaW/2, y + 8, { align: 'center' });
+                
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(100, 116, 139); // Abu-abu
+                doc.text('RT. 01 / RW. 05 KebonAgung', x + notaW/2, y + 12.5, { align: 'center' });
+
+                // Garis Pemisah Header
+                doc.setDrawColor(200, 200, 200);
+                doc.setLineWidth(0.2);
+                doc.line(x + 5, y + 15, x + notaW - 5, y + 15);
+
+                // Info Penerima
+                doc.setFontSize(9);
+                doc.setTextColor(51, 65, 85);
+                doc.text('Kepada Yth,', x + 5, y + 20);
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(15, 23, 42);
+                doc.text('Bpk/Ibu ' + data.nama, x + 5, y + 25);
+
+                // Label Rincian
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(100, 116, 139);
+                doc.text('Rincian Tagihan:', x + 5, y + 31);
+
+                // Menampilkan List Rincian (Maksimal 6 item)
+                let itemY = y + 36;
+                doc.setTextColor(51, 65, 85);
+                doc.setFontSize(8);
+                
+                const maxItems = 6;
+                for (let i = 0; i < data.items.length && i < maxItems; i++) {
+                    const item = data.items[i];
+                    let ket = item.keterangan;
+                    if (ket.length > 20) ket = ket.substring(0, 20) + '...';
+                    
+                    doc.text(`${i+1}. ${item.tanggal}`, x + 5, itemY);
+                    doc.text(ket, x + 28, itemY);
+                    doc.text(formatRp(item.nominal), x + notaW - 5, itemY, { align: 'right' });
+                    itemY += 5;
+                }
+
+                // Jika item lebih dari 6, sisanya dirangkum
+                if (data.items.length > maxItems) {
+                    const sisa = data.items.length - maxItems;
+                    doc.setFont('helvetica', 'italic');
+                    doc.text(`... dan ${sisa} rincian lainnya`, x + 5, itemY);
+                    doc.setFont('helvetica', 'normal');
+                }
+
+                // Kotak Rekap Total
+                const totalY = y + 68;
+                doc.setFillColor(254, 242, 242); 
+                doc.rect(x + 5, totalY, notaW - 10, 10, 'F');
+                doc.setDrawColor(252, 165, 165); 
+                doc.setLineWidth(0.2);
+                doc.rect(x + 5, totalY, notaW - 10, 10, 'S');
+
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(220, 38, 38); // Merah
+                doc.text('TOTAL', x + 8, totalY + 6.5);
+                doc.setFontSize(11);
+                doc.text(formatRp(data.total), x + notaW - 8, totalY + 6.5, { align: 'right' });
+
+                // Footer (Tanggal Cetak)
+                doc.setFontSize(6);
+                doc.setFont('helvetica', 'italic');
+                doc.setTextColor(148, 163, 184);
+                doc.text('Dicetak oleh sistem pada: ' + new Date().toLocaleString('id-ID'), x + notaW/2, y + 84, { align: 'center' });
+            });
+
+            doc.save(`Semua_Nota_Tagihan_A4_RT01_${Date.now()}.pdf`);
         }
 
         function editDenda(id, event) {
