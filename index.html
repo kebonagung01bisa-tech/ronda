@@ -103,22 +103,26 @@
                     </div>
                 </div>
                 <!-- Menu Cepat -->
-                <div class="grid grid-cols-4 gap-2 mt-2">
+                <div class="grid grid-cols-5 gap-1.5 mt-2">
+                    <button onclick="bukaModalInfo()" class="bg-white p-2 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-1 hover:bg-gray-50 transition">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-book-open"></i></div>
+                        <span class="text-[8px] sm:text-[9px] font-bold text-gray-600 text-center">Aturan</span>
+                    </button>
                     <button onclick="switchTab('presensi')" id="btn-catat-presensi" class="bg-white p-2 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-1 hover:bg-gray-50 transition">
                         <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center"><i class="fa-solid fa-clipboard-check"></i></div>
-                        <span class="text-[9px] font-bold text-gray-600 text-center">Presensi</span>
+                        <span class="text-[8px] sm:text-[9px] font-bold text-gray-600 text-center">Presensi</span>
                     </button>
                     <button onclick="switchTab('riwayat-kas')" class="bg-white p-2 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-1 hover:bg-gray-50 transition">
                         <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center"><i class="fa-solid fa-list-ul"></i></div>
-                        <span class="text-[9px] font-bold text-gray-600 text-center">Mutasi Kas</span>
+                        <span class="text-[8px] sm:text-[9px] font-bold text-gray-600 text-center">Mutasi Kas</span>
                     </button>
                     <button onclick="switchTab('realisasi')" class="bg-white p-2 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-1 hover:bg-gray-50 transition">
                         <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center"><i class="fa-solid fa-camera"></i></div>
-                        <span class="text-[9px] font-bold text-gray-600 text-center">Realisasi</span>
+                        <span class="text-[8px] sm:text-[9px] font-bold text-gray-600 text-center">Realisasi</span>
                     </button>
                     <button onclick="switchTab('aspirasi')" class="bg-white p-2 rounded-lg shadow-sm border border-gray-100 flex flex-col items-center justify-center gap-1 hover:bg-gray-50 transition">
                         <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center"><i class="fa-solid fa-bullhorn"></i></div>
-                        <span class="text-[9px] font-bold text-gray-600 text-center">Aspirasi</span>
+                        <span class="text-[8px] sm:text-[9px] font-bold text-gray-600 text-center">Aspirasi</span>
                     </button>
                 </div>
                 <!-- Riwayat Presensi Singkat -->
@@ -650,21 +654,53 @@
 
     <!-- Modal Informasi & Aturan -->
     <div id="modal-informasi" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[200] p-4 transition-opacity">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden">
-            <div class="px-5 py-4 border-b bg-blue-50 flex justify-between items-center">
-                <h3 class="text-base font-bold text-blue-900 flex items-center"><i class="fa-solid fa-circle-info mr-2 text-blue-600"></i>Informasi & Aturan</h3>
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-5 py-4 border-b bg-blue-50 flex justify-between items-center shrink-0">
+                <h3 class="text-base font-bold text-blue-900 flex items-center"><i class="fa-solid fa-book-open mr-2 text-blue-600"></i>Ketentuan & Tata Tertib</h3>
                 <button onclick="tutupModalInfo()" class="text-gray-500 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
             </div>
-            <div class="p-5 text-sm">
-                <ul class="list-disc list-outside ml-4 text-gray-600 space-y-2.5">
-                    <li>Sistem ini terhubung ke <b>Database Cloud</b>. Perubahan tersimpan secara real-time.</li>
-                    <li>Warga wajib mengikuti jadwal ronda. Jika berhalangan/absen akan dikenakan denda kedisiplinan.</li>
-                    <li>Besaran tarif denda bervariasi tergantung status warga yang sudah disepakati bersama.</li>
-                    <li>Uang hasil denda 100% masuk ke Kas RT. Pengeluaran serta bukti foto realisasinya transparan dan dapat dilihat oleh semua warga.</li>
-                </ul>
+            <div class="p-5 overflow-y-auto text-sm bg-white space-y-5">
+                <div class="space-y-4">
+                    <section>
+                        <h4 class="font-bold text-blue-700 border-b border-blue-100 pb-1 mb-2">1. Iuran Kesadaran Penuh (Rp 10.000)</h4>
+                        <ul class="list-disc list-outside ml-4 text-gray-700 space-y-1.5 text-[11px] sm:text-xs">
+                            <li>Warga yang menetap di rumah setiap hari (tidak merantau).</li>
+                            <li>Warga yang merantau, namun memiliki perwakilan di rumah yang dinilai mampu (contoh: anak laki-laki min. SMA/sederajat).</li>
+                            <li>Warga perantau yang sedang masa cuti/libur (perlop) di rumah.</li>
+                            <li>Ibu Janda (Orang Tua Tunggal) yang memiliki anggota keluarga/anak laki-laki di dalam satu rumah yang memenuhi syarat (min. SMA).</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h4 class="font-bold text-amber-600 border-b border-amber-100 pb-1 mb-2">2. Iuran Kebijaksanaan (Rp 5.000)</h4>
+                        <ul class="list-disc list-outside ml-4 text-gray-700 space-y-1.5 text-[11px] sm:text-xs">
+                            <li>Warga yang sedang merantau dan tidak memiliki wakil cukup umur (misal: anak masih usia balita, SD, atau SMP).</li>
+                            <li>Ibu Janda (Orang Tua Tunggal)/SEPUH yang tidak memiliki anggota keluarga yang cukup umur.</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h4 class="font-bold text-green-600 border-b border-green-100 pb-1 mb-2">3. Bebas Uang Kesadaran (Rp 0)</h4>
+                        <ul class="list-disc list-outside ml-4 text-gray-700 space-y-1.5 text-[11px] sm:text-xs">
+                            <li>Warga yang sedang sakit dan tidak memiliki perwakilan. <i>(Catatan: mari budayakan saling menjenguk & membantu)</i>.</li>
+                            <li>Warga yang sedang memiliki hajat besar di rumahnya (misal: resepsi pernikahan, khitanan).</li>
+                            <li>Warga yang sedang mengalami musibah atau berduka cita.</li>
+                        </ul>
+                    </section>
+
+                    <section class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        <h4 class="font-bold text-gray-800 text-xs mb-1">4. Tanggung Jawab Sosial</h4>
+                        <p class="text-[10px] sm:text-[11px] text-gray-600 leading-relaxed mb-2 text-justify">
+                            Kegiatan ronda merupakan wujud kesadaran bermasyarakat. Pekerjaan utama untuk pemenuhan kebutuhan keluarga tetap prioritas. Apabila jadwal ronda berbenturan/menghalangi pekerjaan utama, mohon segera komunikasikan kepada pengurus untuk dicari solusi paling bijak bersama.
+                        </p>
+                        <p class="text-[10px] sm:text-[11px] font-bold text-blue-700 italic border-t border-gray-200 pt-2 text-justify">
+                            *Dana iuran akan dikelola transparan dan dikembalikan untuk kepentingan warga (perbaikan pos, inventaris, kas). Jika jadwal perlu direvisi, silakan hubungi pengurus RT 01/05.
+                        </p>
+                    </section>
+                </div>
             </div>
-            <div class="px-5 py-3 bg-gray-50 border-t text-center">
-                <button onclick="tutupModalInfo()" class="w-full bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold shadow-sm hover:bg-blue-700 transition">Tutup Informasi</button>
+            <div class="px-5 py-3 bg-gray-50 border-t text-center shrink-0">
+                <button onclick="tutupModalInfo()" class="w-full bg-blue-600 text-white px-6 py-2.5 rounded-lg font-bold shadow-sm hover:bg-blue-700 transition">Tutup & Mengerti</button>
             </div>
         </div>
     </div>
