@@ -162,13 +162,15 @@
             <!-- HALAMAN KEUANGAN / DENDA -->
             <div id="page-keuangan" class="page-content p-4">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-bold text-gray-800">Tagihan & Denda</h2>
-                    <div class="flex gap-2">
+                    <h2 id="keuangan-title" class="text-lg font-bold text-gray-800">Tagihan Mingguan</h2>
+                    <button id="btn-kembali-keuangan" onclick="renderTabelKeuanganMingguan()" class="hidden text-[10px] bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-gray-300 transition flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+                    <div id="keuangan-action-btns" class="hidden flex gap-2">
                         <button id="btn-cetak-nota" onclick="cetakSemuaNotaPDF()" class="text-[10px] bg-green-600 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-green-700 transition flex items-center gap-1.5"><i class="fa-solid fa-print"></i> Nota A4</button>
                         <button onclick="downloadPDFDenda()" class="text-[10px] bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-red-700 transition flex items-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> Rekap</button>
                     </div>
                 </div>
-                <div id="container-denda" class="space-y-3"></div>
+                <div id="container-denda-mingguan" class="space-y-3"></div>
+                <div id="container-denda" class="space-y-3 hidden"></div>
             </div>
 
             <!-- HALAMAN RIWAYAT KAS -->
@@ -652,6 +654,29 @@
         </div>
     </div>
 
+    <!-- Modal Input Keterangan Izin -->
+    <div id="modal-izin" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[200] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl p-5 w-full max-w-sm border-t-4 border-yellow-500">
+            <h3 class="text-lg font-bold mb-4 text-yellow-800 flex items-center"><i class="fa-solid fa-envelope-open-text mr-2"></i>Keterangan Izin</h3>
+            <div class="space-y-3">
+                <input type="hidden" id="form-izin-tgl">
+                <input type="hidden" id="form-izin-warga-id">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Nama Warga</label>
+                    <input type="text" id="form-izin-nama" class="w-full border border-gray-300 bg-gray-100 rounded-lg p-2.5 text-sm font-bold text-gray-600" readonly>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Alasan / Keterangan</label>
+                    <input type="text" id="form-izin-ket" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-yellow-500 text-sm" placeholder="Contoh: Sakit tipes, Dinas luar kota...">
+                </div>
+            </div>
+            <div class="mt-5 flex justify-end space-x-2">
+                <button onclick="tutupModalIzin()" class="bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg hover:bg-gray-300 text-sm font-bold transition">Batal</button>
+                <button onclick="simpanIzin()" class="bg-yellow-500 text-white px-4 py-2.5 rounded-lg hover:bg-yellow-600 text-sm font-bold shadow-sm transition">Simpan Izin</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Informasi & Aturan -->
     <div id="modal-informasi" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[200] p-4 transition-opacity">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden flex flex-col max-h-[90vh]">
@@ -898,6 +923,36 @@
         let dataAspirasi = [];
         let tempBuktiBase64 = []; 
         let currentModalDateStr = '';
+        let currentWeekFilterId = null;
+        let currentWeekFilterLabel = "";
+
+        function getWeekInfo(dateString) {
+            if (!dateString) return null;
+            const d = new Date(dateString);
+            if (isNaN(d.getTime())) return null;
+            const day = d.getDay();
+            const diffToMonday = d.getDate() - day + (day === 0 ? -6 : 1);
+            
+            const startOfWeek = new Date(d);
+            startOfWeek.setDate(diffToMonday);
+            
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            
+            const formatDisplay = (dt) => {
+                const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'];
+                return `${dt.getDate()} ${months[dt.getMonth()]} ${dt.getFullYear()}`;
+            };
+            
+            const yyyy = startOfWeek.getFullYear();
+            const mm = String(startOfWeek.getMonth() + 1).padStart(2, '0');
+            const dd = String(startOfWeek.getDate()).padStart(2, '0');
+            
+            return {
+                id: `${yyyy}-${mm}-${dd}`,
+                label: `${formatDisplay(startOfWeek)} - ${formatDisplay(endOfWeek)}`
+            };
+        }
 
         function getNominalDenda(tipeText) {
             const p = pengaturanDenda.find(x => x.tipe === tipeText);
@@ -1031,7 +1086,10 @@
 
             onSnapshot(getColl('denda'), (snap) => {
                 dataDenda = snap.docs.map(d => d.data());
-                if(document.getElementById('page-keuangan') && document.getElementById('page-keuangan').classList.contains('active')) renderTabelDenda();
+                if(document.getElementById('page-keuangan') && document.getElementById('page-keuangan').classList.contains('active')) {
+                    if (currentWeekFilterId) renderTabelDenda();
+                    else renderTabelKeuanganMingguan();
+                }
                 updateDashboard();
                 if(isFirstDenda) { isFirstDenda = false; cekSelesaiLoading(); }
             }, (err) => console.error(err));
@@ -1099,6 +1157,7 @@
                 if(document.getElementById('btn-catat-presensi')) document.getElementById('btn-catat-presensi').style.display = 'none';
                 if(document.getElementById('btn-tambah-deposit')) document.getElementById('btn-tambah-deposit').style.display = 'none';
                 if(document.getElementById('btn-cetak-nota')) document.getElementById('btn-cetak-nota').style.display = 'none';
+                if(document.getElementById('keuangan-action-btns')) document.getElementById('keuangan-action-btns').classList.add('hidden');
                 if(formKas) formKas.classList.add('hidden');
                 
                 badge.innerText = "Mode Warga";
@@ -1111,6 +1170,7 @@
                 if(document.getElementById('btn-catat-presensi')) document.getElementById('btn-catat-presensi').style.display = 'flex';
                 if(document.getElementById('btn-tambah-deposit')) document.getElementById('btn-tambah-deposit').style.display = 'inline-flex';
                 if(document.getElementById('btn-cetak-nota')) document.getElementById('btn-cetak-nota').style.display = 'inline-flex';
+                if(document.getElementById('keuangan-action-btns')) document.getElementById('keuangan-action-btns').classList.remove('hidden');
                 if(formKas) formKas.classList.remove('hidden');
                 
                 badge.innerText = "Mode Admin";
@@ -1118,7 +1178,10 @@
             }
             
             if(document.getElementById('page-warga') && document.getElementById('page-warga').classList.contains('active')) renderTabelWarga();
-            if(document.getElementById('page-keuangan') && document.getElementById('page-keuangan').classList.contains('active')) renderTabelDenda();
+            if(document.getElementById('page-keuangan') && document.getElementById('page-keuangan').classList.contains('active')) {
+                if (currentWeekFilterId) renderTabelDenda();
+                else renderTabelKeuanganMingguan();
+            }
             if(document.getElementById('page-kas-lainnya') && document.getElementById('page-kas-lainnya').classList.contains('active')) renderTabelKasLainnya();
             if(document.getElementById('page-riwayat-kas') && document.getElementById('page-riwayat-kas').classList.contains('active')) renderRiwayatKas();
             if(document.getElementById('page-realisasi') && document.getElementById('page-realisasi').classList.contains('active')) renderRealisasi();
@@ -1142,7 +1205,7 @@
             if(tabId === 'dashboard') updateDashboard();
             if(tabId === 'warga') renderTabelWarga();
             if(tabId === 'deposit') renderTabelDeposit();
-            if(tabId === 'keuangan') renderTabelDenda();
+            if(tabId === 'keuangan') renderTabelKeuanganMingguan();
             if(tabId === 'riwayat-kas') renderRiwayatKas();
             if(tabId === 'kas-lainnya') {
                 renderTabelKasLainnya();
@@ -1188,12 +1251,19 @@
         async function bukaModalNotaGabungan(wargaId, event) {
             if(event) event.stopPropagation();
             
-            // Ambil semua tagihan denda milik warga ini yang berstatus "Belum Dibayar"
-            const dendaList = dataDenda
-                .filter(d => d.wargaId === wargaId && d.status === 'Belum Dibayar')
-                .sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
+            // Filter list by selected week if any
+            let targetDendaList = dataDenda.filter(d => d.wargaId === wargaId && d.status === 'Belum Dibayar');
+            
+            if (currentWeekFilterId) {
+                targetDendaList = targetDendaList.filter(d => {
+                    const weekInfo = getWeekInfo(d.tanggal);
+                    return weekInfo && weekInfo.id === currentWeekFilterId;
+                });
+            }
+            
+            const dendaList = targetDendaList.sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
                 
-            if(dendaList.length === 0) return showToast('Warga ini tidak memiliki tunggakan denda.');
+            if(dendaList.length === 0) return showToast('Warga ini tidak memiliki tunggakan denda pada minggu ini.');
             
             const warga = dataWarga.find(w => w.id === wargaId);
             
@@ -1512,34 +1582,76 @@
                 wrapper.classList.remove('hidden');
             }
 
-            const recentDates = validDates.slice(0, 7);
+            const groupedWeeks = {};
+            validDates.forEach(date => {
+                const weekInfo = getWeekInfo(date);
+                if (!weekInfo) return;
+                if (!groupedWeeks[weekInfo.id]) {
+                    groupedWeeks[weekInfo.id] = { id: weekInfo.id, label: weekInfo.label, dates: [] };
+                }
+                groupedWeeks[weekInfo.id].dates.push(date);
+            });
 
-            recentDates.forEach(date => {
-                let stringTanggal = date;
-                let adaFoto = false;
-                try {
-                    const dateObj = new Date(date);
-                    if (!isNaN(dateObj.getTime())) {
-                        const namaHariStr = namaHari[dateObj.getDay()];
-                        stringTanggal = `${namaHariStr}, ${dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}`;
-                    }
-                    if (dataPresensi[date] && dataPresensi[date].bukti_foto && dataPresensi[date].bukti_foto.length > 0) {
-                        adaFoto = true;
-                    }
-                } catch(e) {}
+            const sortedWeeks = Object.values(groupedWeeks).sort((a,b) => new Date(b.id) - new Date(a.id)).slice(0, 5); // Tampilkan 5 minggu terakhir
+
+            sortedWeeks.forEach(week => {
+                let daysHtml = week.dates.map(date => {
+                    let stringTanggal = date;
+                    let adaFoto = false;
+                    try {
+                        const dateObj = new Date(date);
+                        if (!isNaN(dateObj.getTime())) {
+                            stringTanggal = `${namaHari[dateObj.getDay()]}, ${dateObj.toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'})}`;
+                        }
+                        if (dataPresensi[date] && dataPresensi[date].bukti_foto && dataPresensi[date].bukti_foto.length > 0) adaFoto = true;
+                    } catch(e) {}
+
+                    return `
+                        <div onclick="bukaDetailPresensi('${date}')" class="flex items-center justify-between p-2.5 sm:p-3 bg-white border-b border-gray-100 cursor-pointer hover:bg-indigo-50 transition last:border-0">
+                            <div class="flex items-center gap-2 pl-2">
+                                <i class="fa-solid fa-clock-rotate-left text-indigo-300 text-[10px]"></i>
+                                <span class="text-xs sm:text-sm font-medium text-gray-700">${stringTanggal}</span>
+                            </div>
+                            ${adaFoto ? '<span class="bg-blue-100 text-blue-600 text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded font-bold shadow-sm flex items-center gap-1"><i class="fa-solid fa-image"></i> Foto</span>' : '<i class="fa-solid fa-chevron-right text-gray-300 text-[10px] pr-2"></i>'}
+                        </div>
+                    `;
+                }).join('');
 
                 container.innerHTML += `
-                    <button onclick="bukaDetailPresensi('${date}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 px-3 sm:px-4 py-3 rounded-lg text-xs sm:text-sm font-bold transition shadow-sm flex items-center justify-between w-full text-left group">
-                        <div class="flex items-center gap-3 overflow-hidden">
-                            <div class="bg-white rounded-full shadow-sm text-indigo-500 w-8 h-8 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
-                                <i class="fa-solid fa-calendar-check"></i>
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-xl overflow-hidden shadow-sm mb-2 transition-all">
+                        <button onclick="toggleDetailMingguPresensi('${week.id}')" class="w-full flex items-center justify-between p-3 sm:p-4 hover:bg-indigo-100 transition focus:outline-none">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <div class="bg-indigo-500 text-white w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                                    <i class="fa-solid fa-calendar-week text-sm sm:text-base"></i>
+                                </div>
+                                <div class="text-left min-w-0">
+                                    <p class="text-[9px] sm:text-[10px] text-indigo-600 font-bold uppercase tracking-wider mb-0.5">Minggu Kehadiran</p>
+                                    <p class="text-xs sm:text-sm font-bold text-indigo-900 truncate">${week.label}</p>
+                                </div>
                             </div>
-                            <span class="truncate">${stringTanggal}</span>
+                            <div class="flex items-center gap-2 shrink-0 ml-2">
+                                <span class="bg-white text-indigo-600 text-[9px] sm:text-[10px] px-2 py-1 rounded-full font-bold shadow-sm">${week.dates.length} Hari</span>
+                                <i id="icon-minggu-presensi-${week.id}" class="fa-solid fa-chevron-down text-indigo-400 transition-transform duration-300"></i>
+                            </div>
+                        </button>
+                        <div id="detail-minggu-presensi-${week.id}" class="hidden bg-white flex flex-col border-t border-indigo-100">
+                            ${daysHtml}
                         </div>
-                        ${adaFoto ? '<span class="bg-blue-500 text-white text-[9px] sm:text-[10px] px-2 py-1.5 rounded-md flex items-center gap-1.5 shadow-sm shrink-0 ml-2"><i class="fa-solid fa-image"></i> <span class="hidden sm:inline">Ada Foto</span></span>' : '<i class="fa-solid fa-chevron-right text-indigo-300 shrink-0 ml-2"></i>'}
-                    </button>
+                    </div>
                 `;
             });
+        }
+
+        function toggleDetailMingguPresensi(weekId) {
+            const el = document.getElementById(`detail-minggu-presensi-${weekId}`);
+            const icon = document.getElementById(`icon-minggu-presensi-${weekId}`);
+            if(el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                el.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
         }
 
         function bukaDetailPresensi(dateStr) {
@@ -1565,13 +1677,14 @@
             
             wargaRegu.forEach(w => {
                 const status = records && records[w.id] && records[w.id] !== 'Belum' ? records[w.id] : 'Belum';
+                const ketIzin = (status === 'Izin' && records[`${w.id}_ket`]) ? records[`${w.id}_ket`] : '';
                 
                 let actionBtns = '';
                 if (userRole === 'admin') {
                     actionBtns = `
                         <div class="flex gap-1 ml-2 shrink-0">
                             ${status !== 'Hadir' ? `<button onclick="setPresensi('${dateStr}', ${w.id}, 'Hadir')" class="w-6 h-6 sm:w-7 sm:h-7 rounded bg-green-50 border border-green-200 text-green-600 hover:bg-green-500 hover:text-white transition flex items-center justify-center text-[10px] sm:text-xs shadow-sm" title="Ubah ke Hadir"><i class="fa-solid fa-check"></i></button>` : ''}
-                            ${status !== 'Izin' ? `<button onclick="setPresensi('${dateStr}', ${w.id}, 'Izin')" class="w-6 h-6 sm:w-7 sm:h-7 rounded bg-yellow-50 border border-yellow-200 text-yellow-600 hover:bg-yellow-500 hover:text-white transition flex items-center justify-center text-[10px] sm:text-xs shadow-sm" title="Ubah ke Izin"><i class="fa-solid fa-envelope"></i></button>` : ''}
+                            ${status !== 'Izin' ? `<button onclick="bukaModalIzin('${dateStr}', ${w.id}, '${w.nama}')" class="w-6 h-6 sm:w-7 sm:h-7 rounded bg-yellow-50 border border-yellow-200 text-yellow-600 hover:bg-yellow-500 hover:text-white transition flex items-center justify-center text-[10px] sm:text-xs shadow-sm" title="Ubah ke Izin"><i class="fa-solid fa-envelope"></i></button>` : ''}
                             ${status !== 'Absen' ? `<button onclick="setPresensi('${dateStr}', ${w.id}, 'Absen')" class="w-6 h-6 sm:w-7 sm:h-7 rounded bg-red-50 border border-red-200 text-red-600 hover:bg-red-500 hover:text-white transition flex items-center justify-center text-[10px] sm:text-xs shadow-sm" title="Ubah ke Absen"><i class="fa-solid fa-times"></i></button>` : ''}
                             <button onclick="hapusPresensiWarga('${dateStr}', ${w.id})" class="w-6 h-6 sm:w-7 sm:h-7 rounded bg-gray-100 border border-gray-200 text-gray-500 hover:bg-gray-500 hover:text-white transition flex items-center justify-center text-[10px] sm:text-xs shadow-sm ml-1" title="Hapus/Reset Data"><i class="fa-solid fa-trash"></i></button>
                         </div>
@@ -1581,7 +1694,8 @@
                 if (status === 'Hadir') {
                     hadirList.push(`<li class="text-sm font-medium text-gray-800 flex items-center justify-between border-b border-gray-100 pb-1.5 pt-1"><div class="flex items-center min-w-0 pr-2"><i class="fa-solid fa-user text-gray-300 text-xs mr-2 w-3 shrink-0"></i><span class="truncate">${w.nama}</span></div> ${actionBtns}</li>`);
                 } else if (status === 'Izin' || status === 'Absen') {
-                    tidakHadirList.push(`<li class="text-sm font-medium text-gray-800 flex items-center justify-between border-b border-gray-100 pb-1.5 pt-1"><div class="flex items-center min-w-0 pr-2"><i class="fa-solid fa-user text-gray-300 text-xs mr-2 w-3 shrink-0"></i><span class="truncate">${w.nama}</span> <span class="text-[9px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded ml-2 tracking-widest uppercase shrink-0">${status}</span></div> ${actionBtns}</li>`);
+                    let infoKetHtml = ketIzin ? ` <span class="text-[9px] text-gray-500 capitalize truncate block w-full mt-0.5 leading-none">Ket: ${ketIzin}</span>` : '';
+                    tidakHadirList.push(`<li class="text-sm font-medium text-gray-800 flex items-center justify-between border-b border-gray-100 pb-1.5 pt-1"><div class="flex items-center min-w-0 pr-2"><i class="fa-solid fa-user text-gray-300 text-xs mr-2 w-3 shrink-0"></i><div class="flex flex-col min-w-0"><div class="flex items-center"><span class="truncate">${w.nama}</span> <span class="text-[9px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded ml-2 tracking-widest uppercase shrink-0">${status}</span></div>${infoKetHtml}</div></div> ${actionBtns}</li>`);
                 }
             });
 
@@ -1703,6 +1817,13 @@
                 if(status === 'Absen') badgeClass = 'bg-red-100 text-red-800 border-red-200';
                 if(status === 'Izin') badgeClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
 
+                const ketIzin = (status === 'Izin' && dataPresensi[tanggalStr] && dataPresensi[tanggalStr][`${w.id}_ket`]) ? dataPresensi[tanggalStr][`${w.id}_ket`] : '';
+                let statusInfoHtml = '<span class="text-[10px] text-gray-400 italic bg-gray-50 px-2 py-0.5 rounded border border-gray-100">Belum diproses</span>';
+                if(status !== 'Belum') {
+                    let textKet = ketIzin ? ` - ${ketIzin}` : '';
+                    statusInfoHtml = `<span class="px-2 py-0.5 text-[10px] rounded border ${badgeClass} font-bold inline-block uppercase tracking-wider">Status: ${status}${textKet}</span>`;
+                }
+
                 container.innerHTML += `
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 transition hover:shadow-md">
                         <div class="flex-1 min-w-0">
@@ -1710,11 +1831,11 @@
                                 <h4 class="font-bold text-gray-800 text-sm truncate">${w.nama}</h4>
                                 <span class="px-2 py-0.5 inline-flex text-[10px] font-bold rounded-full bg-blue-50 text-blue-700 shrink-0 border border-blue-100">${w.tipe}</span>
                             </div>
-                            ${status !== 'Belum' ? `<span class="px-2 py-0.5 text-[10px] rounded border ${badgeClass} font-bold inline-block uppercase tracking-wider">Status: ${status}</span>` : '<span class="text-[10px] text-gray-400 italic bg-gray-50 px-2 py-0.5 rounded border border-gray-100">Belum diproses</span>'}
+                            ${statusInfoHtml}
                         </div>
                         <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto mt-1 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-0 border-gray-100">
                             <button onclick="setPresensi('${tanggalStr}', ${w.id}, 'Hadir')" class="flex-1 sm:flex-none px-3 py-2 bg-green-50 text-green-600 hover:bg-green-500 hover:text-white border border-green-200 hover:border-green-500 rounded text-xs transition shadow-sm font-bold flex items-center justify-center gap-1.5"><i class="fa-solid fa-check"></i> Hadir</button>
-                            <button onclick="setPresensi('${tanggalStr}', ${w.id}, 'Izin')" class="flex-1 sm:flex-none px-3 py-2 bg-yellow-50 text-yellow-600 hover:bg-yellow-500 hover:text-white border border-yellow-200 hover:border-yellow-500 rounded text-xs transition shadow-sm font-bold flex items-center justify-center gap-1.5"><i class="fa-solid fa-envelope"></i> Izin</button>
+                            <button onclick="bukaModalIzin('${tanggalStr}', ${w.id}, '${w.nama}')" class="flex-1 sm:flex-none px-3 py-2 bg-yellow-50 text-yellow-600 hover:bg-yellow-500 hover:text-white border border-yellow-200 hover:border-yellow-500 rounded text-xs transition shadow-sm font-bold flex items-center justify-center gap-1.5"><i class="fa-solid fa-envelope"></i> Izin</button>
                             <button onclick="setPresensi('${tanggalStr}', ${w.id}, 'Absen')" class="flex-1 sm:flex-none px-3 py-2 bg-red-50 text-red-600 hover:bg-red-500 hover:text-white border border-red-200 hover:border-red-500 rounded text-xs transition shadow-sm font-bold flex items-center justify-center gap-1.5"><i class="fa-solid fa-times"></i> Absen</button>
                         </div>
                     </div>
@@ -1722,7 +1843,33 @@
             });
         }
 
-        function setPresensi(tgl, wargaId, status) {
+        function bukaModalIzin(tgl, wargaId, namaWarga) {
+            if(userRole !== 'admin') return;
+            document.getElementById('form-izin-tgl').value = tgl;
+            document.getElementById('form-izin-warga-id').value = wargaId;
+            document.getElementById('form-izin-nama').value = namaWarga;
+            document.getElementById('form-izin-ket').value = '';
+            document.getElementById('modal-izin').classList.remove('hidden');
+        }
+
+        function tutupModalIzin() {
+            document.getElementById('modal-izin').classList.add('hidden');
+        }
+
+        function simpanIzin() {
+            const tgl = document.getElementById('form-izin-tgl').value;
+            const wargaId = document.getElementById('form-izin-warga-id').value;
+            const ket = document.getElementById('form-izin-ket').value.trim();
+
+            if(!ket) {
+                return showDialog('alert', 'Perhatian', 'Keterangan izin harus diisi terlebih dahulu!');
+            }
+
+            setPresensi(tgl, parseInt(wargaId), 'Izin', ket);
+            tutupModalIzin();
+        }
+
+        function setPresensi(tgl, wargaId, status, keteranganIzin = null) {
             if(userRole !== 'admin') return;
             const prevStatus = (dataPresensi[tgl] && dataPresensi[tgl][wargaId]) ? dataPresensi[tgl][wargaId] : 'Belum';
             const warga = dataWarga.find(w => w.id === wargaId);
@@ -1730,8 +1877,14 @@
             let updatePayload = {};
             if (status === 'Hapus') {
                 updatePayload[wargaId] = deleteField();
+                updatePayload[`${wargaId}_ket`] = deleteField(); // Hapus keterangan
             } else {
                 updatePayload[wargaId] = status;
+                if (status === 'Izin' && keteranganIzin) {
+                    updatePayload[`${wargaId}_ket`] = keteranganIzin; // Simpan keterangan
+                } else {
+                    updatePayload[`${wargaId}_ket`] = deleteField(); // Hapus keterangan jika ubah dari Izin ke Hadir/Absen
+                }
             }
 
             setDoc(doc(getColl('presensi'), tgl), updatePayload, { merge: true });
@@ -1958,18 +2111,113 @@
         }
 
         // --- KEUANGAN DENDA ---
+        function renderTabelKeuanganMingguan() {
+            currentWeekFilterId = null;
+            document.getElementById('keuangan-title').innerText = "Tagihan Mingguan";
+            document.getElementById('btn-kembali-keuangan').classList.add('hidden');
+            
+            // Selalu tampilkan tombol Rekap dan Nota A4 di halaman utama untuk Admin
+            if (userRole === 'admin' && document.getElementById('keuangan-action-btns')) {
+                document.getElementById('keuangan-action-btns').classList.remove('hidden');
+            }
+            
+            const containerMingguan = document.getElementById('container-denda-mingguan');
+            const containerDenda = document.getElementById('container-denda');
+            if(!containerMingguan || !containerDenda) return;
+
+            containerMingguan.classList.remove('hidden');
+            containerDenda.classList.add('hidden');
+            containerMingguan.innerHTML = '';
+            
+            if(dataDenda.length === 0) {
+                containerMingguan.innerHTML = `<div class="text-center text-gray-500 bg-white p-6 rounded-lg border border-gray-200 text-sm">Belum ada data tagihan denda.</div>`;
+                return;
+            }
+
+            const groupedWeeks = {};
+            dataDenda.forEach(d => {
+                const weekInfo = getWeekInfo(d.tanggal);
+                if(!weekInfo) return; 
+                
+                if(!groupedWeeks[weekInfo.id]) {
+                    groupedWeeks[weekInfo.id] = { id: weekInfo.id, label: weekInfo.label, totalBelum: 0, totalLunas: 0, itemsCount: 0 };
+                }
+                
+                groupedWeeks[weekInfo.id].itemsCount++;
+                if(d.status === 'Belum Dibayar') {
+                    groupedWeeks[weekInfo.id].totalBelum += d.nominal;
+                } else {
+                    groupedWeeks[weekInfo.id].totalLunas += (d.nominalAsli || d.nominal);
+                }
+            });
+
+            const sortedWeeks = Object.values(groupedWeeks).sort((a,b) => new Date(b.id) - new Date(a.id));
+
+            sortedWeeks.forEach(week => {
+                const hasTunggakan = week.totalBelum > 0;
+                const totalText = hasTunggakan ? `Tunggakan: ${formatRp(week.totalBelum)}` : `Semua Lunas`;
+                const headerColor = hasTunggakan ? 'text-red-600' : 'text-green-600';
+                const bgIconColor = hasTunggakan ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600';
+
+                containerMingguan.innerHTML += `
+                    <div onclick="bukaDetailMinggu('${week.id}', '${week.label}')" class="bg-white rounded-lg shadow-sm border ${hasTunggakan ? 'border-red-300' : 'border-green-200'} p-3 sm:p-4 flex justify-between items-center cursor-pointer hover:shadow-md transition">
+                        <div class="flex items-center gap-3 w-full">
+                            <div class="h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-full flex items-center justify-center font-bold text-lg sm:text-xl ${bgIconColor}">
+                                <i class="fa-solid fa-calendar-week"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-gray-800 text-sm sm:text-base truncate">${week.label}</h4>
+                                <div class="flex items-center flex-wrap gap-1 mt-0.5">
+                                    <p class="text-[10px] sm:text-xs font-bold ${headerColor}">${totalText}</p>
+                                    <span class="text-[8px] sm:text-[9px] bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full font-bold ml-1">${week.itemsCount} Data</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-gray-400 shrink-0 ml-2">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function bukaDetailMinggu(weekId, weekLabel) {
+            currentWeekFilterId = weekId;
+            currentWeekFilterLabel = weekLabel;
+            
+            document.getElementById('keuangan-title').innerText = "Minggu: " + weekLabel;
+            document.getElementById('btn-kembali-keuangan').classList.remove('hidden');
+            
+            if (userRole === 'admin' && document.getElementById('keuangan-action-btns')) {
+                document.getElementById('keuangan-action-btns').classList.remove('hidden');
+            }
+            
+            document.getElementById('container-denda-mingguan').classList.add('hidden');
+            document.getElementById('container-denda').classList.remove('hidden');
+            
+            renderTabelDenda();
+        }
+
         function renderTabelDenda() {
             const container = document.getElementById('container-denda');
             if(!container) return;
             container.innerHTML = '';
             
-            if(dataDenda.length === 0) {
-                container.innerHTML = `<div class="text-center text-gray-500 bg-white p-6 rounded-lg border border-gray-200 text-sm">Belum ada data tagihan denda.</div>`;
+            let filteredDenda = dataDenda;
+            if (currentWeekFilterId) {
+                filteredDenda = dataDenda.filter(d => {
+                    const weekInfo = getWeekInfo(d.tanggal);
+                    return weekInfo && weekInfo.id === currentWeekFilterId;
+                });
+            }
+
+            if(filteredDenda.length === 0) {
+                container.innerHTML = `<div class="text-center text-gray-500 bg-white p-6 rounded-lg border border-gray-200 text-sm">Belum ada data tagihan denda untuk minggu ini.</div>`;
                 return;
             }
 
             const grouped = {};
-            dataDenda.forEach(d => {
+            filteredDenda.forEach(d => {
                 if(!grouped[d.wargaId]) {
                     grouped[d.wargaId] = { nama: d.namaWarga, totalBelum: 0, totalLunas: 0, items: [] };
                 }
@@ -1977,9 +2225,7 @@
                 if(d.status === 'Belum Dibayar') {
                     grouped[d.wargaId].totalBelum += d.nominal;
                 } else {
-                    // Cek jika lunas karena deposit, tambahkan nominal aslinya ke riwayat jika dicatat
-                    const nom = d.nominalAsli || d.nominal;
-                    grouped[d.wargaId].totalLunas += nom;
+                    grouped[d.wargaId].totalLunas += (d.nominalAsli || d.nominal);
                 }
             });
 
@@ -2071,45 +2317,81 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
+            // Ambil SEMUA tunggakan yang Belum Dibayar tanpa peduli minggu
+            let tunggakanData = dataDenda.filter(d => d.status === 'Belum Dibayar');
+
+            if(tunggakanData.length === 0) {
+                showToast('Tidak ada data tunggakan untuk direkap.');
+                return;
+            }
+
             doc.setFontSize(16); doc.setFont('helvetica', 'bold');
-            doc.text("Rekap Tagihan & Riwayat Denda Ronda", 14, 15);
+            doc.text("Rekap Seluruh Tunggakan Warga", 14, 15);
             doc.setFontSize(10); doc.setFont('helvetica', 'normal');
             doc.text("RT 01 / RW 05 KebonAgung", 14, 21);
             doc.text("Dicetak pada: " + new Date().toLocaleString('id-ID'), 14, 26);
 
-            const tableColumn = ["No", "Nama Warga", "Tanggal", "Keterangan", "Status", "Nominal"];
-            const tableRows = [];
-
-            const sortedData = [...dataDenda].sort((a,b) => {
-                if(a.namaWarga < b.namaWarga) return -1;
-                if(a.namaWarga > b.namaWarga) return 1;
-                return new Date(b.tanggal) - new Date(a.tanggal);
+            // Kelompokkan tagihan berdasarkan minggu
+            const groupedWeeks = {};
+            tunggakanData.forEach(d => {
+                const weekInfo = getWeekInfo(d.tanggal);
+                const weekId = weekInfo ? weekInfo.id : 'unknown';
+                const weekLabel = weekInfo ? weekInfo.label : '-';
+                if (!groupedWeeks[weekId]) groupedWeeks[weekId] = { id: weekId, label: weekLabel, items: [] };
+                groupedWeeks[weekId].items.push(d);
             });
+
+            // Urutkan minggu dari yang terbaru
+            const sortedWeeks = Object.values(groupedWeeks).sort((a,b) => new Date(b.id) - new Date(a.id));
 
             let totalTunggakanKeseluruhan = 0;
-            
-            sortedData.forEach((d, index) => {
-                const nom = d.status === 'Lunas' && d.nominalAsli ? d.nominalAsli : d.nominal;
-                tableRows.push([ index + 1, d.namaWarga, d.tanggal, d.keterangan, d.status, formatRp(nom) ]);
-                if(d.status === 'Belum Dibayar') totalTunggakanKeseluruhan += d.nominal;
-            });
+            let finalY = 32;
 
-            doc.autoTable({
-                head: [tableColumn], body: tableRows, startY: 32, theme: 'grid', styles: { fontSize: 8, font: 'helvetica' },
-                headStyles: { fillColor: [37, 99, 235], textColor: 255 },
-                columnStyles: { 5: { halign: 'right', fontStyle: 'bold' }, 4: { halign: 'center' } },
-                didParseCell: function(data) {
-                    if (data.section === 'body' && data.column.index === 4) {
-                        if(data.cell.raw === 'Belum Dibayar') { data.cell.styles.textColor = [220, 38, 38]; data.cell.styles.fontStyle = 'bold'; } 
-                        else { data.cell.styles.textColor = [22, 163, 74]; }
-                    }
+            // Cetak tabel dipisah per minggu
+            sortedWeeks.forEach(week => {
+                if (finalY > 260) {
+                    doc.addPage();
+                    finalY = 20;
                 }
+
+                doc.setFontSize(11);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(37, 99, 235);
+                doc.text(`Periode Minggu: ${week.label}`, 14, finalY);
+                finalY += 4;
+                
+                const tableRows = [];
+                let totalMinggu = 0;
+                week.items.sort((a,b) => a.namaWarga.localeCompare(b.namaWarga)).forEach((d, idx) => {
+                    tableRows.push([idx + 1, d.namaWarga, d.tanggal, d.keterangan, formatRp(d.nominal)]);
+                    totalMinggu += d.nominal;
+                    totalTunggakanKeseluruhan += d.nominal;
+                });
+
+                doc.autoTable({
+                    head: [["No", "Nama Warga", "Tanggal", "Keterangan", "Nominal"]],
+                    body: tableRows,
+                    startY: finalY,
+                    theme: 'grid', styles: { fontSize: 8, font: 'helvetica' },
+                    headStyles: { fillColor: [241, 245, 249], textColor: [51, 65, 85], fontStyle: 'bold' },
+                    columnStyles: { 4: { halign: 'right', fontStyle: 'bold' }, 0: {halign: 'center', cellWidth: 10} },
+                    margin: { bottom: 20 }
+                });
+
+                finalY = doc.lastAutoTable.finalY;
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(220, 38, 38);
+                doc.text(`Subtotal Minggu Ini: ${formatRp(totalMinggu)}`, 14, finalY + 6);
+                finalY += 16;
             });
 
-            const finalY = doc.lastAutoTable.finalY || 32;
-            doc.setFontSize(10); doc.setFont('helvetica', 'bold');
-            doc.text(`Total Keseluruhan Tunggakan Warga: ${formatRp(totalTunggakanKeseluruhan)}`, 14, finalY + 8);
-            doc.save(`Rekap_Denda_RT01_${Date.now()}.pdf`);
+            if (finalY > 260) { doc.addPage(); finalY = 20; }
+            doc.setFontSize(12); doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Total Keseluruhan Tunggakan: ${formatRp(totalTunggakanKeseluruhan)}`, 14, finalY + 4);
+
+            doc.save(`Rekap_Seluruh_Tunggakan_${Date.now()}.pdf`);
         }
 
         function cetakSemuaNotaPDF() {
@@ -2118,23 +2400,46 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'a4'); // Kertas A4
 
-            // Kelompokkan tagihan yang statusnya belum dibayar berdasarkan warga
-            const grouped = {};
-            dataDenda.forEach(d => {
-                if (d.status === 'Belum Dibayar') {
-                    if(!grouped[d.wargaId]) {
-                        grouped[d.wargaId] = { nama: d.namaWarga, total: 0, items: [] };
-                    }
-                    grouped[d.wargaId].items.push(d);
-                    grouped[d.wargaId].total += d.nominal;
-                }
-            });
+            // Ambil SEMUA tunggakan yang Belum Dibayar
+            let tunggakanData = dataDenda.filter(d => d.status === 'Belum Dibayar');
 
-            const wargaKeys = Object.keys(grouped);
-            if(wargaKeys.length === 0) {
+            if(tunggakanData.length === 0) {
                 showToast('Tidak ada tagihan yang belum dibayar saat ini.');
                 return;
             }
+
+            // Kelompokkan tagihan berdasarkan minggu, lalu dikelompokkan lagi per warga
+            const groupedByWeek = {};
+            tunggakanData.forEach(d => {
+                const weekInfo = getWeekInfo(d.tanggal);
+                const weekId = weekInfo ? weekInfo.id : 'unknown';
+                const weekLabel = weekInfo ? weekInfo.label : '-';
+                
+                if(!groupedByWeek[weekId]) {
+                    groupedByWeek[weekId] = { id: weekId, label: weekLabel, wargaMap: {} };
+                }
+                
+                if(!groupedByWeek[weekId].wargaMap[d.wargaId]) {
+                    groupedByWeek[weekId].wargaMap[d.wargaId] = { nama: d.namaWarga, total: 0, items: [] };
+                }
+                
+                groupedByWeek[weekId].wargaMap[d.wargaId].items.push(d);
+                groupedByWeek[weekId].wargaMap[d.wargaId].total += d.nominal;
+            });
+
+            // Ubah struktur data menjadi flat list kumpulan Nota untuk dicetak
+            const allNotas = [];
+            const sortedWeeks = Object.values(groupedByWeek).sort((a,b) => new Date(b.id) - new Date(a.id));
+            
+            sortedWeeks.forEach(week => {
+                const wargaKeys = Object.keys(week.wargaMap);
+                wargaKeys.forEach(wId => {
+                    allNotas.push({
+                        weekLabel: week.label,
+                        warga: week.wargaMap[wId]
+                    });
+                });
+            });
 
             showToast('Menyiapkan dokumen Nota A4...');
 
@@ -2146,8 +2451,8 @@
             const gapX = 10;
             const gapY = 10;
 
-            wargaKeys.forEach((wargaId, index) => {
-                const data = grouped[wargaId];
+            allNotas.forEach((notaData, index) => {
+                const data = notaData.warga;
                 data.items.sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
 
                 // Tambah lembar baru jika sudah lebih dari 6 nota di halaman ini
@@ -2183,7 +2488,7 @@
                 doc.setLineWidth(0.2);
                 doc.line(x + 5, y + 15, x + notaW - 5, y + 15);
 
-                // Info Penerima
+                // Info Penerima & Label Minggu
                 doc.setFontSize(9);
                 doc.setTextColor(51, 65, 85);
                 doc.text('Kepada Yth,', x + 5, y + 20);
@@ -2191,6 +2496,11 @@
                 doc.setFont('helvetica', 'bold');
                 doc.setTextColor(15, 23, 42);
                 doc.text('Bpk/Ibu ' + data.nama, x + 5, y + 25);
+                
+                doc.setFontSize(7);
+                doc.setFont('helvetica', 'italic');
+                doc.setTextColor(220, 38, 38); // Merah untuk penanda minggu
+                doc.text(`Periode: ${notaData.weekLabel}`, x + notaW - 5, y + 20, { align: 'right' });
 
                 // Label Rincian
                 doc.setFontSize(8);
@@ -2242,7 +2552,7 @@
                 doc.setFontSize(6);
                 doc.setFont('helvetica', 'italic');
                 doc.setTextColor(148, 163, 184);
-                doc.text('Dicetak oleh sistem pada: ' + new Date().toLocaleString('id-ID'), x + notaW/2, y + 84, { align: 'center' });
+                doc.text('Dicetak otomatis pada: ' + new Date().toLocaleString('id-ID'), x + notaW/2, y + 84, { align: 'center' });
             });
 
             doc.save(`Semua_Nota_Tagihan_A4_RT01_${Date.now()}.pdf`);
