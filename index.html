@@ -165,8 +165,8 @@
                     <h2 id="keuangan-title" class="text-lg font-bold text-gray-800">Tagihan Mingguan</h2>
                     <button id="btn-kembali-keuangan" onclick="renderTabelKeuanganMingguan()" class="hidden text-[10px] bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-gray-300 transition flex items-center gap-1.5"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
                     <div id="keuangan-action-btns" class="hidden flex gap-2">
-                        <button id="btn-cetak-nota" onclick="cetakSemuaNotaPDF()" class="text-[10px] bg-green-600 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-green-700 transition flex items-center gap-1.5"><i class="fa-solid fa-print"></i> Nota A4</button>
-                        <button onclick="downloadPDFDenda()" class="text-[10px] bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-red-700 transition flex items-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> Rekap</button>
+                        <button id="btn-cetak-nota" onclick="bukaModalCetakA4()" class="text-[10px] bg-green-600 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-green-700 transition flex items-center gap-1.5"><i class="fa-solid fa-print"></i> Nota A4</button>
+                        <button onclick="bukaModalCetakRekap()" class="text-[10px] bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-red-700 transition flex items-center gap-1.5"><i class="fa-solid fa-file-pdf"></i> Rekap</button>
                     </div>
                 </div>
                 <div id="container-denda-mingguan" class="space-y-3"></div>
@@ -336,6 +336,58 @@
                 <button onclick="kirimNotaWA()" class="w-full bg-green-600 text-white font-bold text-sm px-4 py-3 rounded-lg hover:bg-green-700 transition shadow-sm flex justify-center items-center gap-2">
                     <i class="fa-solid fa-share-nodes"></i> Download & Bagikan via WA
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pilihan Cetak A4 -->
+    <div id="modal-cetak-a4" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden flex items-center justify-center z-[130] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm border-t-4 border-green-500 overflow-hidden flex flex-col">
+            <div class="px-5 py-4 border-b bg-green-50 flex justify-between items-center shrink-0">
+                <h3 class="text-base font-bold text-green-800 flex items-center"><i class="fa-solid fa-print mr-2 text-green-600"></i>Opsi Cetak Nota A4</h3>
+                <button onclick="tutupModalCetakA4()" class="text-gray-500 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div class="p-5 space-y-4 bg-white">
+                <!-- Cetak Semua -->
+                <div class="border border-gray-200 p-3 rounded-lg bg-gray-50 shadow-sm">
+                    <p class="text-[11px] font-bold text-gray-700 mb-2">Cetak Seluruh Tagihan</p>
+                    <button onclick="prosesCetakA4('semua')" class="w-full bg-green-600 text-white font-bold text-xs px-3 py-2.5 rounded-lg hover:bg-green-700 transition flex justify-center items-center gap-1.5"><i class="fa-solid fa-print"></i> Cetak Semua Warga</button>
+                </div>
+                <!-- Cetak Per Minggu -->
+                <div class="border border-gray-200 p-3 rounded-lg bg-gray-50 shadow-sm">
+                    <p class="text-[11px] font-bold text-gray-700 mb-2">Cetak Berdasarkan Minggu</p>
+                    <select id="select-cetak-minggu" class="w-full border border-gray-300 rounded-lg p-2 text-xs mb-2 focus:ring-green-500 font-medium"></select>
+                    <button onclick="prosesCetakA4('minggu')" class="w-full bg-blue-600 text-white font-bold text-xs px-3 py-2.5 rounded-lg hover:bg-blue-700 transition flex justify-center items-center gap-1.5"><i class="fa-solid fa-calendar-week"></i> Cetak Per Minggu</button>
+                </div>
+                <!-- Cetak Per Warga -->
+                <div class="border border-gray-200 p-3 rounded-lg bg-gray-50 shadow-sm">
+                    <p class="text-[11px] font-bold text-gray-700 mb-2">Cetak Berdasarkan Warga</p>
+                    <select id="select-cetak-warga" class="w-full border border-gray-300 rounded-lg p-2 text-xs mb-2 focus:ring-green-500 font-medium"></select>
+                    <button onclick="prosesCetakA4('warga')" class="w-full bg-indigo-600 text-white font-bold text-xs px-3 py-2.5 rounded-lg hover:bg-indigo-700 transition flex justify-center items-center gap-1.5"><i class="fa-solid fa-user"></i> Cetak Per Warga</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Pilihan Cetak Rekap PDF -->
+    <div id="modal-cetak-rekap" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden flex items-center justify-center z-[130] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm border-t-4 border-red-500 overflow-hidden flex flex-col">
+            <div class="px-5 py-4 border-b bg-red-50 flex justify-between items-center shrink-0">
+                <h3 class="text-base font-bold text-red-800 flex items-center"><i class="fa-solid fa-file-pdf mr-2 text-red-600"></i>Opsi Cetak Rekap PDF</h3>
+                <button onclick="tutupModalCetakRekap()" class="text-gray-500 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div class="p-5 space-y-4 bg-white">
+                <!-- Cetak Semua -->
+                <div class="border border-gray-200 p-3 rounded-lg bg-gray-50 shadow-sm">
+                    <p class="text-[11px] font-bold text-gray-700 mb-2">Rekap Seluruh Tunggakan</p>
+                    <button onclick="prosesCetakRekap('semua')" class="w-full bg-red-600 text-white font-bold text-xs px-3 py-2.5 rounded-lg hover:bg-red-700 transition flex justify-center items-center gap-1.5"><i class="fa-solid fa-print"></i> Cetak Semua Warga</button>
+                </div>
+                <!-- Cetak Per Minggu -->
+                <div class="border border-gray-200 p-3 rounded-lg bg-gray-50 shadow-sm">
+                    <p class="text-[11px] font-bold text-gray-700 mb-2">Rekap Berdasarkan Minggu</p>
+                    <select id="select-rekap-minggu" class="w-full border border-gray-300 rounded-lg p-2 text-xs mb-2 focus:ring-red-500 font-medium"></select>
+                    <button onclick="prosesCetakRekap('minggu')" class="w-full bg-blue-600 text-white font-bold text-xs px-3 py-2.5 rounded-lg hover:bg-blue-700 transition flex justify-center items-center gap-1.5"><i class="fa-solid fa-calendar-week"></i> Cetak Per Minggu</button>
+                </div>
             </div>
         </div>
     </div>
@@ -2310,23 +2362,71 @@
             }
         }
 
-        function downloadPDFDenda() {
+        function bukaModalCetakRekap() {
+            let tunggakanData = dataDenda.filter(d => d.status === 'Belum Dibayar');
+            if (tunggakanData.length === 0) {
+                return showToast('Tidak ada tagihan yang belum dibayar saat ini.');
+            }
+
+            // Populate pilihan minggu
+            const groupedWeeks = {};
+            tunggakanData.forEach(d => {
+                const weekInfo = getWeekInfo(d.tanggal);
+                if (weekInfo) groupedWeeks[weekInfo.id] = weekInfo.label;
+            });
+            const selectMinggu = document.getElementById('select-rekap-minggu');
+            selectMinggu.innerHTML = Object.keys(groupedWeeks).sort((a,b) => new Date(b) - new Date(a)).map(id => `<option value="${id}">${groupedWeeks[id]}</option>`).join('');
+
+            document.getElementById('modal-cetak-rekap').classList.remove('hidden');
+        }
+
+        function tutupModalCetakRekap() {
+            document.getElementById('modal-cetak-rekap').classList.add('hidden');
+        }
+
+        function prosesCetakRekap(mode) {
+            let filterValue = null;
+            if (mode === 'minggu') filterValue = document.getElementById('select-rekap-minggu').value;
+            
+            tutupModalCetakRekap();
+            downloadPDFDenda(mode, filterValue);
+        }
+
+        function downloadPDFDenda(mode = 'semua', filterValue = null) {
             if(typeof window.jspdf === 'undefined') { showToast('Fitur PDF belum siap, mohon tunggu.'); return; }
             
             showToast('Menyiapkan dokumen PDF...');
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            // Ambil SEMUA tunggakan yang Belum Dibayar tanpa peduli minggu
+            // Ambil SEMUA tunggakan yang Belum Dibayar
             let tunggakanData = dataDenda.filter(d => d.status === 'Belum Dibayar');
 
+            // Terapkan Filter
+            if (mode === 'minggu') {
+                tunggakanData = tunggakanData.filter(d => {
+                    const info = getWeekInfo(d.tanggal);
+                    return info && info.id === filterValue;
+                });
+            }
+
             if(tunggakanData.length === 0) {
-                showToast('Tidak ada data tunggakan untuk direkap.');
+                showToast('Tidak ada data tunggakan untuk direkap kriteria ini.');
                 return;
             }
 
+            let titlePdf = "Rekap Seluruh Tunggakan Warga";
+            let filename = `Rekap_Seluruh_Tunggakan_${Date.now()}.pdf`;
+            if (mode === 'minggu') {
+                const info = getWeekInfo(tunggakanData[0].tanggal);
+                if (info) {
+                    titlePdf = `Rekap Tunggakan Minggu: ${info.label}`;
+                    filename = `Rekap_Tunggakan_Minggu_${Date.now()}.pdf`;
+                }
+            }
+
             doc.setFontSize(16); doc.setFont('helvetica', 'bold');
-            doc.text("Rekap Seluruh Tunggakan Warga", 14, 15);
+            doc.text(titlePdf, 14, 15);
             doc.setFontSize(10); doc.setFont('helvetica', 'normal');
             doc.text("RT 01 / RW 05 KebonAgung", 14, 21);
             doc.text("Dicetak pada: " + new Date().toLocaleString('id-ID'), 14, 26);
@@ -2391,10 +2491,50 @@
             doc.setTextColor(0, 0, 0);
             doc.text(`Total Keseluruhan Tunggakan: ${formatRp(totalTunggakanKeseluruhan)}`, 14, finalY + 4);
 
-            doc.save(`Rekap_Seluruh_Tunggakan_${Date.now()}.pdf`);
+            doc.save(filename);
         }
 
-        function cetakSemuaNotaPDF() {
+        function bukaModalCetakA4() {
+            let tunggakanData = dataDenda.filter(d => d.status === 'Belum Dibayar');
+            if (tunggakanData.length === 0) {
+                return showToast('Tidak ada tagihan yang belum dibayar saat ini.');
+            }
+
+            // Populate minggu
+            const groupedWeeks = {};
+            tunggakanData.forEach(d => {
+                const weekInfo = getWeekInfo(d.tanggal);
+                if (weekInfo) groupedWeeks[weekInfo.id] = weekInfo.label;
+            });
+            const selectMinggu = document.getElementById('select-cetak-minggu');
+            selectMinggu.innerHTML = Object.keys(groupedWeeks).sort((a,b) => new Date(b) - new Date(a)).map(id => `<option value="${id}">${groupedWeeks[id]}</option>`).join('');
+
+            // Populate warga
+            const groupedWarga = {};
+            tunggakanData.forEach(d => {
+                groupedWarga[d.wargaId] = d.namaWarga;
+            });
+            const selectWarga = document.getElementById('select-cetak-warga');
+            const sortedWargaKeys = Object.keys(groupedWarga).sort((a,b) => groupedWarga[a].localeCompare(groupedWarga[b]));
+            selectWarga.innerHTML = sortedWargaKeys.map(id => `<option value="${id}">${groupedWarga[id]}</option>`).join('');
+
+            document.getElementById('modal-cetak-a4').classList.remove('hidden');
+        }
+
+        function tutupModalCetakA4() {
+            document.getElementById('modal-cetak-a4').classList.add('hidden');
+        }
+
+        function prosesCetakA4(mode) {
+            let filterValue = null;
+            if (mode === 'minggu') filterValue = document.getElementById('select-cetak-minggu').value;
+            if (mode === 'warga') filterValue = document.getElementById('select-cetak-warga').value;
+            
+            tutupModalCetakA4();
+            cetakNotaA4(mode, filterValue);
+        }
+
+        function cetakNotaA4(mode = 'semua', filterValue = null) {
             if(typeof window.jspdf === 'undefined') { showToast('Fitur PDF belum siap, mohon tunggu.'); return; }
 
             const { jsPDF } = window.jspdf;
@@ -2403,8 +2543,18 @@
             // Ambil SEMUA tunggakan yang Belum Dibayar
             let tunggakanData = dataDenda.filter(d => d.status === 'Belum Dibayar');
 
+            // Terapkan Filter
+            if (mode === 'minggu') {
+                tunggakanData = tunggakanData.filter(d => {
+                    const info = getWeekInfo(d.tanggal);
+                    return info && info.id === filterValue;
+                });
+            } else if (mode === 'warga') {
+                tunggakanData = tunggakanData.filter(d => d.wargaId === parseInt(filterValue));
+            }
+
             if(tunggakanData.length === 0) {
-                showToast('Tidak ada tagihan yang belum dibayar saat ini.');
+                showToast('Tidak ada tagihan untuk kriteria ini.');
                 return;
             }
 
@@ -2555,7 +2705,11 @@
                 doc.text('Dicetak otomatis pada: ' + new Date().toLocaleString('id-ID'), x + notaW/2, y + 84, { align: 'center' });
             });
 
-            doc.save(`Semua_Nota_Tagihan_A4_RT01_${Date.now()}.pdf`);
+            let filename = `Semua_Nota_Tagihan_A4_RT01_${Date.now()}.pdf`;
+            if (mode === 'minggu') filename = `Nota_Mingguan_A4_RT01_${Date.now()}.pdf`;
+            if (mode === 'warga') filename = `Nota_Warga_A4_RT01_${Date.now()}.pdf`;
+            
+            doc.save(filename);
         }
 
         function editDenda(id, event) {
