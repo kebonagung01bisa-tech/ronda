@@ -181,7 +181,10 @@
                 </div>
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 flex justify-between items-center shadow-sm">
                     <span class="text-xs font-bold text-blue-800">Saldo Akhir:</span>
-                    <span id="halaman-total-kas" class="text-base sm:text-lg font-extrabold text-blue-700">Rp 0</span>
+                    <div class="flex items-center gap-2">
+                        <span id="halaman-total-kas" class="text-base sm:text-lg font-extrabold text-blue-700">Rp 0</span>
+                        <button id="btn-edit-saldo-kas" onclick="bukaModalEditSaldoKas()" class="text-[10px] bg-blue-200 text-blue-700 hover:bg-blue-300 px-2 py-1.5 rounded transition hidden shadow-sm"><i class="fa-solid fa-pen"></i></button>
+                    </div>
                 </div>
                 <div id="container-riwayat-kas" class="space-y-3"></div>
             </div>
@@ -432,6 +435,24 @@
             <div class="mt-5 flex justify-end space-x-2">
                 <button onclick="tutupModalEditDeposit()" class="bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg hover:bg-gray-300 text-sm font-bold transition">Batal</button>
                 <button onclick="simpanEditDeposit()" class="bg-yellow-500 text-white px-4 py-2.5 rounded-lg hover:bg-yellow-600 text-sm font-bold transition shadow-sm">Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Saldo Kas (Penyesuaian) -->
+    <div id="modal-edit-saldo-kas" class="fixed inset-0 bg-gray-900 bg-opacity-60 hidden flex items-center justify-center z-[110] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl p-5 w-full max-w-sm border-t-4 border-yellow-500">
+            <h3 class="text-lg font-bold mb-4 text-yellow-800"><i class="fa-solid fa-pen-to-square mr-2"></i>Penyesuaian Saldo Kas</h3>
+            <div class="space-y-3">
+                <p class="text-xs text-gray-600 mb-2 font-medium">Ubah total saldo akhir kas secara manual tanpa menambahkan baris riwayat transaksi baru.</p>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 mb-1">Total Saldo Seharusnya (Rp)</label>
+                    <input type="text" id="edit-saldo-kas-nominal" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-yellow-500 text-sm font-bold text-green-600" oninput="formatInputRupiah(this)">
+                </div>
+            </div>
+            <div class="mt-5 flex justify-end space-x-2">
+                <button onclick="tutupModalEditSaldoKas()" class="bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg hover:bg-gray-300 text-sm font-bold transition">Batal</button>
+                <button onclick="simpanEditSaldoKas()" class="bg-yellow-500 text-white px-4 py-2.5 rounded-lg hover:bg-yellow-600 text-sm font-bold transition shadow-sm">Simpan Saldo</button>
             </div>
         </div>
     </div>
@@ -977,6 +998,7 @@
         let currentModalDateStr = '';
         let currentWeekFilterId = null;
         let currentWeekFilterLabel = "";
+        let penyesuaianSaldoKas = 0;
 
         function getWeekInfo(dateString) {
             if (!dateString) return null;
@@ -1012,7 +1034,8 @@
         }
 
         function hitungTotalKas() {
-            return dataMutasi.reduce((total, m) => m.jenis === 'Pemasukan' ? total + m.nominal : total - m.nominal, 0);
+            const mutasiReal = dataMutasi.reduce((total, m) => m.jenis === 'Pemasukan' ? total + m.nominal : total - m.nominal, 0);
+            return mutasiReal + penyesuaianSaldoKas;
         }
 
         function formatNoWA(no) {
@@ -1192,6 +1215,16 @@
                 dataAspirasi = snap.docs.map(d => d.data());
                 if(document.getElementById('page-aspirasi') && document.getElementById('page-aspirasi').classList.contains('active')) renderAspirasi();
             }, (err) => console.error(err));
+
+            onSnapshot(doc(getColl('pengaturan_kas'), 'saldo'), (snap) => {
+                if(snap.exists()) {
+                    penyesuaianSaldoKas = snap.data().offset || 0;
+                } else {
+                    penyesuaianSaldoKas = 0;
+                }
+                updateDashboard();
+                if(document.getElementById('page-riwayat-kas') && document.getElementById('page-riwayat-kas').classList.contains('active')) renderRiwayatKas();
+            }, (err) => console.error(err));
         }
 
         // --- SISTEM ROLE UI & NAVIGASI ---
@@ -1210,6 +1243,7 @@
                 if(document.getElementById('btn-tambah-deposit')) document.getElementById('btn-tambah-deposit').style.display = 'none';
                 if(document.getElementById('btn-cetak-nota')) document.getElementById('btn-cetak-nota').style.display = 'none';
                 if(document.getElementById('keuangan-action-btns')) document.getElementById('keuangan-action-btns').classList.add('hidden');
+                if(document.getElementById('btn-edit-saldo-kas')) document.getElementById('btn-edit-saldo-kas').classList.add('hidden');
                 if(formKas) formKas.classList.add('hidden');
                 
                 badge.innerText = "Mode Warga";
@@ -1223,6 +1257,7 @@
                 if(document.getElementById('btn-tambah-deposit')) document.getElementById('btn-tambah-deposit').style.display = 'inline-flex';
                 if(document.getElementById('btn-cetak-nota')) document.getElementById('btn-cetak-nota').style.display = 'inline-flex';
                 if(document.getElementById('keuangan-action-btns')) document.getElementById('keuangan-action-btns').classList.remove('hidden');
+                if(document.getElementById('btn-edit-saldo-kas')) document.getElementById('btn-edit-saldo-kas').classList.remove('hidden');
                 if(formKas) formKas.classList.remove('hidden');
                 
                 badge.innerText = "Mode Admin";
@@ -1303,30 +1338,33 @@
         async function bukaModalNotaGabungan(wargaId, event) {
             if(event) event.stopPropagation();
             
-            // Filter list by selected week if any
+            // Ambil SEMUA tagihan warga tersebut yang belum dibayar secara keseluruhan (abaikan filter minggu)
             let targetDendaList = dataDenda.filter(d => d.wargaId === wargaId && d.status === 'Belum Dibayar');
-            
-            if (currentWeekFilterId) {
-                targetDendaList = targetDendaList.filter(d => {
-                    const weekInfo = getWeekInfo(d.tanggal);
-                    return weekInfo && weekInfo.id === currentWeekFilterId;
-                });
-            }
             
             const dendaList = targetDendaList.sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
                 
-            if(dendaList.length === 0) return showToast('Warga ini tidak memiliki tunggakan denda pada minggu ini.');
+            if(dendaList.length === 0) return showToast('Warga ini tidak memiliki tunggakan denda.');
             
             const warga = dataWarga.find(w => w.id === wargaId);
             
             currentNotaDendaList = dendaList;
             currentWargaNota = warga;
             
-            // Format daftar rincian untuk draf pesan WhatsApp
-            let listPesan = dendaList.map((d, i) => `${i+1}. Tgl ${d.tanggal} - ${d.keterangan} (*${formatRp(d.nominal)}*)`).join('\n');
             let totalNominal = dendaList.reduce((sum, d) => sum + d.nominal, 0);
             
-            const pesan = `Assalamu'alaikum Wr. Wb.\nMohon maaf mengganggu waktunya Bpk/Ibu *${warga.nama}*. 🙏\n\nBerikut kami lampirkan nota rekap tagihan kas/denda ronda yang belum diselesaikan:\n\n${listPesan}\n\n*Total Tagihan: ${formatRp(totalNominal)}*\n\nMohon perkenannya untuk dapat diselesaikan. Terima kasih banyak atas partisipasi dan kerjasamanya.\n\nSehat selalu untuk keluarga.\n\nHormat kami,\n*Pengurus RT 01 / RW 05 KebonAgung*`;
+            // Format daftar rincian untuk draf pesan WhatsApp
+            let pesan = `Assalamu'alaikum Wr. Wb.\nMohon maaf mengganggu waktunya Bpk/Ibu *${warga.nama}*. 🙏\n\n`;
+            
+            if (dendaList.length > 1) {
+                // Jika tagihan lebih dari 1, gabungkan menjadi 1 total tagihan di teks WA
+                pesan += `Berikut kami sampaikan rekap gabungan untuk *${dendaList.length} tagihan* kas/denda ronda yang belum diselesaikan.\n\n*TOTAL TAGIHAN KESELURUHAN: ${formatRp(totalNominal)}*\n\n_(Rincian tanggal dan denda dapat dilihat pada gambar nota terlampir)_`;
+            } else {
+                // Jika hanya 1 tagihan, tampilkan seperti biasa
+                let listPesan = dendaList.map((d, i) => `Tgl ${d.tanggal} - ${d.keterangan} (*${formatRp(d.nominal)}*)`).join('\n');
+                pesan += `Berikut kami lampirkan nota tagihan kas/denda ronda yang belum diselesaikan:\n\n${listPesan}\n\n*Total Tagihan: ${formatRp(totalNominal)}*`;
+            }
+            
+            pesan += `\n\nMohon perkenannya untuk dapat diselesaikan. Terima kasih banyak atas partisipasi dan kerjasamanya.\n\nSehat selalu untuk keluarga.\n\nHormat kami,\n*Pengurus RT 01 / RW 05 KebonAgung*`;
             
             document.getElementById('nota-pesan').value = pesan;
             
@@ -3417,6 +3455,39 @@
             } else {
                 showDialog('alert', 'Pemasangan Manual (iOS / Browser Lain)', 'Sistem otomatis diblokir oleh browser. \n\nSilakan tap ikon Share/Bagikan di browser Anda, lalu pilih opsi "Add to Home Screen" (Tambahkan ke Layar Utama) secara manual.');
             }
+        }
+
+        // --- MANAJEMEN PENYESUAIAN SALDO KAS ---
+        function bukaModalEditSaldoKas() {
+            if (userRole !== 'admin') return;
+            const totalSekarang = hitungTotalKas();
+            document.getElementById('edit-saldo-kas-nominal').value = totalSekarang.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            document.getElementById('modal-edit-saldo-kas').classList.remove('hidden');
+        }
+
+        function tutupModalEditSaldoKas() {
+            document.getElementById('modal-edit-saldo-kas').classList.add('hidden');
+        }
+
+        function simpanEditSaldoKas() {
+            if (userRole !== 'admin') return;
+            const nominalInput = document.getElementById('edit-saldo-kas-nominal').value;
+            const nominalTarget = parseInt(nominalInput ? nominalInput.replace(/\./g, '') : "0");
+
+            if (isNaN(nominalTarget)) {
+                return showDialog('alert', 'Kesalahan Input', 'Nominal saldo tidak valid!');
+            }
+
+            // Hitung total dari mutasi asli (tanpa memasukkan variabel penyesuaian saat ini)
+            const mutasiReal = dataMutasi.reduce((total, m) => m.jenis === 'Pemasukan' ? total + m.nominal : total - m.nominal, 0);
+            
+            // Rumus: Offset Baru = Target Saldo Admin - Total Mutasi Asli
+            const offsetBaru = nominalTarget - mutasiReal;
+
+            setDoc(doc(getColl('pengaturan_kas'), 'saldo'), { offset: offsetBaru }, { merge: true }).then(() => {
+                tutupModalEditSaldoKas();
+                showToast('Total saldo kas berhasil disesuaikan.');
+            });
         }
 
     </script>
