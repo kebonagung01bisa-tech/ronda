@@ -1446,13 +1446,21 @@
             // Loop untuk mencetak semua tagihan
             ctx.fillStyle = '#334155';
             dendaList.forEach((d, index) => {
+                let formatTanggal = d.tanggal;
+                try {
+                    const dateObj = new Date(d.tanggal);
+                    if (!isNaN(dateObj.getTime())) {
+                        formatTanggal = dateObj.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                    }
+                } catch(e) {}
+
                 ctx.font = 'bold 14px sans-serif';
-                ctx.fillText(`${index + 1}.  ${d.tanggal}`, 60, currentY);
+                ctx.fillText(`${index + 1}.  ${formatTanggal}`, 60, currentY);
                 
                 ctx.font = '14px sans-serif';
                 let ketText = d.keterangan;
                 if(ketText.length > 25) { ketText = ketText.substring(0, 25) + '...'; }
-                ctx.fillText(ketText, 200, currentY);
+                ctx.fillText(ketText, 260, currentY);
                 
                 ctx.textAlign = 'right';
                 ctx.font = 'bold 14px sans-serif';
@@ -2501,7 +2509,15 @@
                 const tableRows = [];
                 let totalMinggu = 0;
                 week.items.sort((a,b) => a.namaWarga.localeCompare(b.namaWarga)).forEach((d, idx) => {
-                    tableRows.push([idx + 1, d.namaWarga, d.tanggal, d.keterangan, formatRp(d.nominal)]);
+                    let formatTanggal = d.tanggal;
+                    try {
+                        const dateObj = new Date(d.tanggal);
+                        if (!isNaN(dateObj.getTime())) {
+                            formatTanggal = dateObj.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                        }
+                    } catch(e) {}
+
+                    tableRows.push([idx + 1, d.namaWarga, formatTanggal, d.keterangan, formatRp(d.nominal)]);
                     totalMinggu += d.nominal;
                     totalTunggakanKeseluruhan += d.nominal;
                 });
@@ -2596,36 +2612,40 @@
                 return;
             }
 
-            // Kelompokkan tagihan berdasarkan minggu, lalu dikelompokkan lagi per warga
-            const groupedByWeek = {};
+            // Kelompokkan tagihan berdasarkan Warga (gabungkan semua minggu menjadi 1 nota)
+            const groupedByWarga = {};
             tunggakanData.forEach(d => {
-                const weekInfo = getWeekInfo(d.tanggal);
-                const weekId = weekInfo ? weekInfo.id : 'unknown';
-                const weekLabel = weekInfo ? weekInfo.label : '-';
-                
-                if(!groupedByWeek[weekId]) {
-                    groupedByWeek[weekId] = { id: weekId, label: weekLabel, wargaMap: {} };
+                if(!groupedByWarga[d.wargaId]) {
+                    groupedByWarga[d.wargaId] = { nama: d.namaWarga, total: 0, items: [] };
                 }
-                
-                if(!groupedByWeek[weekId].wargaMap[d.wargaId]) {
-                    groupedByWeek[weekId].wargaMap[d.wargaId] = { nama: d.namaWarga, total: 0, items: [] };
-                }
-                
-                groupedByWeek[weekId].wargaMap[d.wargaId].items.push(d);
-                groupedByWeek[weekId].wargaMap[d.wargaId].total += d.nominal;
+                groupedByWarga[d.wargaId].items.push(d);
+                groupedByWarga[d.wargaId].total += d.nominal;
             });
 
             // Ubah struktur data menjadi flat list kumpulan Nota untuk dicetak
             const allNotas = [];
-            const sortedWeeks = Object.values(groupedByWeek).sort((a,b) => new Date(b.id) - new Date(a.id));
+            const sortedWarga = Object.values(groupedByWarga).sort((a,b) => a.nama.localeCompare(b.nama));
             
-            sortedWeeks.forEach(week => {
-                const wargaKeys = Object.keys(week.wargaMap);
-                wargaKeys.forEach(wId => {
-                    allNotas.push({
-                        weekLabel: week.label,
-                        warga: week.wargaMap[wId]
+            sortedWarga.forEach(warga => {
+                let labelPeriode = "Akumulasi Tunggakan";
+                
+                if (mode === 'minggu') {
+                    const wi = getWeekInfo(warga.items[0].tanggal);
+                    labelPeriode = wi ? wi.label : "-";
+                } else {
+                    const uniqueWeeks = new Set();
+                    warga.items.forEach(item => {
+                        const wi = getWeekInfo(item.tanggal);
+                        if(wi) uniqueWeeks.add(wi.label);
                     });
+                    if (uniqueWeeks.size === 1) {
+                        labelPeriode = [...uniqueWeeks][0]; // Jika ternyata hanya 1 minggu, pakai label minggu tersebut
+                    }
+                }
+
+                allNotas.push({
+                    weekLabel: labelPeriode,
+                    warga: warga
                 });
             });
 
@@ -2705,10 +2725,19 @@
                 for (let i = 0; i < data.items.length && i < maxItems; i++) {
                     const item = data.items[i];
                     let ket = item.keterangan;
-                    if (ket.length > 20) ket = ket.substring(0, 20) + '...';
+                    // Keterangan dipotong lebih pendek agar muat di samping tanggal yang panjang
+                    if (ket.length > 15) ket = ket.substring(0, 15) + '...';
                     
-                    doc.text(`${i+1}. ${item.tanggal}`, x + 5, itemY);
-                    doc.text(ket, x + 28, itemY);
+                    let formatTanggal = item.tanggal;
+                    try {
+                        const dateObj = new Date(item.tanggal);
+                        if (!isNaN(dateObj.getTime())) {
+                            formatTanggal = dateObj.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                        }
+                    } catch(e) {}
+                    
+                    doc.text(`${i+1}. ${formatTanggal}`, x + 5, itemY);
+                    doc.text(ket, x + 42, itemY);
                     doc.text(formatRp(item.nominal), x + notaW - 5, itemY, { align: 'right' });
                     itemY += 5;
                 }
