@@ -177,7 +177,10 @@
             <div id="page-riwayat-kas" class="page-content p-4">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-lg font-bold text-gray-800">Riwayat Mutasi Kas</h2>
-                    <button onclick="switchTab('kas-lainnya')" class="text-[10px] bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-blue-700 transition"><i class="fa-solid fa-plus mr-1"></i> Catat Manual</button>
+                    <div class="flex gap-2">
+                        <button onclick="bukaModalCetakKas()" class="text-[10px] bg-red-600 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-red-700 transition hidden" id="btn-cetak-kas-admin"><i class="fa-solid fa-file-pdf mr-1"></i> Cetak</button>
+                        <button onclick="switchTab('kas-lainnya')" class="text-[10px] bg-blue-600 text-white px-3 py-1.5 rounded-lg font-bold shadow-sm hover:bg-blue-700 transition"><i class="fa-solid fa-plus mr-1"></i> Catat Manual</button>
+                    </div>
                 </div>
                 <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 flex justify-between items-center shadow-sm">
                     <span class="text-xs font-bold text-blue-800">Saldo Akhir:</span>
@@ -687,6 +690,36 @@
                 <div class="flex space-x-2">
                     <button onclick="tutupModalEditKas()" class="bg-gray-200 text-gray-800 px-4 py-2.5 rounded-lg hover:bg-gray-300 text-sm font-bold transition">Batal</button>
                     <button onclick="simpanEditKas()" class="bg-yellow-500 text-white px-4 py-2.5 rounded-lg hover:bg-yellow-600 text-sm font-bold shadow-sm transition">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cetak Laporan Kas (BARU) -->
+    <div id="modal-cetak-kas" class="fixed inset-0 bg-gray-900 bg-opacity-70 hidden flex items-center justify-center z-[130] p-4 transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm border-t-4 border-red-500 overflow-hidden flex flex-col">
+            <div class="px-5 py-4 border-b bg-red-50 flex justify-between items-center shrink-0">
+                <h3 class="text-base font-bold text-red-800 flex items-center"><i class="fa-solid fa-file-pdf mr-2 text-red-600"></i>Cetak Laporan Kas</h3>
+                <button onclick="tutupModalCetakKas()" class="text-gray-500 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
+            </div>
+            <div class="p-5 space-y-4 bg-white">
+                <div class="border border-gray-200 p-3 rounded-lg bg-gray-50 shadow-sm">
+                    <p class="text-[11px] font-bold text-gray-700 mb-2">Cetak Seluruh Riwayat Kas & Realisasi</p>
+                    <button onclick="prosesCetakKas('semua')" class="w-full bg-red-600 text-white font-bold text-xs px-3 py-2.5 rounded-lg hover:bg-red-700 transition flex justify-center items-center gap-1.5"><i class="fa-solid fa-print"></i> Cetak Semua Data</button>
+                </div>
+                <div class="border border-gray-200 p-3 rounded-lg bg-gray-50 shadow-sm">
+                    <p class="text-[11px] font-bold text-gray-700 mb-2">Cetak Berdasarkan Rentang Bulan/Tanggal</p>
+                    <div class="flex gap-2 mb-2">
+                        <div class="w-1/2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-1">Dari Tanggal:</label>
+                            <input type="date" id="cetak-kas-start" class="w-full border border-gray-300 rounded-lg p-2 text-xs focus:ring-red-500 font-medium">
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-[9px] font-bold text-gray-500 mb-1">Sampai Tanggal:</label>
+                            <input type="date" id="cetak-kas-end" class="w-full border border-gray-300 rounded-lg p-2 text-xs focus:ring-red-500 font-medium">
+                        </div>
+                    </div>
+                    <button onclick="prosesCetakKas('rentang')" class="w-full bg-blue-600 text-white font-bold text-xs px-3 py-2.5 rounded-lg hover:bg-blue-700 transition flex justify-center items-center gap-1.5"><i class="fa-solid fa-calendar-alt"></i> Cetak Rentang Waktu</button>
                 </div>
             </div>
         </div>
@@ -1242,6 +1275,7 @@
                 if(document.getElementById('btn-catat-presensi')) document.getElementById('btn-catat-presensi').style.display = 'none';
                 if(document.getElementById('btn-tambah-deposit')) document.getElementById('btn-tambah-deposit').style.display = 'none';
                 if(document.getElementById('btn-cetak-nota')) document.getElementById('btn-cetak-nota').style.display = 'none';
+                if(document.getElementById('btn-cetak-kas-admin')) document.getElementById('btn-cetak-kas-admin').classList.add('hidden');
                 if(document.getElementById('keuangan-action-btns')) document.getElementById('keuangan-action-btns').classList.add('hidden');
                 if(document.getElementById('btn-edit-saldo-kas')) document.getElementById('btn-edit-saldo-kas').classList.add('hidden');
                 if(formKas) formKas.classList.add('hidden');
@@ -1256,6 +1290,7 @@
                 if(document.getElementById('btn-catat-presensi')) document.getElementById('btn-catat-presensi').style.display = 'flex';
                 if(document.getElementById('btn-tambah-deposit')) document.getElementById('btn-tambah-deposit').style.display = 'inline-flex';
                 if(document.getElementById('btn-cetak-nota')) document.getElementById('btn-cetak-nota').style.display = 'inline-flex';
+                if(document.getElementById('btn-cetak-kas-admin')) document.getElementById('btn-cetak-kas-admin').classList.remove('hidden');
                 if(document.getElementById('keuangan-action-btns')) document.getElementById('keuangan-action-btns').classList.remove('hidden');
                 if(document.getElementById('btn-edit-saldo-kas')) document.getElementById('btn-edit-saldo-kas').classList.remove('hidden');
                 if(formKas) formKas.classList.remove('hidden');
@@ -2999,6 +3034,146 @@
                     tutupModalEditKas(); showToast('Transaksi berhasil dihapus.');
                 });
             });
+        }
+
+        // --- FUNGSI CETAK LAPORAN KAS (BARU) ---
+        function bukaModalCetakKas() {
+            if (userRole !== 'admin') return;
+            const date = new Date();
+            const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+            document.getElementById('cetak-kas-start').valueAsDate = firstDay;
+            document.getElementById('cetak-kas-end').valueAsDate = date;
+            document.getElementById('modal-cetak-kas').classList.remove('hidden');
+        }
+
+        function tutupModalCetakKas() {
+            document.getElementById('modal-cetak-kas').classList.add('hidden');
+        }
+
+        function prosesCetakKas(mode) {
+            let startDate = null;
+            let endDate = null;
+            if (mode === 'rentang') {
+                startDate = document.getElementById('cetak-kas-start').value;
+                endDate = document.getElementById('cetak-kas-end').value;
+                if (!startDate || !endDate) return showDialog('alert', 'Perhatian', 'Harap pilih tanggal awal dan akhir rentang!');
+                if (new Date(startDate) > new Date(endDate)) return showDialog('alert', 'Perhatian', 'Tanggal awal tidak boleh lebih besar dari tanggal akhir!');
+            }
+            tutupModalCetakKas();
+            cetakLaporanKasPDF(mode, startDate, endDate);
+        }
+
+        function cetakLaporanKasPDF(mode, startDate, endDate) {
+            if(typeof window.jspdf === 'undefined') { showToast('Fitur PDF belum siap, mohon tunggu.'); return; }
+            
+            showToast('Menyiapkan Laporan PDF Kas...');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            let dataLaporan = [...dataMutasi].sort((a,b) => new Date(a.tanggal) - new Date(b.tanggal));
+
+            let titlePdf = "Laporan Riwayat Mutasi Kas & Realisasi";
+            let filename = `Laporan_Kas_Keseluruhan_${Date.now()}.pdf`;
+            let subTitle = "Periode: Seluruh Data (Awal s.d Saat Ini)";
+            let saldoAwal = 0;
+
+            if (mode === 'rentang') {
+                const startObj = new Date(startDate);
+                const endObj = new Date(endDate);
+                
+                const mutasiSebelum = dataLaporan.filter(d => new Date(d.tanggal) < startObj);
+                saldoAwal = mutasiSebelum.reduce((sum, d) => d.jenis === 'Pemasukan' ? sum + d.nominal : sum - d.nominal, 0);
+
+                dataLaporan = dataLaporan.filter(d => {
+                    const dDate = new Date(d.tanggal);
+                    return dDate >= startObj && dDate <= endObj;
+                });
+
+                subTitle = `Periode: ${startObj.toLocaleDateString('id-ID')} s/d ${endObj.toLocaleDateString('id-ID')}`;
+                filename = `Laporan_Kas_Rentang_${Date.now()}.pdf`;
+            }
+
+            doc.setFontSize(14); doc.setFont('helvetica', 'bold');
+            doc.text(titlePdf, 14, 15);
+            doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+            doc.text("RT 01 / RW 05 KebonAgung", 14, 21);
+            doc.text(subTitle, 14, 26);
+            doc.text("Dicetak pada: " + new Date().toLocaleString('id-ID'), 14, 31);
+
+            const tableRows = [];
+            let saldoBerjalan = saldoAwal;
+            let totalMasuk = 0;
+            let totalKeluar = 0;
+
+            if (mode === 'rentang' && saldoAwal !== 0) {
+                tableRows.push(["-", "-", "SALDO AWAL", "Akumulasi sebelum periode", "-", "-", formatRp(saldoAwal)]);
+            }
+
+            dataLaporan.forEach((d, idx) => {
+                let formatTgl = d.tanggal;
+                try {
+                    const dateObj = new Date(d.tanggal);
+                    if (!isNaN(dateObj.getTime())) formatTgl = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+                } catch(e) {}
+
+                const isMasuk = d.jenis === 'Pemasukan';
+                const masukStr = isMasuk ? formatRp(d.nominal) : "-";
+                const keluarStr = !isMasuk ? formatRp(d.nominal) : "-";
+
+                if (isMasuk) { saldoBerjalan += d.nominal; totalMasuk += d.nominal; } 
+                else { saldoBerjalan -= d.nominal; totalKeluar += d.nominal; }
+
+                tableRows.push([
+                    (idx + 1).toString(), formatTgl, d.kategori || (isMasuk ? 'Pemasukan' : 'Pengeluaran'), d.keterangan, masukStr, keluarStr, formatRp(saldoBerjalan)
+                ]);
+            });
+
+            tableRows.push(["", "", "TOTAL MUTASI", `Pemasukan: ${formatRp(totalMasuk)} | Pengeluaran: ${formatRp(totalKeluar)}`, "", "", ""]);
+
+            doc.autoTable({
+                head: [["No", "Tanggal", "Kategori", "Keterangan", "Masuk (Rp)", "Keluar (Rp)", "Saldo (Rp)"]],
+                body: tableRows,
+                startY: 36,
+                theme: 'grid', 
+                styles: { fontSize: 8, font: 'helvetica' },
+                headStyles: { fillColor: [37, 99, 235], textColor: [255, 255, 255], fontStyle: 'bold' },
+                columnStyles: { 
+                    0: {halign: 'center', cellWidth: 8}, 1: {cellWidth: 20}, 2: {cellWidth: 22},
+                    4: {halign: 'right', cellWidth: 22}, 5: {halign: 'right', cellWidth: 22},
+                    6: {halign: 'right', cellWidth: 25, fontStyle: 'bold', textColor: [22, 163, 74]} 
+                },
+                didParseCell: function (data) {
+                    if (data.row.raw[2] === 'SALDO AWAL' || data.row.raw[2] === 'TOTAL MUTASI') {
+                        data.cell.styles.fontStyle = 'bold'; data.cell.styles.fillColor = [241, 245, 249];
+                    }
+                }
+            });
+
+            let finalY = doc.lastAutoTable.finalY + 10;
+            if (finalY > 260) { doc.addPage(); finalY = 20; }
+
+            const totalKasRealTimeSistem = hitungTotalKas();
+
+            doc.setFontSize(10); doc.setTextColor(0, 0, 0);
+            doc.setDrawColor(200, 200, 200); doc.setFillColor(248, 250, 252);
+            doc.rect(14, finalY, 182, 35, 'FD');
+
+            doc.setFont('helvetica', 'bold');
+            doc.text("Ringkasan Kas Saat Ini", 18, finalY + 7);
+            
+            doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+            doc.text(`Total Pemasukan Sistem (Seluruh Waktu): ${formatRp(dataMutasi.reduce((s,d)=>d.jenis==='Pemasukan'?s+d.nominal:s,0))}`, 18, finalY + 14);
+            doc.text(`Total Pengeluaran / Realisasi Sistem: ${formatRp(dataMutasi.reduce((s,d)=>d.jenis==='Pengeluaran'?s+d.nominal:s,0))}`, 18, finalY + 20);
+            
+            if (penyesuaianSaldoKas !== 0) {
+                doc.text(`Penyesuaian Manual Sistem: ${formatRp(penyesuaianSaldoKas)}`, 18, finalY + 26);
+            }
+
+            doc.setFontSize(12); doc.setFont('helvetica', 'bold');
+            doc.setTextColor(22, 163, 74);
+            doc.text(`TOTAL SALDO KAS RT SAAT INI: ${formatRp(totalKasRealTimeSistem)}`, 18, finalY + 31);
+
+            doc.save(filename);
         }
 
         // --- REALISASI ANGGARAN ---
