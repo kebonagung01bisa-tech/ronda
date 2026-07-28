@@ -2580,6 +2580,59 @@
             doc.setTextColor(0, 0, 0);
             doc.text(`Total Keseluruhan Tunggakan: ${formatRp(totalTunggakanKeseluruhan)}`, 14, finalY + 4);
 
+            // --- MULAI TAMBAHAN: TABEL REKAP PER WARGA ---
+            doc.addPage(); // Buat halaman baru khusus untuk rekapitulasi akhir
+            let summaryY = 20;
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 0, 0);
+            doc.text("Rekapitulasi Total Tunggakan Per Warga", 14, summaryY);
+            summaryY += 8;
+
+            // Hitung total per warga
+            const rekapPerWarga = {};
+            tunggakanData.forEach(d => {
+                if (!rekapPerWarga[d.wargaId]) {
+                    rekapPerWarga[d.wargaId] = { nama: d.namaWarga, total: 0, jumlahItem: 0 };
+                }
+                rekapPerWarga[d.wargaId].total += d.nominal;
+                rekapPerWarga[d.wargaId].jumlahItem += 1;
+            });
+
+            // Ubah object ke array dan urutkan berdasarkan nama
+            const arrayRekapWarga = Object.values(rekapPerWarga).sort((a, b) => a.nama.localeCompare(b.nama));
+            
+            const summaryTableRows = [];
+            let grandTotalSummary = 0;
+            arrayRekapWarga.forEach((w, idx) => {
+                summaryTableRows.push([idx + 1, w.nama, `${w.jumlahItem} Tagihan`, formatRp(w.total)]);
+                grandTotalSummary += w.total;
+            });
+            
+            // Tambahkan baris total di akhir tabel summary
+            summaryTableRows.push(["", "TOTAL KESELURUHAN", "", formatRp(grandTotalSummary)]);
+
+            doc.autoTable({
+                head: [["No", "Nama Warga", "Jumlah Tagihan", "Total Tunggakan"]],
+                body: summaryTableRows,
+                startY: summaryY,
+                theme: 'grid', styles: { fontSize: 9, font: 'helvetica' },
+                headStyles: { fillColor: [220, 38, 38], textColor: [255, 255, 255], fontStyle: 'bold' }, // Warna Header Merah
+                columnStyles: { 
+                    0: {halign: 'center', cellWidth: 15}, 
+                    2: {halign: 'center', cellWidth: 40}, 
+                    3: {halign: 'right', fontStyle: 'bold'} 
+                },
+                didParseCell: function (data) {
+                    // Beri gaya tebal & warna background khusus untuk baris TOTAL KESELURUHAN
+                    if (data.row.raw[1] === 'TOTAL KESELURUHAN') {
+                        data.cell.styles.fontStyle = 'bold';
+                        data.cell.styles.fillColor = [254, 226, 226]; // bg-red-100
+                    }
+                }
+            });
+            // --- AKHIR TAMBAHAN ---
+
             doc.save(filename);
         }
 
