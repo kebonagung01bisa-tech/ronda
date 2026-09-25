@@ -41,6 +41,12 @@ const angka = (s) => { const neg = /^\s*-/.test(String(s || '')); const d = Stri
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const URUT_HARI = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
 const STATUS_PRESENSI = ['Hadir', 'Izin', 'Absen'];
+const KATEGORI_ADUAN = ['Keamanan', 'Kebersihan', 'Jalan & lampu', 'Sosial', 'Usulan', 'Lainnya'];
+const STATUS_ADUAN = ['Baru', 'Diproses', 'Selesai'];
+const KATEGORI_KEG = ['Kerja bakti', 'Rapat', 'Keagamaan', 'Olahraga', 'Pemuda', 'Sosial', 'Lainnya'];
+const JENIS_PEMUDA = ['Karya', 'Ide', 'Usaha', 'Konten', 'Prestasi'];
+const IKON_KEG = { 'Kerja bakti': 'fa-broom', Rapat: 'fa-comments', Keagamaan: 'fa-mosque', Olahraga: 'fa-futbol', Pemuda: 'fa-lightbulb', Sosial: 'fa-hand-holding-heart', Lainnya: 'fa-star' };
+const WARNA_ORG = ['#2563EB', '#F97316', '#16A34A', '#DB2777', '#7C3AED', '#0D9488', '#CA8A04', '#DC2626'];
 const byNama = (a, b) => String(a.nama || '').localeCompare(String(b.nama || ''), 'id');
 
 function ymd(d = new Date()) {
@@ -66,6 +72,11 @@ function imgAman(src) {
 }
 let idTerakhir = 0;
 function idBaru() { let t = Date.now(); if (t <= idTerakhir) t = idTerakhir + 1; idTerakhir = t; return t; }
+// Hanya izinkan tautan https (menolak javascript:, data:, http: tanpa enkripsi)
+function amanUrl(u) {
+  try { const x = new URL(String(u || '').trim()); return x.protocol === 'https:' && !x.username && !x.password ? x.href : ''; } catch (e) { return ''; }
+}
+function inisial(n) { return String(n || '?').trim().split(/\s+/).slice(0, 2).map((s) => s[0] || '').join('').toUpperCase() || '?'; }
 function bersihTeks(s, maks) { return String(s || '').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').trim().slice(0, maks); }
 
 // ---------------------------------------------------------------------------
@@ -74,8 +85,9 @@ function bersihTeks(s, maks) { return String(s || '').replace(/[\u0000-\u0008\u0
 const S = {
   role: null, loginMode: 'warga',
   warga: [], tipe: [], denda: [], mutasi: [], presensi: {}, rencana: [], aspirasi: [], offset: 0,
+  kegiatan: [], cctv: [], pemuda: [], profil: {},
   tab: 'beranda', sub: { ronda: 'jadwal', kas: 'tagihan' },
-  filter: { tagihan: 'belum', kas: 'semua' },
+  filter: { tagihan: 'belum', kas: 'semua', aduan: 'semua', keg: 'semua' },
   presensiTgl: ymd(), grupTerbuka: new Set(), unsub: [], galatDitampilkan: false
 };
 let fb = null;
@@ -116,6 +128,10 @@ function pasangListener() {
   on(koleksi('presensi'), (s) => { const p = {}; s.docs.forEach((d) => { p[d.id] = d.data() || {}; }); S.presensi = p; segarkan(); });
   on(koleksi('rencana'), (s) => { S.rencana = s.docs.map((d) => d.data()).filter((r) => r && r.id != null).map((r) => ({ ...r, id: num(r.id) })); segarkan(); });
   on(koleksi('aspirasi'), (s) => { S.aspirasi = s.docs.map((d) => d.data()).filter((a) => a && a.id != null).map((a) => ({ ...a, id: num(a.id) })); segarkan(); });
+  on(koleksi('kegiatan'), (s) => { S.kegiatan = s.docs.map((d) => d.data()).filter((k) => k && k.id != null).map((k) => ({ ...k, id: num(k.id) })); segarkan(); });
+  on(koleksi('cctv'), (s) => { S.cctv = s.docs.map((d) => d.data()).filter((c) => c && c.id != null).map((c) => ({ ...c, id: num(c.id) })); segarkan(); });
+  on(koleksi('pemuda'), (s) => { S.pemuda = s.docs.map((d) => d.data()).filter((p) => p && p.id != null).map((p) => ({ ...p, id: num(p.id) })); segarkan(); });
+  on(dok('profil', 'utama'), (s) => { S.profil = s.exists() ? (s.data() || {}) : {}; segarkan(); });
   on(dok('pengaturan_kas', 'saldo'), (s) => { S.offset = s.exists() ? num(s.data().offset) : 0; segarkan(); });
 }
 function lepasListener() { S.unsub.forEach((u) => { try { u(); } catch (e) { /* abaikan */ } }); S.unsub = []; }
@@ -193,7 +209,7 @@ function masukApp(user) {
 async function keluar() {
   if (!(await konfirmasi('Keluar dari aplikasi?', 'Anda perlu memasukkan PIN lagi untuk masuk.', 'Keluar'))) return;
   lepasListener();
-  Object.assign(S, { warga: [], tipe: [], denda: [], mutasi: [], presensi: {}, rencana: [], aspirasi: [], offset: 0, role: null });
+  Object.assign(S, { warga: [], tipe: [], denda: [], mutasi: [], presensi: {}, rencana: [], aspirasi: [], offset: 0, kegiatan: [], cctv: [], pemuda: [], profil: {}, role: null });
   await fb.authM.signOut(fb.auth);
 }
 const isAdmin = () => S.role === 'admin';
@@ -201,20 +217,27 @@ const isAdmin = () => S.role === 'admin';
 // ---------------------------------------------------------------------------
 // Navigasi
 // ---------------------------------------------------------------------------
-function gantiTab(tab, sub) {
+function gantiTab(tab, sub, gulir) {
+  if (!document.getElementById(`v-${tab}`)) tab = 'beranda';
   S.tab = tab;
   if (sub) S.sub[tab] = sub;
   $$('.view').forEach((v) => { v.hidden = v.id !== `v-${tab}`; });
   $$('.tabs button').forEach((b) => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
-  window.scrollTo(0, 0);
   renderTab();
+  const target = gulir && document.getElementById(gulir);
+  if (target) target.scrollIntoView({ block: 'start' }); else window.scrollTo(0, 0);
+  if (target) window.scrollBy(0, -70);
 }
 function renderTab() {
   if (!S.role) return;
   if (S.tab === 'beranda') renderBeranda();
   if (S.tab === 'ronda') renderRonda();
   if (S.tab === 'kas') renderKas();
-  if (S.tab === 'info') renderInfo();
+  if (S.tab === 'kegiatan') renderKegiatan();
+  if (S.tab === 'aduan') renderAduan();
+  if (S.tab === 'cctv') renderCctv();
+  if (S.tab === 'pemuda') renderPemuda();
+  if (S.tab === 'profil') renderProfil();
 }
 function setSub(view, sub) {
   S.sub[view] = sub;
@@ -243,27 +266,31 @@ function fotoPresensi(tgl) { const f = (S.presensi[tgl] || {}).bukti_foto; retur
 // BERANDA
 // ---------------------------------------------------------------------------
 function renderBeranda() {
-  const hari = hariMalamIni();
+  const hari = hariMalamIni(), jam = new Date().getHours();
+  const salam = jam < 11 ? 'Selamat pagi' : jam < 15 ? 'Selamat siang' : jam < 18 ? 'Selamat sore' : 'Selamat malam';
   const regu = S.warga.filter((w) => w.jadwal === hari).sort(byNama);
-  $('#b-malam').innerHTML = `
-    <i class="fa-solid fa-lightbulb lampu" aria-hidden="true"></i>
-    <p class="kecil">Regu ronda malam ini</p>
-    <div class="hari">Malam ${esc(hari)}</div>
-    ${regu.length ? `<ul>${regu.map((w) => `<li>${esc(w.nama)}</li>`).join('')}</ul>` : '<p class="kecil">Belum ada warga di regu ini.</p>'}`;
+  $('#b-hero').innerHTML = `
+    <p class="salam">${salam}, ${isAdmin() ? 'Pengurus' : 'warga'} RT 01 👋</p>
+    <div class="hari"><i class="fa-solid fa-moon"></i> Ronda malam ${esc(hari)}</div>
+    ${regu.length ? `<ul>${regu.map((w) => `<li>${esc(w.nama)}</li>`).join('')}</ul>` : '<p class="kosong-regu">Belum ada warga di regu ini.</p>'}`;
 
   const saldo = saldoKas();
   $('#b-stats').innerHTML = `
-    <button class="stat" data-act="goto" data-tab="kas" data-sub="kas"><span>Saldo kas</span><b style="color:${saldo < 0 ? 'var(--merah)' : 'inherit'}">${rp(saldo)}</b></button>
-    <button class="stat" data-act="goto" data-tab="kas" data-sub="tagihan"><span>Tunggakan</span><b style="color:var(--merah)">${rp(totalTunggakan())}</b></button>
-    <button class="stat lebar" data-act="goto" data-tab="ronda" data-sub="jadwal"><span>Warga terdaftar</span><b>${S.warga.length} orang</b></button>`;
+    <button class="stat" data-act="goto" data-tab="kas" data-sub="kas"><span class="ic" style="background:var(--hijau-bg);color:var(--hijau)"><i class="fa-solid fa-wallet"></i></span>
+      <span><span>Saldo kas</span><b style="color:${saldo < 0 ? 'var(--merah)' : 'inherit'}">${rp(saldo)}</b></span></button>
+    <button class="stat" data-act="goto" data-tab="kas" data-sub="tagihan"><span class="ic" style="background:var(--merah-bg);color:var(--merah)"><i class="fa-solid fa-receipt"></i></span>
+      <span><span>Tunggakan</span><b style="color:var(--merah)">${rp(totalTunggakan())}</b></span></button>`;
+
+  const keg = S.kegiatan.slice().sort((x, y) => String(y.tanggal).localeCompare(String(x.tanggal)) || y.id - x.id).slice(0, 2);
+  $('#b-kegiatan').innerHTML = keg.length ? keg.map(kartuKegiatanMini).join('') : '<div class="kosong">Belum ada kegiatan yang diumumkan.</div>';
 
   const tgl = Object.keys(S.presensi).filter((t) => parseYMD(t)).filter((t) => {
     const r = ringkasPresensi(t); return r.Hadir + r.Izin + r.Absen > 0 || fotoPresensi(t).length > 0;
-  }).sort((a, b) => b.localeCompare(a)).slice(0, 6);
+  }).sort((a, b) => b.localeCompare(a)).slice(0, 3);
   $('#b-presensi').innerHTML = tgl.length ? tgl.map((t) => {
     const r = ringkasPresensi(t); const foto = fotoPresensi(t).length;
     return `<button class="item" data-act="buka-presensi" data-tgl="${esc(t)}">
-      <div class="bulat"><i class="fa-regular fa-calendar"></i></div>
+      <div class="bulat" style="background:var(--biru-bg);color:var(--biru)"><i class="fa-solid fa-clipboard-check"></i></div>
       <div class="isi"><b>${esc(tglPanjang(t))}</b><small>${r.Hadir} hadir · ${r.Izin} izin · ${r.Absen} absen${foto ? ` · ${foto} foto` : ''}</small></div>
       <i class="fa-solid fa-chevron-right redup"></i></button>`;
   }).join('') : '<div class="kosong">Belum ada presensi yang dicatat.</div>';
@@ -723,24 +750,276 @@ function editDeposit(id) {
 // ---------------------------------------------------------------------------
 // INFO — rencana & aspirasi
 // ---------------------------------------------------------------------------
-function renderInfo() {
+const statusAduan = (a) => (STATUS_ADUAN.includes(a.status) ? a.status : (a.tanggapan ? 'Selesai' : 'Baru'));
+function renderAduan() {
+  $$('[data-act="filter"]').forEach((b) => b.setAttribute('aria-pressed', String(S.filter[b.dataset.f] === b.dataset.v)));
+  const f = S.filter.aduan;
+  const list = S.aspirasi.filter((a) => f === 'semua' || statusAduan(a) === f).sort((a, b) => b.id - a.id);
+  $('#aspirasi-list').innerHTML = list.length ? list.map((a) => {
+    const st = statusAduan(a);
+    return `<div class="pos">
+      <div class="baris antara"><span class="baris"><span class="st st-sistem">${esc(KATEGORI_ADUAN.includes(a.kategori) ? a.kategori : 'Usulan')}</span><span class="st st-${st}">${st}</span></span><span class="redup kecil">${esc(a.tanggal || '')}</span></div>
+      <p class="teks">${esc(a.teks)}</p>
+      <p class="redup kecil" style="margin:6px 0 0"><i class="fa-solid fa-user"></i> ${esc(a.nama || 'Warga (Anonim)')}</p>
+      ${a.tanggapan ? `<div class="tanggapan"><b>Tanggapan pengurus:</b>\n${esc(a.tanggapan)}</div>` : ''}
+      ${isAdmin() ? `<div class="baris" style="margin-top:10px">
+        <button class="btn kecil" data-act="tanggapi" data-id="${a.id}"><i class="fa-solid fa-reply"></i> Tanggapi</button>
+        <button class="btn kecil lembut" data-act="hapus-aspirasi" data-id="${a.id}" style="color:var(--merah)"><i class="fa-solid fa-trash"></i> Hapus</button></div>` : ''}
+    </div>`;
+  }).join('') : `<div class="kosong">${f === 'semua' ? 'Belum ada aduan. Sampaikan keluhan atau usulan lewat tombol di atas.' : 'Tidak ada aduan dengan status ini.'}</div>`;
+}
+
+function renderProfil() {
+  const p = S.profil || {};
+  const misi = Array.isArray(p.misi) ? p.misi.filter((m) => typeof m === 'string' && m.trim()) : [];
+  $('#profil-visi').innerHTML = (p.visi || misi.length) ? `
+    <div class="visi"><small>Visi</small><p>${esc(p.visi || '-')}</p></div>
+    ${misi.length ? `<p class="lbl" style="margin:14px 0 8px">Misi</p><ol class="misi">${misi.map((m) => `<li>${esc(m)}</li>`).join('')}</ol>` : ''}`
+    : `<div class="kosong">Visi dan misi RT belum diisi.${isAdmin() ? ' Tekan “Ubah” untuk mengisi.' : ''}</div>`;
+
+  const peng = Array.isArray(p.pengurus) ? p.pengurus.filter((x) => x && x.nama) : [];
+  $('#profil-pengurus').innerHTML = peng.length ? `<div class="pengurus">${peng.map((x, i) => {
+    const wa = formatWA(x.wa || ''), ketua = i === 0 && /ketua/i.test(x.jabatan || '');
+    return `<div class="org ${ketua ? 'ketua' : ''}"><div class="ava" style="--c:${WARNA_ORG[i % WARNA_ORG.length]}">${esc(inisial(x.nama))}</div>
+      <b>${esc(x.nama)}</b><small>${esc(x.jabatan || 'Pengurus')}</small>
+      ${wa ? `<a href="https://wa.me/${wa}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Chat</a>` : ''}</div>`;
+  }).join('')}</div>` : `<div class="kosong">Susunan pengurus belum diisi.${isAdmin() ? ' Tekan “Ubah” untuk mengisi.' : ''}</div>`;
+
   const warnaStatus = (s) => (s === 'Selesai' ? 'st-Lunas' : s === 'Sedang Berjalan' ? 'st-Izin' : 'st-sistem');
   $('#rencana-list').innerHTML = S.rencana.length ? S.rencana.slice().sort((a, b) => b.id - a.id).map((r) => `
     <button class="rencana" data-act="detail-rencana" data-id="${r.id}">
       <div class="baris antara"><b>${esc(r.judul)}</b><span class="st ${warnaStatus(r.status)}">${esc(r.status)}</span></div>
-      <p>${esc(r.deskripsi)}</p></button>`).join('') : '<div class="kosong">Belum ada rencana program.</div>';
-
-  $('#aspirasi-list').innerHTML = S.aspirasi.length ? S.aspirasi.slice().sort((a, b) => b.id - a.id).map((a) => `
-    <div class="aspirasi">
-      <div class="baris antara"><b>${esc(a.nama || 'Warga (Anonim)')}</b><span class="redup kecil">${esc(a.tanggal || '')}</span></div>
-      <p class="teks">${esc(a.teks)}</p>
-      ${a.tanggapan ? `<div class="tanggapan"><b>Tanggapan pengurus:</b>\n${esc(a.tanggapan)}</div>` : ''}
-      ${isAdmin() ? `<div class="baris" style="margin-top:10px">
-        <button class="btn kecil lembut" data-act="tanggapi" data-id="${a.id}"><i class="fa-solid fa-reply"></i> ${a.tanggapan ? 'Ubah tanggapan' : 'Tanggapi'}</button>
-        <button class="btn kecil lembut" data-act="hapus-aspirasi" data-id="${a.id}" style="color:var(--merah)"><i class="fa-solid fa-trash"></i> Hapus</button></div>` : ''}
-    </div>`).join('') : '<div class="kosong">Belum ada aspirasi. Sampaikan saran Anda lewat tombol “Tulis”.</div>';
+      <p>${esc(r.deskripsi)}</p></button>`).join('') : '<div class="kosong">Belum ada program pembangunan.</div>';
 
   $('#btn-pasang').hidden = !promptPasang;
+}
+
+function formVisi() {
+  const p = S.profil || {};
+  bukaSheet('Visi & misi RT', `
+    <form id="f">
+      <div class="fld"><label class="lbl" for="f-visi">Visi</label><textarea id="f-visi" class="inp" maxlength="400" rows="3" placeholder="Contoh: Mewujudkan lingkungan RT 01 yang aman, bersih, rukun, dan berdaya">${esc(p.visi || '')}</textarea></div>
+      <div class="fld"><label class="lbl" for="f-misi">Misi (satu baris satu misi)</label><textarea id="f-misi" class="inp" maxlength="2000" rows="7" placeholder="Menjaga keamanan lewat ronda rutin&#10;Mengelola kas secara transparan">${esc((Array.isArray(p.misi) ? p.misi : []).join('\n'))}</textarea></div>
+      <div class="sheet-kaki"><button type="button" class="btn lembut" data-act="tutup-sheet">Batal</button><button class="btn">Simpan</button></div>
+    </form>`, (root) => {
+    formSubmit(root, async () => {
+      const visi = bersihTeks($('#f-visi', root).value, 400);
+      const misi = $('#f-misi', root).value.split('\n').map((m) => bersihTeks(m, 200)).filter(Boolean).slice(0, 12);
+      if (await simpan(fb.fsM.setDoc(dok('profil', 'utama'), { visi, misi }, { merge: true }), 'Visi & misi disimpan.')) tutupSheet();
+    });
+  });
+}
+function formPengurus() {
+  const awal = Array.isArray(S.profil.pengurus) && S.profil.pengurus.length ? S.profil.pengurus
+    : ['Ketua RT', 'Sekretaris', 'Bendahara', 'Seksi Keamanan', 'Seksi Pemuda'].map((jabatan) => ({ jabatan, nama: '', wa: '' }));
+  const baris = (x) => `<div class="baris-pengurus">
+      <input class="inp" data-k="jabatan" maxlength="40" placeholder="Jabatan" value="${esc(x.jabatan || '')}">
+      <input class="inp" data-k="nama" maxlength="60" placeholder="Nama" value="${esc(x.nama || '')}">
+      <button type="button" class="ikon-btn" data-hapus-baris aria-label="Hapus baris" style="color:var(--merah)"><i class="fa-solid fa-trash"></i></button>
+      <input class="inp wa" data-k="wa" inputmode="tel" maxlength="16" placeholder="No. WA (opsional)" value="${esc(x.wa || '')}"></div>`;
+  bukaSheet('Susunan pengurus', `
+    <form id="f">
+      <p class="redup kecil" style="margin-top:0">Urutan pertama tampil paling atas. Nomor WA akan terlihat oleh semua warga yang login.</p>
+      <div id="f-baris">${awal.map(baris).join('')}</div>
+      <button type="button" class="btn kecil lembut" id="f-tambah" style="margin-bottom:14px"><i class="fa-solid fa-plus"></i> Tambah jabatan</button>
+      <div class="sheet-kaki"><button type="button" class="btn lembut" data-act="tutup-sheet">Batal</button><button class="btn">Simpan pengurus</button></div>
+    </form>`, (root) => {
+    const wadah = $('#f-baris', root);
+    wadah.addEventListener('click', (e) => { const b = e.target.closest('[data-hapus-baris]'); if (b) b.parentElement.remove(); });
+    $('#f-tambah', root).addEventListener('click', () => { if (wadah.children.length < 20) wadah.insertAdjacentHTML('beforeend', baris({})); });
+    formSubmit(root, async () => {
+      const data = $$('.baris-pengurus', root).map((r) => ({
+        jabatan: bersihTeks($('[data-k=jabatan]', r).value, 40),
+        nama: bersihTeks($('[data-k=nama]', r).value, 60),
+        wa: $('[data-k=wa]', r).value.replace(/\D/g, '').slice(0, 15)
+      })).filter((x) => x.nama);
+      if (await simpan(fb.fsM.setDoc(dok('profil', 'utama'), { pengurus: data }, { merge: true }), 'Susunan pengurus disimpan.')) tutupSheet();
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+// KEGIATAN
+// ---------------------------------------------------------------------------
+const fotoKeg = (k) => (Array.isArray(k.foto) ? k.foto.filter(imgAman) : []);
+function kartuKegiatanMini(k) {
+  const f = fotoKeg(k)[0];
+  return `<button class="item keg-mini" data-act="detail-kegiatan" data-id="${k.id}">
+    <span class="thumb">${f ? `<img src="${esc(f)}" alt="">` : `<i class="fa-solid ${IKON_KEG[k.kategori] || 'fa-star'}"></i>`}</span>
+    <span class="isi"><b>${esc(k.judul)}</b><small>${esc(tglPendek(k.tanggal))}${k.lokasi ? ` · ${esc(k.lokasi)}` : ''}</small></span>
+    ${k.tanggal >= ymd() ? '<span class="st st-Baru">Akan datang</span>' : ''}</button>`;
+}
+function renderKegiatan() {
+  const ada = KATEGORI_KEG.filter((c) => S.kegiatan.some((k) => k.kategori === c));
+  if (S.filter.keg !== 'semua' && !ada.includes(S.filter.keg)) S.filter.keg = 'semua';
+  $('#keg-chips').innerHTML = ada.length > 1 ? ['semua', ...ada].map((c) => `<button data-act="filter" data-f="keg" data-v="${esc(c)}" aria-pressed="${S.filter.keg === c}">${c === 'semua' ? 'Semua' : esc(c)}</button>`).join('') : '';
+  const list = S.kegiatan.filter((k) => S.filter.keg === 'semua' || k.kategori === S.filter.keg)
+    .sort((x, y) => String(y.tanggal).localeCompare(String(x.tanggal)) || y.id - x.id);
+  $('#kegiatan-list').innerHTML = list.length ? list.map((k) => {
+    const f = fotoKeg(k)[0];
+    return `<button class="keg" data-act="detail-kegiatan" data-id="${k.id}">
+      <div class="sampul">${f ? `<img src="${esc(f)}" alt="">` : `<i class="fa-solid ${IKON_KEG[k.kategori] || 'fa-star'}"></i>`}</div>
+      <div class="badan"><div class="baris antara"><span class="st st-sistem">${esc(k.kategori || 'Lainnya')}</span>${k.tanggal >= ymd() ? '<span class="st st-Baru">Akan datang</span>' : ''}</div>
+        <b style="margin-top:6px">${esc(k.judul)}</b>
+        <div class="meta"><span><i class="fa-regular fa-calendar"></i> ${esc(tglPanjang(k.tanggal))}${k.waktu ? `, ${esc(k.waktu)}` : ''}</span>${k.lokasi ? `<span><i class="fa-solid fa-location-dot"></i> ${esc(k.lokasi)}</span>` : ''}</div></div>
+    </button>`;
+  }).join('') : '<div class="kosong">Belum ada kegiatan. Pengurus bisa mengumumkan kerja bakti, rapat, atau acara di sini.</div>';
+}
+function detailKegiatan(id) {
+  const k = S.kegiatan.find((x) => x.id === id); if (!k) return;
+  const foto = fotoKeg(k);
+  bukaSheet(k.judul, `
+    <p class="baris" style="margin-top:0"><span class="st st-sistem">${esc(k.kategori || 'Lainnya')}</span></p>
+    <p class="kecil" style="margin:0"><i class="fa-regular fa-calendar"></i> ${esc(tglPanjang(k.tanggal))}${k.waktu ? `, pukul ${esc(k.waktu)}` : ''}</p>
+    ${k.lokasi ? `<p class="kecil" style="margin:4px 0 0"><i class="fa-solid fa-location-dot"></i> ${esc(k.lokasi)}</p>` : ''}
+    <p style="white-space:pre-line;overflow-wrap:anywhere">${esc(k.deskripsi || '')}</p>
+    ${foto.length ? `<div class="foto-grid">${foto.map((src, i) => `<div class="foto"><button data-act="lihat-foto" data-sumber="kegiatan" data-id="${k.id}" data-idx="${i}" aria-label="Lihat foto ${i + 1}"><img src="${esc(src)}" alt=""></button></div>`).join('')}</div>` : ''}
+    ${isAdmin() ? `<div class="sheet-kaki" style="margin-top:18px"><button class="btn lembut" data-act="hapus-kegiatan" data-id="${k.id}" style="color:var(--merah)"><i class="fa-solid fa-trash"></i> Hapus</button><button class="btn" data-act="edit-kegiatan" data-id="${k.id}"><i class="fa-solid fa-pen"></i> Ubah</button></div>` : ''}`);
+}
+function formKegiatan(id) {
+  const k = id != null ? S.kegiatan.find((x) => x.id === id) : null;
+  let foto = k ? fotoKeg(k) : [];
+  bukaSheet(k ? 'Ubah kegiatan' : 'Umumkan kegiatan', `
+    <form id="f">
+      <div class="fld"><label class="lbl" for="f-j">Nama kegiatan</label><input id="f-j" class="inp" maxlength="100" required placeholder="Kerja bakti bersih selokan" value="${esc(k ? k.judul : '')}"></div>
+      <div class="grid2">
+        <div class="fld"><label class="lbl" for="f-kat">Jenis</label><select id="f-kat" class="inp">${KATEGORI_KEG.map((c) => `<option ${k && k.kategori === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
+        <div class="fld"><label class="lbl" for="f-tgl">Tanggal</label><input id="f-tgl" type="date" class="inp" required value="${esc(k ? k.tanggal : ymd())}"></div>
+      </div>
+      <div class="grid2">
+        <div class="fld"><label class="lbl" for="f-jam">Jam (opsional)</label><input id="f-jam" type="time" class="inp" value="${esc(k && /^\d{2}:\d{2}$/.test(k.waktu || '') ? k.waktu : '')}"></div>
+        <div class="fld"><label class="lbl" for="f-lok">Tempat</label><input id="f-lok" class="inp" maxlength="80" placeholder="Pos ronda" value="${esc(k ? k.lokasi || '' : '')}"></div>
+      </div>
+      <div class="fld"><label class="lbl" for="f-d">Keterangan</label><textarea id="f-d" class="inp" maxlength="2000" rows="4">${esc(k ? k.deskripsi || '' : '')}</textarea></div>
+      <div class="fld"><span class="lbl">Foto (maks. 4)</span><div id="f-foto" class="foto-grid"></div>
+        <label class="btn kecil lembut unggah" style="margin-top:8px"><i class="fa-solid fa-camera"></i> <span id="f-foto-lbl">Pilih foto</span><input id="f-foto-in" type="file" accept="image/*" multiple></label></div>
+      <div class="sheet-kaki"><button type="button" class="btn lembut" data-act="tutup-sheet">Batal</button><button id="f-simpan" class="btn oranye">Simpan</button></div>
+    </form>`, (root) => {
+    const gambar = () => {
+      $('#f-foto', root).innerHTML = foto.length ? foto.map((src, i) => `<div class="foto"><button type="button" tabindex="-1"><img src="${esc(src)}" alt=""></button><button type="button" class="hapus" data-hapus="${i}" aria-label="Hapus foto"><i class="fa-solid fa-xmark"></i></button></div>`).join('') : '<span class="redup kecil">Belum ada foto.</span>';
+      $$('[data-hapus]', root).forEach((b) => b.addEventListener('click', () => { foto.splice(+b.dataset.hapus, 1); gambar(); }));
+    };
+    gambar();
+    const inp = $('#f-foto-in', root);
+    inp.addEventListener('change', async () => {
+      if (!inp.files.length) return;
+      if (foto.length + inp.files.length > 4) { inp.value = ''; return info('Terlalu banyak foto', 'Maksimal 4 foto per kegiatan.'); }
+      $('#f-foto-lbl', root).textContent = 'Memproses…'; $('#f-simpan', root).disabled = true;
+      try { foto = foto.concat(await prosesFoto(inp.files)); gambar(); }
+      catch (e) { info('Gagal memproses foto', 'Pastikan file yang dipilih adalah gambar.'); }
+      finally { $('#f-foto-lbl', root).textContent = 'Pilih foto'; $('#f-simpan', root).disabled = false; inp.value = ''; }
+    });
+    formSubmit(root, async () => {
+      const judul = bersihTeks($('#f-j', root).value, 100), tanggal = $('#f-tgl', root).value, kategori = $('#f-kat', root).value;
+      const waktu = /^\d{2}:\d{2}$/.test($('#f-jam', root).value) ? $('#f-jam', root).value : '';
+      if (!judul || !parseYMD(tanggal) || !KATEGORI_KEG.includes(kategori)) return info('Data belum lengkap', 'Isi nama kegiatan dan tanggal.');
+      if (ukuran(foto) > BATAS_DOK) return info('Foto terlalu besar', 'Kurangi jumlah foto lalu coba lagi.');
+      const newId = k ? k.id : idBaru();
+      const data = { judul, kategori, tanggal, waktu, lokasi: bersihTeks($('#f-lok', root).value, 80), deskripsi: bersihTeks($('#f-d', root).value, 2000), foto };
+      if (!k) data.id = newId;
+      if (await simpan(fb.fsM.setDoc(dok('kegiatan', newId), data, { merge: true }), k ? 'Kegiatan diperbarui.' : 'Kegiatan diumumkan.')) tutupSheet();
+    });
+  });
+}
+async function hapusKegiatan(id) {
+  if (!(await konfirmasi('Hapus kegiatan?', 'Kegiatan beserta fotonya akan dihapus.', 'Hapus', true))) return;
+  if (await simpan(fb.fsM.deleteDoc(dok('kegiatan', id)), 'Kegiatan dihapus.')) tutupSheet();
+}
+
+// ---------------------------------------------------------------------------
+// CCTV — hanya tautan (tidak disematkan), dibuka di tab baru
+// ---------------------------------------------------------------------------
+function renderCctv() {
+  $('#cctv-list').innerHTML = S.cctv.length ? S.cctv.slice().sort((a, b) => String(a.nama).localeCompare(String(b.nama), 'id')).map((c) => {
+    const url = amanUrl(c.link), st = c.status === 'Mati' ? 'Mati' : 'Aktif';
+    return `<div class="cctv"><span class="lensa"><i class="fa-solid fa-video"></i></span>
+      <div class="isi" style="flex:1;min-width:0"><b>${esc(c.nama)}</b><small>${esc(c.lokasi || '')}</small><span class="st st-${st}" style="margin-top:4px">${st === 'Aktif' ? 'Aktif' : 'Tidak aktif'}</span></div>
+      <div class="baris" style="flex-direction:column;align-items:stretch">
+        ${url && st === 'Aktif' ? `<a class="btn kecil" href="${esc(url)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-play"></i> Lihat</a>` : '<span class="btn kecil lembut" aria-disabled="true">Tidak tersedia</span>'}
+        ${isAdmin() ? `<button class="btn kecil lembut" data-act="edit-cctv" data-id="${c.id}"><i class="fa-solid fa-pen"></i> Ubah</button>` : ''}
+      </div></div>`;
+  }).join('') : `<div class="kosong">Belum ada kamera yang didaftarkan.${isAdmin() ? ' Tambahkan tautan dari aplikasi CCTV Anda.' : ''}</div>`;
+}
+function formCctv(id) {
+  const c = id != null ? S.cctv.find((x) => x.id === id) : null;
+  bukaSheet(c ? 'Ubah kamera' : 'Tambah kamera', `
+    <form id="f">
+      <div class="fld"><label class="lbl" for="f-n">Nama kamera</label><input id="f-n" class="inp" maxlength="60" required placeholder="Gerbang utara" value="${esc(c ? c.nama : '')}"></div>
+      <div class="fld"><label class="lbl" for="f-l">Lokasi</label><input id="f-l" class="inp" maxlength="80" placeholder="Depan pos ronda" value="${esc(c ? c.lokasi || '' : '')}"></div>
+      <div class="fld"><label class="lbl" for="f-u">Tautan tayangan (https)</label><input id="f-u" class="inp" type="url" maxlength="500" placeholder="https://…" value="${esc(c ? c.link || '' : '')}">
+        <p class="bantu">Gunakan tautan berbagi dari aplikasi/NVR CCTV yang <b>memerlukan login</b>. Jangan pakai tautan publik tanpa kata sandi — siapa pun yang tahu PIN warga akan bisa melihatnya.</p></div>
+      <div class="fld"><label class="lbl" for="f-s">Status</label><select id="f-s" class="inp"><option value="Aktif" ${!c || c.status !== 'Mati' ? 'selected' : ''}>Aktif</option><option value="Mati" ${c && c.status === 'Mati' ? 'selected' : ''}>Tidak aktif / rusak</option></select></div>
+      <div class="sheet-kaki">
+        ${c ? `<button type="button" class="btn lembut" data-act="hapus-cctv" data-id="${c.id}" style="flex:0 0 auto;color:var(--merah)" aria-label="Hapus kamera"><i class="fa-solid fa-trash"></i></button>` : ''}
+        <button type="button" class="btn lembut" data-act="tutup-sheet">Batal</button><button class="btn">Simpan</button></div>
+    </form>`, (root) => {
+    formSubmit(root, async () => {
+      const nama = bersihTeks($('#f-n', root).value, 60), link = $('#f-u', root).value.trim();
+      if (!nama) return info('Nama kosong', 'Isi nama kamera.');
+      if (link && !amanUrl(link)) return info('Tautan tidak valid', 'Tautan harus diawali https:// .');
+      const newId = c ? c.id : idBaru();
+      const data = { nama, lokasi: bersihTeks($('#f-l', root).value, 80), link: link ? amanUrl(link) : '', status: $('#f-s', root).value === 'Mati' ? 'Mati' : 'Aktif' };
+      if (!c) data.id = newId;
+      if (await simpan(fb.fsM.setDoc(dok('cctv', newId), data, { merge: true }), 'Kamera disimpan.')) tutupSheet();
+    });
+  });
+}
+async function hapusCctv(id) {
+  if (!(await konfirmasi('Hapus kamera?', 'Kamera ini akan dihapus dari daftar.', 'Hapus', true))) return;
+  if (await simpan(fb.fsM.deleteDoc(dok('cctv', id)), 'Kamera dihapus.')) tutupSheet();
+}
+
+// ---------------------------------------------------------------------------
+// PEMUDA KREATIF — warga mengirim, tampil setelah disetujui pengurus
+// ---------------------------------------------------------------------------
+function renderPemuda() {
+  const list = S.pemuda.filter((p) => p.status === 'Tampil' || isAdmin()).sort((a, b) => (a.status === b.status ? 0 : a.status === 'Menunggu' ? -1 : 1) || b.id - a.id);
+  $('#pemuda-list').innerHTML = list.length ? list.map((p) => {
+    const url = amanUrl(p.link), st = p.status === 'Tampil' ? 'Tampil' : 'Menunggu';
+    return `<div class="pos">
+      <div class="baris antara"><span class="st" style="background:#FEF9C3;color:#854D0E">${esc(JENIS_PEMUDA.includes(p.jenis) ? p.jenis : 'Karya')}</span>${isAdmin() ? `<span class="st st-${st}">${st === 'Tampil' ? 'Tampil' : 'Menunggu persetujuan'}</span>` : ''}</div>
+      <b style="display:block;font-size:16px;margin-top:8px;overflow-wrap:anywhere">${esc(p.judul)}</b>
+      <p class="redup kecil" style="margin:2px 0 0"><i class="fa-solid fa-user"></i> ${esc(p.pembuat || 'Pemuda RT 01')} · ${esc(p.tanggal || '')}</p>
+      <p class="teks">${esc(p.deskripsi)}</p>
+      <div class="baris" style="margin-top:10px">
+        ${url ? `<a class="btn kecil oranye" href="${esc(url)}" target="_blank" rel="noopener noreferrer nofollow"><i class="fa-solid fa-arrow-up-right-from-square"></i> Buka tautan</a>` : ''}
+        ${isAdmin() && st === 'Menunggu' ? `<button class="btn kecil hijau" data-act="setujui-pemuda" data-id="${p.id}"><i class="fa-solid fa-check"></i> Setujui</button>` : ''}
+        ${isAdmin() ? `<button class="btn kecil lembut" data-act="hapus-pemuda" data-id="${p.id}" style="color:var(--merah)"><i class="fa-solid fa-trash"></i> Hapus</button>` : ''}
+      </div>
+      ${url ? `<p class="bantu">${esc(new URL(url).hostname)}</p>` : ''}
+    </div>`;
+  }).join('') : '<div class="kosong">Belum ada karya. Jadilah yang pertama berbagi ide atau karyamu!</div>';
+}
+function formPemuda() {
+  bukaSheet('Kirim karya / ide', `
+    <form id="f">
+      <div class="grid2">
+        <div class="fld"><label class="lbl" for="f-jn">Jenis</label><select id="f-jn" class="inp">${JENIS_PEMUDA.map((x) => `<option>${x}</option>`).join('')}</select></div>
+        <div class="fld"><label class="lbl" for="f-p">Nama pembuat</label><input id="f-p" class="inp" maxlength="60" required placeholder="Nama / kelompok"></div>
+      </div>
+      <div class="fld"><label class="lbl" for="f-j">Judul</label><input id="f-j" class="inp" maxlength="100" required placeholder="Contoh: Video profil kampung"></div>
+      <div class="fld"><label class="lbl" for="f-d">Ceritakan singkat</label><textarea id="f-d" class="inp" maxlength="1000" required rows="4"></textarea></div>
+      <div class="fld"><label class="lbl" for="f-u">Tautan (opsional)</label><input id="f-u" class="inp" type="url" maxlength="300" placeholder="https://youtube.com/…">
+        <p class="bantu">Tautan harus https. Karya akan dicek pengurus sebelum tampil.</p></div>
+      <div class="sheet-kaki"><button type="button" class="btn lembut" data-act="tutup-sheet">Batal</button><button class="btn oranye"><i class="fa-solid fa-paper-plane"></i> Kirim</button></div>
+    </form>`, (root) => {
+    formSubmit(root, async () => {
+      const judul = bersihTeks($('#f-j', root).value, 100), pembuat = bersihTeks($('#f-p', root).value, 60), deskripsi = bersihTeks($('#f-d', root).value, 1000);
+      const linkMentah = $('#f-u', root).value.trim(), link = linkMentah ? amanUrl(linkMentah) : '';
+      if (!judul || !pembuat || !deskripsi) return info('Data belum lengkap', 'Isi nama pembuat, judul, dan cerita singkat.');
+      if (linkMentah && (!link || link.length > 300)) return info('Tautan tidak valid', 'Tautan harus diawali https:// dan tidak terlalu panjang.');
+      const id = idBaru();
+      const data = { id, jenis: $('#f-jn', root).value, judul, pembuat, deskripsi, link, status: 'Menunggu', tanggal: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }).slice(0, 40) };
+      if (await simpan(fb.fsM.setDoc(dok('pemuda', id), data), 'Terkirim! Karyamu akan tampil setelah disetujui pengurus.')) tutupSheet();
+    });
+  });
+}
+async function setujuiPemuda(id) {
+  await simpan(fb.fsM.updateDoc(dok('pemuda', id), { status: 'Tampil' }), 'Karya ditampilkan.');
+}
+async function hapusPemuda(id) {
+  if (!(await konfirmasi('Hapus karya?', 'Karya ini akan dihapus permanen.', 'Hapus', true))) return;
+  await simpan(fb.fsM.deleteDoc(dok('pemuda', id)), 'Karya dihapus.');
 }
 
 function detailRencana(id) {
@@ -776,10 +1055,11 @@ async function hapusRencana(id) {
 }
 
 function formAspirasi() {
-  bukaSheet('Tulis aspirasi', `
+  bukaSheet('Tulis aduan / usulan', `
     <form id="f">
+      <div class="fld"><label class="lbl" for="f-k">Jenis</label><select id="f-k" class="inp">${KATEGORI_ADUAN.map((k) => `<option>${esc(k)}</option>`).join('')}</select></div>
       <div class="fld"><label class="lbl" for="f-n">Nama (boleh dikosongkan)</label><input id="f-n" class="inp" maxlength="60" placeholder="Anonim"></div>
-      <div class="fld"><label class="lbl" for="f-t">Kritik, saran, atau usulan</label><textarea id="f-t" class="inp" maxlength="1000" required rows="5"></textarea>
+      <div class="fld"><label class="lbl" for="f-t">Isi aduan / usulan</label><textarea id="f-t" class="inp" maxlength="1000" required rows="5"></textarea>
         <p class="bantu" id="f-hitung">0 / 1000</p></div>
       <div class="sheet-kaki"><button type="button" class="btn lembut" data-act="tutup-sheet">Batal</button><button class="btn"><i class="fa-solid fa-paper-plane"></i> Kirim</button></div>
     </form>`, (root) => {
@@ -789,8 +1069,9 @@ function formAspirasi() {
       const nama = bersihTeks($('#f-n', root).value, 60) || 'Warga (Anonim)', teks = bersihTeks(t.value, 1000);
       if (!teks) return info('Aspirasi kosong', 'Tulis isi aspirasi Anda terlebih dahulu.');
       const id = idBaru();
-      const data = { id, nama, teks, tanggapan: null, tanggal: new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).slice(0, 40) };
-      if (await simpan(fb.fsM.setDoc(dok('aspirasi', id), data), 'Aspirasi terkirim. Terima kasih!')) tutupSheet();
+      const kategori = KATEGORI_ADUAN.includes($('#f-k', root).value) ? $('#f-k', root).value : 'Lainnya';
+      const data = { id, nama, teks, kategori, status: 'Baru', tanggapan: null, tanggal: new Date().toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }).slice(0, 40) };
+      if (await simpan(fb.fsM.setDoc(dok('aspirasi', id), data), 'Aduan terkirim. Terima kasih!')) tutupSheet();
     });
   });
 }
@@ -799,19 +1080,21 @@ function formTanggapan(id) {
   bukaSheet('Tanggapan pengurus', `
     <form id="f">
       <p class="redup kecil" style="margin-top:0;white-space:pre-line;overflow-wrap:anywhere">“${esc(a.teks)}”</p>
+      <div class="fld"><label class="lbl" for="f-st">Status</label><select id="f-st" class="inp">${STATUS_ADUAN.map((s) => `<option ${statusAduan(a) === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
       <div class="fld"><label class="lbl" for="f-t">Tanggapan</label><textarea id="f-t" class="inp" maxlength="1000" rows="4">${esc(a.tanggapan || '')}</textarea>
         <p class="bantu">Kosongkan lalu simpan untuk menghapus tanggapan.</p></div>
       <div class="sheet-kaki"><button type="button" class="btn lembut" data-act="tutup-sheet">Batal</button><button class="btn">Simpan tanggapan</button></div>
     </form>`, (root) => {
     formSubmit(root, async () => {
       const tanggapan = bersihTeks($('#f-t', root).value, 1000) || null;
-      if (await simpan(fb.fsM.updateDoc(dok('aspirasi', a.id), { tanggapan }), 'Tanggapan disimpan.')) tutupSheet();
+      const status = STATUS_ADUAN.includes($('#f-st', root).value) ? $('#f-st', root).value : 'Baru';
+      if (await simpan(fb.fsM.updateDoc(dok('aspirasi', a.id), { tanggapan, status }), 'Tanggapan disimpan.')) tutupSheet();
     });
   });
 }
 async function hapusAspirasi(id) {
-  if (!(await konfirmasi('Hapus aspirasi?', 'Aspirasi ini akan dihapus permanen.', 'Hapus', true))) return;
-  await simpan(fb.fsM.deleteDoc(dok('aspirasi', id)), 'Aspirasi dihapus.');
+  if (!(await konfirmasi('Hapus aduan?', 'Aduan ini akan dihapus permanen.', 'Hapus', true))) return;
+  await simpan(fb.fsM.deleteDoc(dok('aspirasi', id)), 'Aduan dihapus.');
 }
 
 // ---------------------------------------------------------------------------
@@ -1137,7 +1420,7 @@ function siapkanPWA() {
     l.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
     document.head.appendChild(l);
   } catch (e) { /* abaikan */ }
-  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); promptPasang = e; if (S.tab === 'info') renderInfo(); });
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); promptPasang = e; if (S.tab === 'profil') renderProfil(); });
   window.addEventListener('appinstalled', () => { promptPasang = null; toast('E-Ronda terpasang di layar utama.'); });
 }
 
@@ -1148,7 +1431,7 @@ const AKSI = {
   'mode-login': (el) => setModeLogin(el.dataset.mode),
   keluar: () => keluar(),
   tab: (el) => gantiTab(el.dataset.tab),
-  goto: (el) => gantiTab(el.dataset.tab, el.dataset.sub),
+  goto: (el) => gantiTab(el.dataset.tab, el.dataset.sub, el.dataset.scroll),
   sub: (el) => { S.sub[el.dataset.view] = el.dataset.sub; renderTab(); },
   filter: (el) => { S.filter[el.dataset.f] = el.dataset.v; renderTab(); },
   'buka-presensi': (el) => { S.presensiTgl = el.dataset.tgl === 'hari-ini' ? ymd() : el.dataset.tgl; gantiTab('ronda', 'presensi'); },
@@ -1157,6 +1440,7 @@ const AKSI = {
   'lihat-foto': (el) => {
     const i = num(el.dataset.idx);
     if (el.dataset.sumber === 'presensi') lihatFoto(fotoPresensi(S.presensiTgl)[i]);
+    else if (el.dataset.sumber === 'kegiatan') { const k = S.kegiatan.find((x) => x.id === num(el.dataset.id)); if (k) lihatFoto(fotoKeg(k)[i]); }
     else { const m = S.mutasi.find((x) => x.id === num(el.dataset.id)); if (m && Array.isArray(m.bukti)) lihatFoto(m.bukti.filter(imgAman)[i]); }
   },
   'hapus-foto-presensi': (el) => hapusFotoPresensi(num(el.dataset.idx)),
@@ -1186,10 +1470,22 @@ const AKSI = {
   'aspirasi-baru': () => formAspirasi(),
   tanggapi: (el) => formTanggapan(num(el.dataset.id)),
   'hapus-aspirasi': (el) => hapusAspirasi(num(el.dataset.id)),
-  'pasang-app': async () => { if (!promptPasang) return; promptPasang.prompt(); await promptPasang.userChoice; promptPasang = null; renderInfo(); }
+  'edit-visi': () => formVisi(),
+  'edit-pengurus': () => formPengurus(),
+  'detail-kegiatan': (el) => detailKegiatan(num(el.dataset.id)),
+  'kegiatan-baru': () => formKegiatan(null),
+  'edit-kegiatan': (el) => formKegiatan(num(el.dataset.id)),
+  'hapus-kegiatan': (el) => hapusKegiatan(num(el.dataset.id)),
+  'cctv-baru': () => formCctv(null),
+  'edit-cctv': (el) => formCctv(num(el.dataset.id)),
+  'hapus-cctv': (el) => hapusCctv(num(el.dataset.id)),
+  'pemuda-baru': () => formPemuda(),
+  'setujui-pemuda': (el) => setujuiPemuda(num(el.dataset.id)),
+  'hapus-pemuda': (el) => hapusPemuda(num(el.dataset.id)),
+  'pasang-app': async () => { if (!promptPasang) return; promptPasang.prompt(); await promptPasang.userChoice; promptPasang = null; renderProfil(); }
 };
 // Aksi yang hanya untuk pengurus (tetap diblokir server lewat firestore.rules)
-const AKSI_ADMIN = new Set(['warga-baru', 'edit-warga', 'hapus-warga', 'kelola-tipe', 'hapus-tipe', 'bayar-denda', 'edit-denda', 'hapus-denda', 'nota-wa', 'mutasi-baru', 'edit-mutasi', 'hapus-mutasi', 'sesuaikan-saldo', 'deposit-baru', 'edit-deposit', 'cetak', 'rencana-baru', 'edit-rencana', 'hapus-rencana', 'tanggapi', 'hapus-aspirasi', 'hapus-foto-presensi', 'presensi']);
+const AKSI_ADMIN = new Set(['warga-baru', 'edit-warga', 'hapus-warga', 'kelola-tipe', 'hapus-tipe', 'bayar-denda', 'edit-denda', 'hapus-denda', 'nota-wa', 'mutasi-baru', 'edit-mutasi', 'hapus-mutasi', 'sesuaikan-saldo', 'deposit-baru', 'edit-deposit', 'cetak', 'rencana-baru', 'edit-rencana', 'hapus-rencana', 'tanggapi', 'hapus-aspirasi', 'hapus-foto-presensi', 'presensi', 'edit-visi', 'edit-pengurus', 'kegiatan-baru', 'edit-kegiatan', 'hapus-kegiatan', 'cctv-baru', 'edit-cctv', 'hapus-cctv', 'setujui-pemuda', 'hapus-pemuda']);
 
 function pasangEvent() {
   document.addEventListener('click', (e) => {
