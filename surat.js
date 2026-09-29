@@ -9,10 +9,11 @@ const TINGGI_SETENGAH_A4_MM = 148.5;
 const MM_KE_PX = 96 / 25.4;
 
 // Isian kop & pejabat yang diingat di perangkat ini (BUKAN data warga).
-const KOLOM_PENGATURAN = ['s-kab','s-kec','s-desa','s-rt','s-rw','s-ketuart','s-ketuarw','s-kertas'];
+const KOLOM_PENGATURAN = ['s-kab','s-kec','s-desa','s-rt','s-rw','s-rwangka','s-ketuart','s-ketuarw','s-kertas'];
 
 const $ = (id) => document.getElementById(id);
 let pemicu = null;
+let sampaiManual = false; // true bila pengurus mengubah tanggal "sampai" sendiri
 
 /* ---------- util ---------- */
 function tanggalIndo(iso) {
@@ -20,6 +21,20 @@ function tanggalIndo(iso) {
   const [y, m, d] = iso.split('-').map(Number);
   if (m < 1 || m > 12 || d < 1 || d > 31) return '';
   return `${d} ${BULAN[m - 1]} ${y}`;
+}
+function tambahBulan(iso) {
+  // +1 bulan; tanggal 31 Jan -> 28/29 Feb (tidak melompat ke bulan berikutnya)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return '';
+  let [y, m, d] = iso.split('-').map(Number);
+  m += 1;
+  if (m > 12) { m = 1; y += 1; }
+  d = Math.min(d, new Date(y, m, 0).getDate());
+  const p = (x) => String(x).padStart(2, '0');
+  return `${y}-${p(m)}-${p(d)}`;
+}
+function isiMasaBerlaku() {
+  if (!$('s-dari').value) $('s-dari').value = hariIni();
+  if (!sampaiManual) $('s-sampai').value = tambahBulan($('s-dari').value);
 }
 function hariIni() {
   const n = new Date();
@@ -60,6 +75,7 @@ function buka(tombol) {
   $('surat').hidden = false;
   document.body.classList.add('surat-terbuka');
   if (!$('s-tgl').value) $('s-tgl').value = hariIni();
+  isiMasaBerlaku();
   $('surat').scrollTop = 0;
   $('s-nama').focus({ preventScroll: true });
 }
@@ -75,6 +91,8 @@ function kosongkan() {
   }
   $('s-warga').value = 'Indonesia';
   $('s-tgl').value = hariIni();
+  sampaiManual = false;
+  isiMasaBerlaku();
   $('surat-err').textContent = '';
   $('s-nama').focus();
 }
@@ -84,7 +102,7 @@ function ambilData() {
   const angka = (id) => baca(id).replace(/\s+/g, '');
   const d = {
     kab: baca('s-kab'), kec: baca('s-kec'), desa: baca('s-desa'),
-    rt: baca('s-rt'), rw: baca('s-rw'),
+    rt: baca('s-rt'), rw: baca('s-rw'), rwAngka: baca('s-rwangka'),
     ketuaRT: baca('s-ketuart'), ketuaRW: baca('s-ketuarw'),
     kertas: ['14x18', 'a4'].includes($('s-kertas').value) ? $('s-kertas').value : 'setengah',
     nomor: baca('s-nomor'), tgl: $('s-tgl').value,
@@ -150,7 +168,7 @@ function bangunSurat(d) {
   else bukti.append('KK No. ', isian(d.kk, '38mm'), '  KTP No. ', isian(d.ktp, '38mm'));
   const perlu = d.perlu
     ? el('div', 'sc-perlu', d.perlu)
-    : (() => { const w = document.createElement('div'); w.append(isian('', w(70)), el('br'), isian('', w(70))); return w; })();
+    : (() => { const wadah = document.createElement('div'); wadah.append(isian('', w(70)), el('br'), isian('', w(70))); return wadah; })();
 
   tb.append(
     baris('Nama', isian(d.nama, w(70))),
@@ -178,9 +196,9 @@ function bangunSurat(d) {
   const kiri = el('div', 'sc-kol');
   kiri.append(el('div', null, 'Pemegang Surat'), el('div', 'sc-ruang'), el('div', 'sc-nama', d.nama));
   const tengah = el('div', 'sc-kol');
-  tengah.append(el('div', null, 'Mengetahui'), el('div', null, `Ketua RW ${d.rw || '..'}`), el('div', 'sc-ruang'), el('div', 'sc-nama', d.ketuaRW || '\u00A0'));
+  tengah.append(el('div', null, 'Mengetahui'), el('div', null, `Ketua RW.${d.rwAngka || '..'}`), el('div', 'sc-ruang'), el('div', 'sc-nama', d.ketuaRW || '\u00A0'));
   const kanan = el('div', 'sc-kol');
-  kanan.append(el('div', null, `${d.desa || '........'}, ${tanggalIndo(d.tgl) || '..............'}`), el('div', null, `Ketua RT ${d.rt || '..'}`), el('div', 'sc-ruang'), el('div', 'sc-nama', d.ketuaRT || '\u00A0'));
+  kanan.append(el('div', null, `${d.desa || '........'}, ${tanggalIndo(d.tgl) || '..............'}`), el('div', null, `Ketua RT.${d.rt || '..'}`), el('div', 'sc-ruang'), el('div', 'sc-nama', d.ketuaRT || '\u00A0'));
   ttd.append(kiri, tengah, kanan);
 
   lembar.append(kop, judul, pembuka, tabel, berlaku, penutup, rw, ttd);
@@ -246,6 +264,8 @@ function mulai() {
     else if (aksi === 'cetak') cetak();
     else if (aksi === 'kosongkan') kosongkan();
   });
+  $('s-dari').addEventListener('input', isiMasaBerlaku);
+  $('s-sampai').addEventListener('input', () => { sampaiManual = true; });
   $('surat-form').addEventListener('submit', (e) => { e.preventDefault(); cetak(); });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !$('surat').hidden) tutup();
