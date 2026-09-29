@@ -291,9 +291,17 @@
   #surat-cetak .sc-kosong{border-bottom:1px dotted #000;height:1em;vertical-align:bottom}
   #surat-cetak .sc-perlu{white-space:pre-wrap;overflow-wrap:anywhere;max-width:135mm}
   #surat-cetak .sc-rw{margin:1.5mm 0 0 34mm}
-  #surat-cetak .sc-ttd{display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;margin-top:1mm}
+  #surat-cetak .sc-ttd{display:grid;grid-template-columns:.85fr .85fr 1.3fr;text-align:center;margin-top:1mm}
+  #surat-cetak .sc-kol{display:flex;flex-direction:column;align-items:center}
   #surat-cetak .sc-ruang{height:11mm}
-  #surat-cetak .sc-nama{font-weight:700;text-decoration:underline;min-height:1.2em}
+  #surat-cetak .sc-nama{font-weight:700;text-decoration:underline;min-height:1.2em;margin-top:auto}
+  #surat-cetak[data-kertas="14x18"]{width:140mm;height:180mm;padding:9.5mm 10mm;position:relative}
+  #surat-cetak[data-kertas="14x18"]::after{content:"";position:absolute;inset:5mm;border:0.5mm solid #000;pointer-events:none}
+  #surat-cetak[data-kertas="14x18"] .sc-tabel{margin-left:2mm}
+  #surat-cetak[data-kertas="14x18"] .sc-tabel td:nth-child(1){width:31mm}
+  #surat-cetak[data-kertas="14x18"] .sc-perlu{max-width:78mm}
+  #surat-cetak[data-kertas="14x18"] .sc-rw{margin-left:0}
+  #surat-cetak[data-kertas="14x18"] .sc-ruang{height:14mm}
   @media print{
     body.cetak-surat>*{display:none!important}
     body.cetak-surat>#surat-cetak{display:block!important}
@@ -640,7 +648,7 @@
         </div>
         <p class="bantu" style="margin:-4px 0 12px">Nomor &amp; tanggal RW boleh dikosongkan; akan dicetak titik-titik untuk diisi RW.</p>
         <div class="sf-grup"><label class="lbl" for="s-kertas">Ukuran kertas</label>
-          <select id="s-kertas" class="inp"><option value="setengah">Setengah A4 (210 × 148,5 mm)</option><option value="a4">A4 penuh (surat di bagian atas, dipotong sendiri)</option></select></div>
+          <select id="s-kertas" class="inp"><option value="14x18">14 × 18 cm, berbingkai</option><option value="setengah">Setengah A4 (210 × 148,5 mm)</option><option value="a4">A4 penuh (surat di bagian atas, dipotong sendiri)</option></select></div>
       </details>
 
       <p id="surat-err" class="err" role="alert"></p>

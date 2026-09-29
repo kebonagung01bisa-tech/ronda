@@ -86,7 +86,7 @@ function ambilData() {
     kab: baca('s-kab'), kec: baca('s-kec'), desa: baca('s-desa'),
     rt: baca('s-rt'), rw: baca('s-rw'),
     ketuaRT: baca('s-ketuart'), ketuaRW: baca('s-ketuarw'),
-    kertas: $('s-kertas').value === 'a4' ? 'a4' : 'setengah',
+    kertas: ['14x18', 'a4'].includes($('s-kertas').value) ? $('s-kertas').value : 'setengah',
     nomor: baca('s-nomor'), tgl: $('s-tgl').value,
     rwNomor: baca('s-rw-nomor'), rwTgl: $('s-rw-tgl').value,
     nama: baca('s-nama'), tempat: baca('s-tempat'), tglLahir: $('s-tgllahir').value,
@@ -123,6 +123,8 @@ function bangunSurat(d) {
   const lembar = $('surat-cetak');
   lembar.replaceChildren();
   lembar.dataset.kertas = d.kertas;
+  const sempit = d.kertas === '14x18';            // kertas 14 × 18 cm: lebih sempit, isian diperpendek
+  const w = (mm) => `${Math.round(mm * (sempit ? 0.72 : 1))}mm`;
 
   const kop = el('div', 'sc-kop');
   const namaKab = d.kab ? `Pemerintah Kabupaten ${d.kab}` : 'Pemerintah Kabupaten';
@@ -144,17 +146,18 @@ function bangunSurat(d) {
   const tinggal = document.createElement('div');
   tinggal.append(el('div', null, `RT ${d.rt || '.....'} /RW ${d.rw || '..'}`), el('div', null, `Desa ${d.desa || '.....'}`));
   const bukti = document.createElement('span');
-  bukti.append('KK No. ', isian(d.kk, '38mm'), '  KTP No. ', isian(d.ktp, '38mm'));
+  if (sempit) bukti.append('KK No. ', isian(d.kk, '48mm'), el('br'), 'KTP No. ', isian(d.ktp, '48mm'));
+  else bukti.append('KK No. ', isian(d.kk, '38mm'), '  KTP No. ', isian(d.ktp, '38mm'));
   const perlu = d.perlu
     ? el('div', 'sc-perlu', d.perlu)
-    : (() => { const w = document.createElement('div'); w.append(isian('', '70mm'), el('br'), isian('', '70mm')); return w; })();
+    : (() => { const w = document.createElement('div'); w.append(isian('', w(70)), el('br'), isian('', w(70))); return w; })();
 
   tb.append(
-    baris('Nama', isian(d.nama, '70mm')),
-    baris('Tempat/ tgl. Lahir', isian(lahir, '70mm')),
-    baris('Kewarganegaraan', isian(d.warga, '70mm')),
-    baris('Agama', isian(d.agama, '70mm')),
-    baris('Pekerjaan', isian(d.kerja, '70mm')),
+    baris('Nama', isian(d.nama, w(70))),
+    baris('Tempat/ tgl. Lahir', isian(lahir, w(70))),
+    baris('Kewarganegaraan', isian(d.warga, w(70))),
+    baris('Agama', isian(d.agama, w(70))),
+    baris('Pekerjaan', isian(d.kerja, w(70))),
     baris('Status', isian(status)),
     baris('Tempat tinggal', tinggal),
     baris('Surat bukti diri', bukti),
@@ -163,7 +166,7 @@ function bangunSurat(d) {
   tabel.append(tb);
 
   const berlaku = el('p', 'sc-p');
-  berlaku.append('Surat ini berlaku mulai tanggal ', isian(tanggalIndo(d.dari), '32mm'), ' sd ', isian(tanggalIndo(d.sampai), '32mm'));
+  berlaku.append('Surat ini berlaku mulai tanggal ', isian(tanggalIndo(d.dari), w(32)), ' sd ', isian(tanggalIndo(d.sampai), w(32)));
   berlaku.append(el('br'), 'Dan hanya berlaku sampai tingkat Desa.');
 
   const penutup = el('p', 'sc-p', 'Demikian agar dapat digunakan sebagaimana mestinya, dan bagi yang berkepentingan harap maklum.');
@@ -214,15 +217,15 @@ function cetak() {
   bangunSurat(d);
   const muat = sesuaikanUkuran();
   if (!muat) {
-    $('surat-err').textContent = 'Isi terlalu panjang untuk setengah halaman. Persingkat bagian "Keperluan".';
+    $('surat-err').textContent = 'Isi terlalu panjang untuk satu lembar. Persingkat bagian "Keperluan".';
     return;
   }
 
   bersihkanCetak();
   gayaHalaman = document.createElement('style');
-  gayaHalaman.textContent = d.kertas === 'a4'
-    ? '@page{size:A4 portrait;margin:0}'
-    : `@page{size:210mm ${TINGGI_SETENGAH_A4_MM}mm;margin:0}`;
+  if (d.kertas === 'a4') gayaHalaman.textContent = '@page{size:A4 portrait;margin:0}';
+  else if (d.kertas === '14x18') gayaHalaman.textContent = '@page{size:140mm 180mm;margin:0}';
+  else gayaHalaman.textContent = `@page{size:210mm ${TINGGI_SETENGAH_A4_MM}mm;margin:0}`;
   document.head.append(gayaHalaman);
   document.body.classList.add('cetak-surat');
   window.addEventListener('afterprint', bersihkanCetak, { once: true });
