@@ -23,7 +23,7 @@
   base-uri 'none';
   form-action 'none';
 ">
-<title>E-Ronda RT 01 / RW 05 KebonAgung</title>
+<title>Warga Kebon Agung RT01/05 – Jatinegara, Sempor, Kebumen, Jawa Tengah</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
@@ -67,8 +67,8 @@
   .top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top));background:var(--malam);color:#fff}
   .top img{width:36px;height:36px;object-fit:contain;background:#fff;border-radius:10px;padding:3px}
   .top .nama{flex:1;min-width:0;line-height:1.2}
-  .top .nama b{display:block;font-size:16px}
-  .top .nama span{font-size:12px;opacity:.8}
+  .top .nama b{display:block;font-size:15px;letter-spacing:.01em}
+  .top .nama span{display:block;font-size:11px;line-height:1.25;opacity:.8}
   .peran{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.16)}
   .peran.admin{background:var(--lampu);color:#fff}
   .ikon-btn{background:none;border:0;color:inherit;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:18px}
@@ -274,6 +274,8 @@
   textarea.inp{resize:vertical;min-height:72px}
   .sf-aksi{display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-top:18px}
 
+  .badge-n{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--merah);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;border:2px solid var(--kartu);line-height:1}
+
   /* Lembar cetak (tersembunyi di layar, hanya tampil saat mencetak) */
   #surat-cetak{display:none;box-sizing:border-box;width:210mm;height:148.5mm;padding:6mm 14mm 5mm;background:#fff;color:#000;overflow:hidden;
     font-family:"Times New Roman",Times,serif;font-size:10pt;line-height:1.25}
@@ -316,7 +318,7 @@
 <div id="boot" class="boot">
   <div>
     <img src="https://i.ibb.co.com/21BpG3JY/RT-01.png" alt="">
-    <p id="boot-msg">Memuat E-Ronda…</p>
+    <p id="boot-msg">Memuat aplikasi…</p>
     <button id="boot-ulang" class="btn lembut" hidden style="margin-top:14px">Muat ulang</button>
   </div>
 </div>
@@ -326,8 +328,8 @@
   <div class="login-box">
     <header>
       <img src="https://i.ibb.co.com/21BpG3JY/RT-01.png" alt="Logo RT 01">
-      <h1>E-Ronda RT 01</h1>
-      <p>RW 05 KebonAgung</p>
+      <h1>WARGA KEBON AGUNG</h1>
+      <p>RT01/05 Jatinegara, Sempor, Kebumen, Jawa Tengah</p>
     </header>
     <div class="seg" role="tablist" aria-label="Masuk sebagai">
       <button type="button" role="tab" data-act="mode-login" data-mode="warga" aria-selected="true">Warga</button>
@@ -347,7 +349,7 @@
 <div id="app" class="app" hidden>
   <header class="top">
     <img src="https://i.ibb.co.com/21BpG3JY/RT-01.png" alt="">
-    <div class="nama"><b>E-Ronda RT 01</b><span>RW 05 KebonAgung</span></div>
+    <div class="nama"><b>WARGA KEBON AGUNG</b><span>RT01/05 Jatinegara, Sempor, Kebumen, Jawa Tengah</span></div>
     <span id="peran" class="peran">Warga</span>
     <button class="ikon-btn" data-act="keluar" aria-label="Keluar"><i class="fa-solid fa-right-from-bracket"></i></button>
   </header>
@@ -370,7 +372,7 @@
         <button data-act="goto" data-tab="profil" data-scroll="sec-pengurus"><span class="ikon" style="--c:#4F46E5"><i class="fa-solid fa-user-tie"></i></span>Pengurus</button>
         <button data-act="goto" data-tab="kas" data-sub="deposit"><span class="ikon" style="--c:#0D9488"><i class="fa-solid fa-piggy-bank"></i></span>Deposit</button>
         <button data-act="goto" data-tab="profil" data-scroll="sec-aturan"><span class="ikon" style="--c:#7C3AED"><i class="fa-solid fa-scale-balanced"></i></span>Aturan</button>
-        <button type="button" data-surat="buka" class="admin-only"><span class="ikon" style="--c:#0EA5E9"><i class="fa-solid fa-file-signature"></i></span>Surat pengantar</button>
+        <button type="button" data-surat="menu"><span class="ikon" style="--c:#0EA5E9;position:relative"><i class="fa-solid fa-file-signature"></i><span id="surat-badge" class="badge-n" hidden aria-label="Permintaan baru"></span></span><span id="surat-label">Surat pengantar</span></button>
       </nav>
       <a class="wa-strip" href="https://wa.me/6285157467216" target="_blank" rel="noopener noreferrer">
         <i class="fa-brands fa-whatsapp"></i><span>Hubungi Pak RT<small>Tanya PIN, lapor darurat, atau konsultasi</small></span>
@@ -592,10 +594,21 @@
 
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
-<!-- Surat keterangan/pengantar (form + lembar cetak). Logika ada di surat.js -->
+<!-- Surat: daftar permintaan warga (pengurus). Logika ada di surat.js -->
+<section id="surat-daftar" class="surat-lapis" aria-labelledby="sd-judul" hidden>
+  <div class="surat-isi">
+    <div class="kembali"><button type="button" class="ikon-btn" data-surat="tutup-daftar" aria-label="Kembali"><i class="fa-solid fa-arrow-left"></i></button><h1 id="sd-judul">Permintaan surat</h1></div>
+    <div id="sd-ingat" class="banner oranye" style="margin-bottom:12px" hidden><i class="fa-solid fa-triangle-exclamation"></i>
+      <div><p id="sd-ingat-teks"></p><button type="button" class="btn kecil" data-surat="hapus-selesai" style="margin-top:8px"><i class="fa-solid fa-trash"></i> Hapus semua yang sudah selesai</button></div></div>
+    <button type="button" class="btn full lembut" data-surat="manual" style="margin-bottom:12px"><i class="fa-solid fa-file-pen"></i> Buat surat manual (tanpa permintaan warga)</button>
+    <div id="sd-list" class="daftar"></div>
+  </div>
+</section>
+<!-- Surat keterangan/pengantar: form pengurus + lembar cetak. Logika ada di surat.js -->
 <section id="surat" class="surat-lapis" aria-labelledby="surat-judul" hidden>
   <div class="surat-isi">
     <div class="kembali"><button type="button" class="ikon-btn" data-surat="tutup" aria-label="Kembali"><i class="fa-solid fa-arrow-left"></i></button><h1 id="surat-judul">Surat keterangan/pengantar</h1></div>
+    <div id="surat-sumber" class="banner info" style="margin-bottom:12px" hidden><i class="fa-solid fa-circle-info"></i><p>Data dari permintaan warga sudah terisi. Lengkapi nomor surat, tanggal, dan masa berlaku, lalu cetak. Setelah dicetak kartu permintaan ditandai selesai.</p></div>
     <form id="surat-form" autocomplete="off" novalidate>
 
       <div class="sf-judul">Data pemohon</div>
@@ -640,6 +653,7 @@
           <div><label class="lbl" for="s-rt">RT</label><input id="s-rt" class="inp" type="text" maxlength="4" value="01"></div>
           <div><label class="lbl" for="s-rw">RW</label><input id="s-rw" class="inp" type="text" maxlength="4" value="V"></div>
         </div>
+        <div class="sf-grup"><label class="lbl" for="s-rwangka">RW (angka) pada tanda tangan</label><input id="s-rwangka" class="inp" type="text" maxlength="4" value="05"></div>
         <div class="sf-grup"><label class="lbl" for="s-ketuart">Nama Ketua RT</label><input id="s-ketuart" class="inp" type="text" maxlength="60"></div>
         <div class="sf-grup"><label class="lbl" for="s-ketuarw">Nama Ketua RW</label><input id="s-ketuarw" class="inp" type="text" maxlength="60"></div>
         <div class="sf-2 sf-grup">
@@ -656,6 +670,36 @@
         <button type="button" class="btn lembut" data-surat="kosongkan"><i class="fa-solid fa-eraser"></i> Kosongkan</button>
         <button type="submit" class="btn oranye"><i class="fa-solid fa-print"></i> Cetak surat</button>
       </div>
+    </form>
+  </div>
+</section>
+<!-- Surat: form pengisian warga. Data dikirim ke pengurus (koleksi KBN01_surat). -->
+<section id="surat-warga" class="surat-lapis" aria-labelledby="sw-judul" hidden>
+  <div class="surat-isi">
+    <div class="kembali"><button type="button" class="ikon-btn" data-surat="tutup-warga" aria-label="Batal"><i class="fa-solid fa-xmark"></i></button><h1 id="sw-judul">Surat keterangan/pengantar</h1></div>
+    <div class="banner info" style="margin-bottom:12px"><i class="fa-solid fa-circle-info"></i><p>Isi data diri Anda lalu tekan <b>Kirim</b>. Ketua RT akan melengkapi dan mencetak surat. No. KK/KTP hanya bisa dilihat pengurus dan dihapus setelah surat dicetak.</p></div>
+    <form id="surat-warga-form" autocomplete="off" novalidate>
+      <div class="sf-grup"><label class="lbl" for="sw-nama">Nama lengkap</label><input id="sw-nama" class="inp" type="text" maxlength="80"></div>
+      <div class="sf-2 sf-grup">
+        <div><label class="lbl" for="sw-tempat">Tempat lahir</label><input id="sw-tempat" class="inp" type="text" maxlength="60"></div>
+        <div><label class="lbl" for="sw-tgllahir">Tanggal lahir</label><input id="sw-tgllahir" class="inp" type="date"></div>
+      </div>
+      <div class="sf-2 sf-grup">
+        <div><label class="lbl" for="sw-warga">Kewarganegaraan</label><input id="sw-warga" class="inp" type="text" maxlength="40" value="Indonesia"></div>
+        <div><label class="lbl" for="sw-agama">Agama</label>
+          <select id="sw-agama" class="inp"><option value="">— pilih —</option><option>Islam</option><option>Kristen</option><option>Katolik</option><option>Hindu</option><option>Buddha</option><option>Konghucu</option></select></div>
+      </div>
+      <div class="sf-2 sf-grup">
+        <div><label class="lbl" for="sw-kerja">Pekerjaan</label><input id="sw-kerja" class="inp" type="text" maxlength="60"></div>
+        <div><label class="lbl" for="sw-status">Status</label>
+          <select id="sw-status" class="inp"><option value="">— pilih —</option><option>Kawin</option><option>Belum Kawin</option><option>Janda</option><option>Duda</option></select></div>
+      </div>
+      <div class="sf-grup"><label class="lbl" for="sw-kk">No. KK</label><input id="sw-kk" class="inp" type="text" inputmode="numeric" maxlength="20"></div>
+      <div class="sf-grup"><label class="lbl" for="sw-ktp">No. KTP (NIK)</label><input id="sw-ktp" class="inp" type="text" inputmode="numeric" maxlength="20">
+        <p class="bantu">16 angka. Boleh dikosongkan jika ingin ditulis tangan oleh Ketua RT.</p></div>
+      <div class="sf-grup"><label class="lbl" for="sw-perlu">Keperluan</label><textarea id="sw-perlu" class="inp" maxlength="300" rows="3" placeholder="Contoh: pengurusan SKCK / surat keterangan usaha"></textarea></div>
+      <p id="sw-err" class="err" role="alert"></p>
+      <div class="sf-aksi"><button type="button" class="btn lembut" data-surat="tutup-warga">Batal</button><button id="sw-kirim" type="submit" class="btn oranye"><i class="fa-solid fa-paper-plane"></i> Kirim</button></div>
     </form>
   </div>
 </section>
