@@ -276,6 +276,13 @@
 
   .badge-n{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--merah);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;border:2px solid var(--kartu);line-height:1}
 
+  body.layanan-terbuka{overflow:hidden}
+  .sos-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .sos-grid .btn{padding:14px 10px;font-size:14px;text-align:center}
+  .ingat{display:none;align-items:center;gap:8px;margin:10px 0 0;font-size:13px;color:var(--redup)}
+  .ingat input{width:18px;height:18px;accent-color:var(--malam)}
+  .login-box:has([data-mode="admin"][aria-selected="true"]) .ingat{display:flex}
+
   /* Lembar cetak (tersembunyi di layar, hanya tampil saat mencetak) */
   #surat-cetak{display:none;box-sizing:border-box;width:210mm;height:148.5mm;padding:6mm 14mm 5mm;background:#fff;color:#000;overflow:hidden;
     font-family:"Times New Roman",Times,serif;font-size:10pt;line-height:1.25}
@@ -338,6 +345,7 @@
     <form id="form-login" autocomplete="off" novalidate>
       <label class="lbl" for="login-kode" id="login-lbl">PIN warga</label>
       <input id="login-kode" class="inp kode" type="password" inputmode="numeric" autocomplete="current-password" maxlength="64" required>
+      <label class="ingat"><input id="ingat-admin" type="checkbox"> Ingat saya di HP ini (jangan dicentang di HP bersama)</label>
       <p id="login-err" class="err" role="alert"></p>
       <button id="login-btn" class="btn full" type="submit" style="margin-top:8px">Masuk</button>
     </form>
@@ -373,6 +381,8 @@
         <button data-act="goto" data-tab="kas" data-sub="deposit"><span class="ikon" style="--c:#0D9488"><i class="fa-solid fa-piggy-bank"></i></span>Deposit</button>
         <button data-act="goto" data-tab="profil" data-scroll="sec-aturan"><span class="ikon" style="--c:#7C3AED"><i class="fa-solid fa-scale-balanced"></i></span>Aturan</button>
         <button type="button" data-surat="menu"><span class="ikon" style="--c:#0EA5E9;position:relative"><i class="fa-solid fa-file-signature"></i><span id="surat-badge" class="badge-n" hidden aria-label="Permintaan baru"></span></span><span id="surat-label">Surat pengantar</span></button>
+        <button type="button" data-layanan="darurat"><span class="ikon" style="--c:#DC2626"><i class="fa-solid fa-phone-volume"></i></span>Darurat / SOS</button>
+        <button type="button" data-layanan="tamu"><span class="ikon" style="--c:#0D9488;position:relative"><i class="fa-solid fa-house-user"></i><span id="tamu-badge" class="badge-n" hidden aria-label="Laporan baru"></span></span>Lapor tamu</button>
       </nav>
       <a class="wa-strip" href="https://wa.me/6285157467216" target="_blank" rel="noopener noreferrer">
         <i class="fa-brands fa-whatsapp"></i><span>Hubungi Pak RT<small>Tanya PIN, lapor darurat, atau konsultasi</small></span>
@@ -594,6 +604,57 @@
 
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 
+<!-- Layanan: darurat & kontak penting, lapor tamu. Logika ada di layanan.js -->
+<section id="darurat" class="surat-lapis" aria-labelledby="dr-judul" hidden>
+  <div class="surat-isi">
+    <div class="kembali"><button type="button" class="ikon-btn" data-layanan="tutup-darurat" aria-label="Kembali"><i class="fa-solid fa-arrow-left"></i></button><h1 id="dr-judul">Darurat &amp; kontak penting</h1></div>
+    <div id="darurat-isi"></div>
+  </div>
+</section>
+<section id="darurat-edit" class="surat-lapis" aria-labelledby="de-judul" hidden>
+  <div class="surat-isi">
+    <div class="kembali"><button type="button" class="ikon-btn" data-layanan="tutup-editor" aria-label="Batal"><i class="fa-solid fa-xmark"></i></button><h1 id="de-judul">Nomor darurat lokal</h1></div>
+    <p class="redup kecil" style="margin-top:0">Isi nomor Puskesmas, Polsek, dan pemadam kebakaran setempat. Nomor ini tampil untuk semua warga. Nomor 110, 113, 118, dan 112 sudah tersedia.</p>
+    <form id="darurat-edit-form" autocomplete="off" novalidate>
+      <div id="de-baris"></div>
+      <button type="button" class="btn kecil lembut" data-layanan="darurat-baris-tambah" style="margin-bottom:14px"><i class="fa-solid fa-plus"></i> Tambah nomor</button>
+      <p id="de-err" class="err" role="alert"></p>
+      <div class="sf-aksi"><button type="button" class="btn lembut" data-layanan="tutup-editor">Batal</button><button id="de-simpan" type="submit" class="btn oranye">Simpan</button></div>
+    </form>
+  </div>
+</section>
+<section id="tamu" class="surat-lapis" aria-labelledby="tm-judul" hidden>
+  <div class="surat-isi">
+    <div class="kembali"><button type="button" class="ikon-btn" data-layanan="tutup-tamu" aria-label="Kembali"><i class="fa-solid fa-arrow-left"></i></button><h1 id="tm-judul">Lapor tamu / warga baru</h1></div>
+    <div class="banner info" style="margin-bottom:12px"><i class="fa-solid fa-circle-info"></i><p>Tamu yang menginap dan warga baru wajib dilaporkan ke RT dalam <b>1&times;24 jam</b>. Daftar ini bisa dilihat semua warga (termasuk petugas ronda), jadi <b>jangan</b> menuliskan nomor KTP atau nomor HP tamu.</p></div>
+    <button type="button" class="btn full oranye" data-layanan="tamu-baru" style="margin-bottom:12px"><i class="fa-solid fa-user-plus"></i> Lapor tamu / warga baru</button>
+    <div id="tamu-list" class="daftar"></div>
+    <button id="tamu-hapus-lewat" type="button" class="btn kecil lembut" data-layanan="tamu-hapus-lewat" style="margin-top:12px;color:var(--merah)" hidden></button>
+  </div>
+</section>
+<section id="tamu-form" class="surat-lapis" aria-labelledby="tf-judul" hidden>
+  <div class="surat-isi">
+    <div class="kembali"><button type="button" class="ikon-btn" data-layanan="tutup-tamu-form" aria-label="Batal"><i class="fa-solid fa-xmark"></i></button><h1 id="tf-judul">Laporan tamu / warga baru</h1></div>
+    <form id="tamu-form-el" autocomplete="off" novalidate>
+      <div class="sf-grup"><label class="lbl" for="tf-jenis">Jenis laporan</label>
+        <select id="tf-jenis" class="inp"><option>Tamu menginap</option><option>Warga baru</option></select></div>
+      <div class="sf-grup"><label class="lbl" for="tf-nama">Nama tamu / warga baru</label><input id="tf-nama" class="inp" type="text" maxlength="80"></div>
+      <div class="sf-2 sf-grup">
+        <div><label class="lbl" for="tf-jumlah">Jumlah orang</label><input id="tf-jumlah" class="inp" type="number" min="1" max="20" inputmode="numeric" value="1"></div>
+        <div><label class="lbl" for="tf-asal">Asal (kota/desa)</label><input id="tf-asal" class="inp" type="text" maxlength="80"></div>
+      </div>
+      <div class="sf-grup"><label class="lbl" for="tf-tuan">Nama tuan rumah / pelapor</label><input id="tf-tuan" class="inp" type="text" maxlength="80" placeholder="Warga yang dikunjungi"></div>
+      <div class="sf-2 sf-grup">
+        <div><label class="lbl" for="tf-datang">Tanggal datang</label><input id="tf-datang" class="inp" type="date"></div>
+        <div><label class="lbl" for="tf-pulang">Rencana pulang</label><input id="tf-pulang" class="inp" type="date"></div>
+      </div>
+      <p class="bantu" style="margin:-4px 0 12px">Rencana pulang boleh dikosongkan untuk warga baru.</p>
+      <div class="sf-grup"><label class="lbl" for="tf-ket">Keterangan (opsional)</label><textarea id="tf-ket" class="inp" maxlength="200" rows="2" placeholder="Contoh: keluarga dari Purwokerto, menginap untuk hajatan"></textarea></div>
+      <p id="tf-err" class="err" role="alert"></p>
+      <div class="sf-aksi"><button type="button" class="btn lembut" data-layanan="tutup-tamu-form">Batal</button><button id="tf-kirim" type="submit" class="btn oranye"><i class="fa-solid fa-paper-plane"></i> Kirim laporan</button></div>
+    </form>
+  </div>
+</section>
 <!-- Surat: daftar permintaan warga (pengurus). Logika ada di surat.js -->
 <section id="surat-daftar" class="surat-lapis" aria-labelledby="sd-judul" hidden>
   <div class="surat-isi">
@@ -706,5 +767,6 @@
 <div id="surat-cetak" aria-hidden="true"></div>
 <script type="module" src="ronda.js"></script>
 <script type="module" src="surat.js"></script>
+<script type="module" src="layanan.js"></script>
 </body>
 </html>
